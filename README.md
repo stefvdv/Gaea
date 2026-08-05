@@ -1,4 +1,4 @@
-# Wildpluk v0.3.0
+# Wildpluk v0.4.0
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -19,7 +19,9 @@ Lokaal: `npx serve .` — geolocatie en service worker vragen https of localhost
     sw.js                 service worker; VERSION == APP_VERSION
     _redirects            GBIF-proxy voor Netlify
     manifest.webmanifest  PWA-manifest
-    icon-*.png            iconen
+    icon-*.png            app-iconen (dryadekop)
+    badge-96.png          monochroom silhouet voor de statusbalk-melding
+    maak_icoon.py         generator voor alle iconen, PIL op 8x met LANCZOS
 
 ## Conventies
 - APP_VERSION en sw.js VERSION altijd in lockstep.
@@ -73,6 +75,60 @@ Weging: eigen plekken > gifplanten > paddenstoelen > eerder foute antwoorden.
 ## Dagelijkse herinnering
 Periodic Background Sync (`wildpluk-dagelijks`, min. 6 u). Werkt alleen als de app
 op het startscherm staat. Chrome bepaalt het exacte moment; marge van ongeveer een uur.
+
+## Iconen
+`icon-192/512/maskable.png` zijn een dryadekop in Green Man-stijl: bladerkroon,
+schorsranken, gouden ring, op diep bosgroen. Gegenereerd door `maak_icoon.py`
+(geen SVG-rasterizer in de omgeving, dus met PIL geteakend op 8x en teruggeschaald).
+
+`badge-96.png` is apart en essentieel: Android maakt van de meldings-badge een
+silhouet en gooit alle kleur weg. Een dekkend vierkant icoon wordt dan een blok.
+De badge is daarom wit-op-transparant met marge, en het silhouet is één geheel
+(kroon en gezicht overlappen), anders valt het uiteen op 24 dp.
+
+Ook in het manifest als `purpose: monochrome`.
+
+## Betrouwbaarheid
+Store `keur`, sleutel = soortsleutel of `r:receptsleutel`.
+Vier standen: open, nagekeken, twijfel, klopt niet. Per stand een bron en notitie.
+
+Tien invoeren zijn tijdens de bouw vergeleken met externe bronnen en staan al
+ingevuld (NVIC, NMV, Het Acute Boekje, Wildpluk wiki): daslook, lelietje-van-dalen,
+herfsttijloos, gevlekte aronskelk, groene knolamaniet, weidechampignon,
+bundelmosklokje, morielje, plus witte knolamaniet en hanenkam op *twijfel*.
+De rest staat op open — dat is de eerlijke stand van zaken.
+
+Gids heeft een tabblad **Te controleren**. Instellingen exporteert de hele
+controlelijst als markdown, handig om mee naar een flora of een kenner te nemen.
+
+Giftige soorten krijgen een noodblok: huisarts of 112, zeg wat en hoeveel,
+bewaar een restant, en wacht niet op klachten.
+
+## Kaartgedrag
+- Twee vingers knijpen om te zoomen (`touchZoom`, `tap:false`, `zoomSnap:.25`).
+- Eén tik op de kaart zet een **spookpin**: gouden stippelring met een plus.
+- Hardware terug laat de spookpin vallen; dat gaat vóór het sluiten van een blad.
+- Nog een tik op de spookpin maakt de echte vondst aan.
+- Lang indrukken werkt nog steeds als kortere weg.
+
+## Kaart vullen
+Instellingen → **Vul de kaart**, of de knop in de Ontdek-kiezer.
+Resolvet eerst de taxonKeys van alle eetbare en medicinale soorten (eenmalig,
+daarna gecachet), en vraagt dan GBIF in groepen van 45 taxonKeys tegelijk —
+`occurrence/search` accepteert `taxonKey` meerdere keren als OR. Eén tot drie
+verzoeken dekken zo de hele gids voor het huidige kaartbeeld.
+
+Vraagt zoom 10 of dieper. De vulling blijft staan tot je de laag uitzet.
+
+## Ornament
+Zestien SVG-symbolen (varenkrul, zwam, gewei, vijzel, ketel, maan, jaarwiel,
+sleutel, veder, vlam, pot, oog, ster, hand, hart, blad) als sectiekoppen,
+lege-schermtekens en accenten. Krullijn onderaan elk blad, rank in beide hoeken.
+
+**Maanstand en jaarwiel** staan bovenaan Gids → Nu en bovenaan Veldschool:
+de maanfase wordt berekend uit de synodische maand vanaf de nieuwe maan van
+6 januari 2000, en het jaarwiel toont welk feest geweest is en hoeveel dagen
+tot het volgende — met wat er dan in het veld gebeurt.
 
 ## Nog te doen
 - Waarneming.nl-koppeling (API-sleutel aanvragen) voor veel dichtere NL-dekking

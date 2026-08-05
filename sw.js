@@ -1,11 +1,11 @@
 /* Wildpluk service worker — VERSION altijd gelijk aan APP_VERSION in index.html */
-const VERSION = "0.3.0";
+const VERSION = "0.4.0";
 const SHELL = "wildpluk-shell-v" + VERSION;
 const LIB   = "wildpluk-lib-v" + VERSION;
 const TILES = "wildpluk-tiles";          /* niet versiegebonden */
 const TILE_MAX = 1500;
 
-const SHELL_FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
+const SHELL_FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./badge-96.png"];
 const LIB_FILES = [
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js",
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
@@ -91,7 +91,7 @@ self.addEventListener("fetch", e => {
 
 /* ---------------- dagelijkse herinnering ---------------- */
 const openDB = () => new Promise((res, rej) => {
-  const rq = indexedDB.open("wildpluk", 3);
+  const rq = indexedDB.open("wildpluk", 4);
   rq.onsuccess = () => res(rq.result);
   rq.onerror = () => rej(rq.error);
 });
@@ -134,7 +134,7 @@ async function checkHerinnering() {
       : "Alles herhaald. Zin in een extra ronde?";
 
   return self.registration.showNotification("Tijd voor de veldschool", {
-    body, icon:"icon-192.png", badge:"icon-192.png", tag:"wildpluk-quiz", data:{scr:"leer"}
+    body, icon:"icon-192.png", badge:"badge-96.png", tag:"wildpluk-quiz", data:{scr:"leer"}
   });
 }
 

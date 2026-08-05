@@ -346,6 +346,52 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .stap .n{font-family:var(--slab);font-size:19px;font-weight:600;color:var(--goud);flex:0 0 22px;line-height:1.2}
 .stap .t{flex:1;font-size:14.5px;line-height:1.55}
 
+/* ---------- ornament en symbolen ---------- */
+.glyph{width:15px;height:15px;flex:0 0 auto;opacity:.85}
+.sec h3 .glyph{color:var(--goud);opacity:1}
+.grouphd .glyph{width:13px;height:13px;color:var(--goud)}
+.brandmark{width:26px;height:26px;flex:0 0 auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+.empty .glyph{width:52px;height:52px;color:var(--varen);opacity:.55;margin:0 auto 14px;display:block}
+.flourish{display:block;margin:20px auto 2px;width:132px;color:var(--goud);opacity:.42}
+.hoekrank{position:absolute;bottom:-4px;left:10px;width:54px;height:60px;opacity:.12;pointer-events:none;transform:scaleX(-1)}
+
+/* maanstand en jaarwiel */
+.hemel{display:flex;align-items:center;gap:11px;margin:0 12px 12px;padding:12px 14px;border-radius:16px;
+  background:linear-gradient(120deg,var(--schors),#27392A);border:1px solid var(--line);position:relative;overflow:hidden}
+.hemel:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 90% -10%,rgba(201,162,39,.16),transparent 46%)}
+.hemel .maan{width:36px;height:36px;flex:0 0 auto;position:relative}
+.hemel .t{position:relative;flex:1;min-width:0}
+.hemel .t b{display:block;font-family:var(--slab);font-size:15px;font-weight:600;font-variation-settings:'SOFT' 50}
+.hemel .t span{font-size:12px;color:var(--kalk-2)}
+.hemel .wiel{width:34px;height:34px;flex:0 0 auto;color:var(--goud);opacity:.8;position:relative}
+
+/* betrouwbaarheid */
+.keur{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;
+  padding:3px 9px;border-radius:999px;letter-spacing:.02em;white-space:nowrap}
+.k-open{background:rgba(148,161,136,.13);color:var(--kalk-2);border:1px solid var(--line)}
+.k-na{background:rgba(156,184,112,.17);color:var(--mos);border:1px solid rgba(156,184,112,.42)}
+.k-twijfel{background:rgba(217,164,65,.16);color:#E0B45F;border:1px solid rgba(217,164,65,.42)}
+.k-fout{background:rgba(168,68,58,.17);color:#D4837B;border:1px solid rgba(168,68,58,.45)}
+.keur.ink.k-open{background:rgba(44,42,31,.07);color:var(--inkt-2);border-color:rgba(44,42,31,.2)}
+.keur.ink.k-na{background:rgba(94,122,68,.15);color:#3F5624;border-color:rgba(94,122,68,.4)}
+.keur.ink.k-twijfel{background:rgba(217,164,65,.16);color:#77510F;border-color:rgba(217,164,65,.5)}
+.keur.ink.k-fout{background:rgba(168,68,58,.13);color:#8A2F27;border-color:rgba(168,68,58,.45)}
+.keurdot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.rec .keurdot{margin-left:2px}
+.nood{margin:14px 18px 0;padding:12px 14px;border-radius:12px;border:2px solid var(--meekrap);
+  background:rgba(168,68,58,.12);font-size:13.5px;color:#7C271F;line-height:1.5}
+.nood b{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:5px}
+.nood a{color:#7C271F;font-weight:700}
+
+/* spookpin */
+.spook{display:grid;place-items:center;animation:opkomen .18s ease-out}
+@keyframes opkomen{from{transform:translateY(-7px) scale(.75);opacity:0}to{transform:none;opacity:1}}
+.spookhint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--safe-b) + 140px);z-index:405;
+  background:rgba(241,233,214,.96);color:var(--inkt);padding:9px 15px;border-radius:12px;font-size:13px;
+  font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.45);display:none;max-width:82vw;text-align:center;
+  border:1px solid rgba(201,162,39,.5)}
+.spookhint.on{display:block}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -355,7 +401,7 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 <div id="vignet"></div>
 
 <header class="topbar" id="topbar">
-  <div class="brand">Wildpluk <em id="verLbl">v0.3</em></div>
+  <div class="brand" id="brandBox">Wildpluk <em id="verLbl">v0.4</em></div>
   <div class="spacer"></div>
   <button class="iconbtn" id="btnLayer" aria-label="Kaartlaag"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg></button>
   <button class="iconbtn" id="btnSet" aria-label="Instellingen"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v2.4M12 19.6V22M22 12h-2.4M4.4 12H2M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7M19.1 19.1l-1.7-1.7M6.6 6.6 4.9 4.9"/></svg></button>
@@ -410,6 +456,7 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
     <button data-v="boom">Bomen &amp; struiken</button>
     <button data-v="zwam">Paddenstoelen</button>
     <button data-v="gif">Giftig</button>
+    <button data-v="keur">Te controleren</button>
     <button data-v="alle">Alles</button>
   </div>
   <div class="searchbar"><input id="qSpec" placeholder="Zoek Nederlandse of Latijnse naam"></div>
@@ -435,8 +482,16 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   <button class="srow" id="setExportPh"><div class="t"><b>Exporteer met foto's</b><span>Groter bestand, volledig herstelbaar</span></div><span class="v">.json</span></button>
   <button class="srow" id="setImport"><div class="t"><b>Herstel uit back-up</b><span>Voegt samen, overschrijft op id</span></div><span class="v">↑</span></button>
   <button class="srow" id="setCache"><div class="t"><b>Opslag</b><span id="cacheInfo">—</span></div><span class="v">i</span></button>
+  <button class="srow" id="setVul"><div class="t"><b>Vul de kaart</b><span>Haal waarnemingen op voor dit kaartbeeld</span></div><span class="v">GBIF</span></button>
+  <button class="srow" id="setKeurExport"><div class="t"><b>Exporteer controlelijst</b><span>Alles wat je hebt nagekeken, als tekst</span></div><span class="v">.md</span></button>
   <button class="srow" id="setGbifWipe"><div class="t"><b>Leeg GBIF-cache</b><span id="gbifInfo">—</span></div><span class="v">↺</span></button>
   <button class="srow" id="setWipe"><div class="t"><b>Wis alle gegevens</b><span>Kan niet ongedaan gemaakt worden</span></div><span class="v" style="color:var(--meekrap)">!</span></button>
+  <p class="grouphd">Betrouwbaarheid</p>
+  <div class="srow" style="display:block"><div class="t" style="font-size:13px;line-height:1.6;color:var(--kalk-2)">
+    <b style="color:var(--kalk);margin-bottom:6px">Controlestatus</b>
+    <span id="keurStand" style="display:block;margin-bottom:8px">—</span>
+    <span style="display:block">Elke soort en elk recept kun je zelf een status geven: nagekeken, twijfel of fout, met de bron erbij. Een handvol soorten is al nagekeken tegen het NVIC en de NMV; de rest staat op open.</span>
+  </div></div>
   <p class="grouphd">Waar komt de informatie vandaan</p>
   <div class="srow" style="display:block"><div class="t" style="font-size:13px;line-height:1.6;color:var(--kalk-2)">
     <b style="color:var(--kalk);margin-bottom:6px">Drie soorten herkomst</b>
@@ -458,6 +513,7 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   <button data-scr="leer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 5.6C5.7 4.3 8.3 4.3 12 6c3.7-1.7 6.3-1.7 9-.4v12c-2.7-1.3-5.3-1.3-9 .4-3.7-1.7-6.3-1.7-9-.4Z"/><path d="M12 6v12"/></svg>Leren</button>
 </nav>
 
+<div class="spookhint" id="spookhint"></div>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet"><div class="grab"></div><div id="sheetBody"></div></div>
 <div class="toast" id="toast"></div>
@@ -481,7 +537,7 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.3.0";
+const APP_VERSION = "0.4.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -1161,13 +1217,14 @@ let DB = null;
 function idb(){
   if(DB) return Promise.resolve(DB);
   return new Promise((res,rej)=>{
-    const rq = indexedDB.open("wildpluk", 3);
+    const rq = indexedDB.open("wildpluk", 4);
     rq.onupgradeneeded = e=>{
       const db = e.target.result;
       ["pins","photos","maaksels"].forEach(n=>{ if(!db.objectStoreNames.contains(n)) db.createObjectStore(n,{keyPath:"id"}); });
       if(!db.objectStoreNames.contains("srs")) db.createObjectStore("srs",{keyPath:"k"});
       if(!db.objectStoreNames.contains("meta")) db.createObjectStore("meta",{keyPath:"k"});
       if(!db.objectStoreNames.contains("gbif")) db.createObjectStore("gbif",{keyPath:"q"});
+      if(!db.objectStoreNames.contains("keur")) db.createObjectStore("keur",{keyPath:"k"});
     };
     rq.onsuccess = ()=>{ DB = rq.result; res(DB); };
     rq.onerror = ()=> rej(rq.error);
@@ -1191,11 +1248,18 @@ const S = {
   map:null, tiles:null, layerK:lsGet("layer","brt"),
   markers:new Map(), ontdekLaag:null, ontdekAan:lsGet("ontdekAan",false), ontdekSoorten:lsGet("ontdekSoorten",[]),
   meMarker:null, meCircle:null, follow:false, pos:null,
-  filter:lsGet("filter",{eetbaar:true,medicinaal:true,giftig:true,zwam:true}),
+  filter:(function(){
+    /* migratie: oudere versies kenden de zwam-sleutel nog niet, undefined verbergt dan pins */
+    const d={eetbaar:true,medicinaal:true,giftig:true,zwam:true,onbekend:true};
+    const f=Object.assign({}, d, lsGet("filter",{}) || {});
+    Object.keys(d).forEach(k=>{ if(typeof f[k]!=="boolean") f[k]=true; });
+    lsSet("filter",f); return f;
+  })(),
   scr:"map", open:null, urls:new Map(),
   leer:lsGet("leer",{streak:0,laatst:null,totaal:0,doel:10}),
   push:{aan:false,tijd:"09:00",laatst:null},
   specView:"nu", kastView:"alles", kastMode:"kast", recView:"alles",
+  keur:{}, spook:null, ontdekVol:null,
   taxa:lsGet("taxa",{})   /* soortsleutel -> gbif taxonKey */
 };
 
@@ -1310,6 +1374,58 @@ async function ontdekWaarnemingen(){
   }
   return uit;
 }
+/* Vult de kaart in één beweging met waarnemingen voor alle bruikbare soorten
+   in het huidige kaartbeeld. GBIF accepteert taxonKey meerdere keren (OR). */
+async function vulKaart(){
+  if(S.map.getZoom() < 10){ toast("Zoom eerst wat verder in — anders is het te veel"); return; }
+  const kandidaten = SPECIES.filter(x=> !x.tags.includes("giftig") && x.tags.length).map(x=>x.k);
+  const onbekend = kandidaten.filter(k=>!S.taxa[k]);
+  if(onbekend.length){
+    toast("Namen opzoeken bij GBIF, "+onbekend.length+" soorten…");
+    let n=0;
+    for(const k of onbekend){
+      await taxonKey(k); n++;
+      if(n%20===0) toast("Namen opzoeken… "+n+" van "+onbekend.length);
+    }
+  }
+  const keys = kandidaten.map(k=>S.taxa[k]).filter(Boolean);
+  const omgekeerd = {};
+  kandidaten.forEach(k=>{ if(S.taxa[k]) omgekeerd[S.taxa[k]] = k; });
+  const wkt = wktVanBounds(S.map.getBounds());
+  toast("Waarnemingen ophalen…");
+  const gevonden = [];
+  for(let i=0;i<keys.length;i+=45){
+    const groep = keys.slice(i, i+45);
+    const pad = "occurrence/search?hasCoordinate=true&hasGeospatialIssue=false&limit=300"+
+      "&geometry="+encodeURIComponent(wkt)+"&"+groep.map(t=>"taxonKey="+t).join("&");
+    try{
+      const r = await gbif(pad);
+      (r.results||[]).forEach(o=>{
+        if(typeof o.decimalLatitude !== "number") return;
+        const k = omgekeerd[o.taxonKey] || omgekeerd[o.speciesKey] || omgekeerd[o.acceptedTaxonKey];
+        if(!k) return;
+        gevonden.push({k, lat:o.decimalLatitude, lng:o.decimalLongitude, jaar:o.year||null,
+          bron:o.datasetName||o.institutionCode||"GBIF",
+          onzeker:o.coordinateUncertaintyInMeters||null, id:o.key});
+      });
+    }catch(e){ /* stil verder */ }
+  }
+  S.ontdekLaag.clearLayers();
+  S.ontdekVol = gevonden;
+  S.ontdekAan = true; lsSet("ontdekAan", true);
+  document.getElementById("btnOntdek").classList.add("mos");
+  gevonden.forEach(o=>{
+    const m = L.marker([o.lat,o.lng],{icon:L.divIcon({className:"",iconSize:[13,13],iconAnchor:[6.5,6.5],
+      html:'<div class="ontdek-dot"></div>'})});
+    m.on("click", ()=> ontdekSheet(o));
+    S.ontdekLaag.addLayer(m);
+  });
+  const soorten = new Set(gevonden.map(o=>o.k)).size;
+  toast(gevonden.length ? gevonden.length+" waarnemingen · "+soorten+" soorten"
+                        : "Geen waarnemingen in dit kaartbeeld");
+  if(S.scr!=="map") go("map");
+}
+
 async function soortBeeld(k){
   const tk = await taxonKey(k); if(!tk) return [];
   try{
@@ -1358,14 +1474,27 @@ function setLayer(k){
 }
 function initMap(){
   const v = lsGet("view",{lat:52.0575,lng:5.2035,z:14});
-  S.map = L.map("map",{zoomControl:false,attributionControl:true,tap:true}).setView([v.lat,v.lng], v.z);
+  S.map = L.map("map",{
+    zoomControl:false, attributionControl:true,
+    tap:false,                    /* Leaflets eigen tap-emulatie botst met onze eigen tikafhandeling */
+    touchZoom:true,               /* knijpen met twee vingers */
+    bounceAtZoomLimits:false,
+    doubleClickZoom:true,
+    dragging:true,
+    zoomSnap:.25, zoomDelta:.5, wheelPxPerZoomLevel:110,
+    inertia:true
+  }).setView([v.lat,v.lng], v.z);
   setLayer(S.layerK);
   S.ontdekLaag = L.layerGroup().addTo(S.map);
   S.map.on("moveend zoomend", ()=>{
     const c=S.map.getCenter(); lsSet("view",{lat:c.lat,lng:c.lng,z:S.map.getZoom()});
     if(S.ontdekAan) tekenOntdek();
   });
-  S.map.on("contextmenu", e=> newPin(e.latlng.lat, e.latlng.lng, null));
+  S.map.on("contextmenu", e=> zetSpook(e.latlng.lat, e.latlng.lng));
+  S.map.on("click", e=>{
+    if(sheetEl.classList.contains("on")) return;
+    zetSpook(e.latlng.lat, e.latlng.lng);
+  });
   S.map.on("dragstart", ()=>{ if(S.follow) setFollow(false); });
 }
 function drawMarkers(){
@@ -1376,17 +1505,50 @@ function drawMarkers(){
     if(k==="eet" && !S.filter.eetbaar) return;
     if(k==="med" && !S.filter.medicinaal) return;
     if(k==="zwam" && !S.filter.zwam) return;
+    if(k==="onb" && !S.filter.onbekend) return;
     const m = L.marker([p.lat,p.lng],{icon:markerIcon(p,S.open===p.id)}).addTo(S.map);
     m.on("click", ()=>openSheet(p.id));
     S.markers.set(p.id, m);
   });
   renderChips();
 }
+/* ---------- spookpin: één tik zet een voorbeeld, nog een tik maakt hem echt ---------- */
+const spookHint = document.getElementById("spookhint");
+function spookIcon(){
+  return L.divIcon({className:"", iconSize:[34,34], iconAnchor:[17,17],
+    html:'<div class="spook"><svg width="34" height="34" viewBox="0 0 34 34">'+
+      '<circle cx="17" cy="17" r="14" fill="none" stroke="#C9A227" stroke-width="1.6" stroke-dasharray="3.4 3"/>'+
+      '<circle cx="17" cy="17" r="9.4" fill="rgba(156,184,112,.30)" stroke="#9CB870" stroke-width="1.6"/>'+
+      '<path d="M17 12.4v9.2M12.4 17h9.2" stroke="#F1E9D6" stroke-width="2.1" stroke-linecap="round"/>'+
+      '</svg></div>'});
+}
+function wisSpook(){
+  if(!S.spook) return;
+  S.map.removeLayer(S.spook.marker);
+  S.spook = null;
+  spookHint.classList.remove("on");
+}
+function zetSpook(lat, lng){
+  wisSpook();
+  const m = L.marker([lat,lng],{icon:spookIcon(), zIndexOffset:900}).addTo(S.map);
+  m.on("click", (ev)=>{
+    if(ev && ev.originalEvent) L.DomEvent.stopPropagation(ev.originalEvent);
+    const p = S.spook;
+    wisSpook();
+    if(p) newPin(p.lat, p.lng, null);
+  });
+  S.spook = {marker:m, lat, lng};
+  spookHint.innerHTML = 'Tik nogmaals om hier een vondst te maken<br>'+
+    '<span style="font-weight:500;opacity:.7;font-size:11.5px">terug-knop laat hem vallen</span>';
+  spookHint.classList.add("on");
+}
+
 function renderChips(){
   const c={eet:0,med:0,gif:0,zwam:0,onb:0};
   S.pins.forEach(p=>c[pinKlass(p)]++);
   const defs=[["eetbaar","Eetbaar",c.eet,""],["medicinaal","Medicinaal",c.med,""],
-              ["zwam","Zwammen",c.zwam,"zwam"],["giftig","Giftig",c.gif,"tox"]];
+              ["zwam","Zwammen",c.zwam,"zwam"],["giftig","Giftig",c.gif,"tox"],
+              ["onbekend","Nog naamloos",c.onb,""]];
   const el=document.getElementById("chips");
   el.innerHTML = defs.map(([k,l,n,x])=>
     '<button class="chip '+(S.filter[k]?"on ":"")+x+'" data-f="'+k+'">'+l+'<span class="n">'+n+'</span></button>').join("");
@@ -1394,8 +1556,9 @@ function renderChips(){
     S.filter[b.dataset.f]=!S.filter[b.dataset.f]; lsSet("filter",S.filter); drawMarkers(); });
 }
 async function tekenOntdek(){
+  if(!S.ontdekAan){ S.ontdekLaag.clearLayers(); return; }
+  if(S.ontdekVol) return;          /* kaartvulling blijft staan tot je hem wist */
   S.ontdekLaag.clearLayers();
-  if(!S.ontdekAan) return;
   const rijen = await ontdekWaarnemingen();
   rijen.forEach(o=>{
     const m = L.marker([o.lat,o.lng],{icon:L.divIcon({className:"",iconSize:[13,13],iconAnchor:[6.5,6.5],
@@ -1478,6 +1641,112 @@ async function hydratePhotos(root){
 }
 
 /* =======================================================================
+   SYMBOLEN — druïde-alfabet, overal in de app gebruikt
+   ======================================================================= */
+const svg = (b, p, sw) => '<svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
+  'stroke-width="'+(sw||1.5)+'" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';
+const SYM = {
+  varen:  '<path d="M12 21c0-6 1-11 4-14M12 21C12 12 9 6 4 4"/><path d="M16 7c2.6-.3 4-1.8 4-4.4-2.6.2-4 1.7-4 4.4Zm-1.6 4.2c2.6-.3 4-1.8 4-4.4-2.6.2-4 1.7-4 4.4Zm-1.5 4.3c2.4-.3 3.7-1.7 3.7-4.1-2.4.2-3.7 1.6-3.7 4.1Z"/><path d="M8 6.6C5.6 6.3 4.2 4.8 4.2 2.2 6.6 2.4 8 3.9 8 6.6Z"/>',
+  blad:   '<path d="M4 20c0-8.5 4.6-14 14-15 .8 9.7-4 15-14 15Z"/><path d="M4 20 14 9"/>',
+  zwam:   '<path d="M3.6 11.4a8.4 8.4 0 0 1 16.8 0Z"/><path d="M9.6 11.4v6.4a2.4 2.4 0 0 0 4.8 0v-6.4"/><path d="M8.2 7.6h.01M12 5.9h.01M15.8 8.2h.01"/>',
+  gewei:  '<path d="M12 21v-7.5"/><path d="M12 13.5 8.2 9.8C6.6 8.2 6 6.4 6.4 4.2 8.4 5 9.6 6 10.2 7.4"/><path d="m12 13.5 3.8-3.7c1.6-1.6 2.2-3.4 1.8-5.6-2 .8-3.2 1.8-3.8 3.2"/><path d="M8.2 9.8 5 9.2M15.8 9.8l3.2-.6"/>',
+  vijzel: '<path d="M5 9.5h14v1.8a7 7 0 0 1-7 7 7 7 0 0 1-7-7Z"/><path d="M9.5 18.3v2.2h5v-2.2"/><path d="m14.5 8.4 3.8-5.2"/>',
+  maan:   '<path d="M20 14.4A8.4 8.4 0 0 1 9.6 4 8.4 8.4 0 1 0 20 14.4Z"/>',
+  wiel:   '<circle cx="12" cy="12" r="8.6"/><path d="M12 3.4v17.2M3.4 12h17.2M5.9 5.9l12.2 12.2M18.1 5.9 5.9 18.1"/>',
+  ketel:  '<path d="M4.6 10.4h14.8v2.4a7.4 7.4 0 0 1-14.8 0Z"/><path d="M3.2 10.4h17.6"/><path d="M9 7.6c-.8-1.2-.5-2.4.8-3.6-.4 1.6.2 2.5 1.4 3.2M14 7.4c-.6-1-.4-1.9.6-2.8-.3 1.2.1 1.9 1 2.4"/>',
+  fles:   '<path d="M10 2.6h4v3.6l2.1 2.8a4 4 0 0 1 .8 2.4v7.2a2.4 2.4 0 0 1-2.4 2.4H9.5a2.4 2.4 0 0 1-2.4-2.4v-7.2a4 4 0 0 1 .8-2.4L10 6.2Z"/><path d="M7.2 13.6h9.6"/>',
+  boek:   '<path d="M3 5.6C5.7 4.3 8.3 4.3 12 6c3.7-1.7 6.3-1.7 9-.4v12c-2.7-1.3-5.3-1.3-9 .4-3.7-1.7-6.3-1.7-9-.4Z"/><path d="M12 6v12"/>',
+  oog:    '<path d="M2.4 12S6 5.4 12 5.4 21.6 12 21.6 12 18 18.6 12 18.6 2.4 12 2.4 12Z"/><circle cx="12" cy="12" r="2.8"/>',
+  sleutel:'<circle cx="8" cy="8" r="4.4"/><path d="m11.1 11.1 8 8M16.6 16.6l-1.8 1.8M18.8 18.8 17 20.6"/>',
+  ster:   '<path d="m12 2.8 2.6 6.1 6.6.6-5 4.4 1.5 6.5L12 17l-5.7 3.4 1.5-6.5-5-4.4 6.6-.6Z"/>',
+  veder:  '<path d="M19.4 4.6C14 3.6 8.4 6.6 6.4 12.4c-.7 2-.8 3.9-.5 5.6M5.9 18c1.7.3 3.6.2 5.6-.5 5.8-2 8.8-7.6 7.9-12.9Z"/><path d="M5 21 19 6"/>',
+  pot:    '<path d="M6.4 8.4h11.2l-.8 11a2.4 2.4 0 0 1-2.4 2.2H9.6a2.4 2.4 0 0 1-2.4-2.2Z"/><path d="M5.2 5.4h13.6v3H5.2z"/>',
+  hand:   '<path d="M12 21c-4.4 0-7.4-3-7.4-7.4V8.4a1.6 1.6 0 0 1 3.2 0"/><path d="M7.8 10V4.6a1.6 1.6 0 0 1 3.2 0V10M11 10V3.8a1.6 1.6 0 0 1 3.2 0V10M14.2 10.4V6a1.6 1.6 0 0 1 3.2 0v7.6c0 4.4-2.6 7.4-5.4 7.4"/>',
+  waarschuw:'<path d="M12 3.6 21.4 20H2.6Z"/><path d="M12 9.6v4.6M12 17.2v.4"/>',
+  kaart:  '<path d="M9 3 3 5.5v15L9 18l6 3 6-2.5v-15L15 6 9 3Z"/><path d="M9 3v15M15 6v15"/>',
+  hart:   '<path d="M12 20.4S3.6 15.4 3.6 9.4a4.8 4.8 0 0 1 8.4-3.2 4.8 4.8 0 0 1 8.4 3.2c0 6-8.4 11-8.4 11Z"/>',
+  vlam:   '<path d="M12 21c3.6 0 6-2.4 6-5.6 0-4.4-4.4-5.6-3.6-10.4-2.8 1.2-4 3.6-3.6 6-1.2-.8-1.6-2-1.6-3.2C7.2 9.6 6 12 6 15.4 6 18.6 8.4 21 12 21Z"/>'
+};
+const G = k => svg(0, SYM[k] || SYM.blad);
+
+/* de dryade als merkteken, dezelfde kop als het app-icoon */
+const DRYADE = '<svg class="brandmark" viewBox="0 0 48 48" aria-hidden="true">'+
+ '<g fill="none" stroke="#8B6A44" stroke-width="2" stroke-linecap="round">'+
+ '<path d="M18 15c-4 3-6 8-6 14M30 15c4 3 6 8 6 14M16 13c-5 3-8 8-9 14M32 13c5 3 8 8 9 14"/></g>'+
+ '<g fill="#7C9E58">'+
+ '<path d="M24 4c2.4 2.6 3 6 1.8 9.4C23.2 11.4 22.2 8 24 4Z"/>'+
+ '<path d="M14.6 6.6c3.4 1 5.4 3.6 5.8 7.4-3.4-1-5.4-3.6-5.8-7.4Z"/>'+
+ '<path d="M33.4 6.6c-3.4 1-5.4 3.6-5.8 7.4 3.4-1 5.4-3.6 5.8-7.4Z"/>'+
+ '<path d="M7.6 12.4c3.6.2 6.1 2 7.4 5.4-3.6-.2-6.1-2-7.4-5.4Z"/>'+
+ '<path d="M40.4 12.4c-3.6.2-6.1 2-7.4 5.4 3.6-.2 6.1-2 7.4-5.4Z"/></g>'+
+ '<path d="M24 12c6.2 0 10 4.4 10 11.4S30.6 40 24 40 14 30.4 14 23.4 17.8 12 24 12Z" fill="#96B276"/>'+
+ '<g fill="#1C2C1E"><ellipse cx="19.6" cy="23" rx="2.6" ry="1.7"/><ellipse cx="28.4" cy="23" rx="2.6" ry="1.7"/></g>'+
+ '<g fill="#EEF4D6"><circle cx="19.9" cy="22.6" r=".7"/><circle cx="28.7" cy="22.6" r=".7"/></g>'+
+ '<path d="M24 25.4 25.6 30h-3.2Z" fill="#6C8A54"/>'+
+ '<path d="M21 32.6c1.8 1.4 4.2 1.4 6 0" fill="none" stroke="#4E6A38" stroke-width="1.5" stroke-linecap="round"/>'+
+ '<g fill="#5E7A44"><path d="M17 33c-2.6 1.4-4 3.6-4.2 6.6 2.8-1.2 4.2-3.4 4.2-6.6Z"/>'+
+ '<path d="M31 33c2.6 1.4 4 3.6 4.2 6.6-2.8-1.2-4.2-3.4-4.2-6.6Z"/>'+
+ '<path d="M24 35.4c-1.6 2-2 4.2-1.2 6.6 1.8-1.6 2.2-3.8 1.2-6.6Z"/></g></svg>';
+
+/* ---- maanstand ---- */
+const SYNODISCH = 2551442876;
+const MAANNAMEN = ["Nieuwe maan","Wassende sikkel","Eerste kwartier","Wassende maan",
+                   "Volle maan","Afnemende maan","Laatste kwartier","Afnemende sikkel"];
+function maanfase(d){
+  const nul = Date.UTC(2000,0,6,18,14);
+  let f = ((d.getTime()-nul) % SYNODISCH) / SYNODISCH;
+  if(f<0) f+=1;
+  return f;
+}
+function maanSvg(f){
+  /* verlichte zijde als twee halve vormen */
+  const wassend = f < .5;
+  const k = Math.abs(Math.cos(2*Math.PI*f));   /* 1 bij nieuw/vol, 0 bij kwartier */
+  const vol = (f>.25 && f<.75);
+  const rx = 16*k;
+  return '<svg viewBox="0 0 40 40" width="36" height="36">'+
+    '<circle cx="20" cy="20" r="16" fill="#232E22" stroke="rgba(201,162,39,.45)" stroke-width="1"/>'+
+    (Math.abs(f-.5)<.02 ? '<circle cx="20" cy="20" r="16" fill="#E8E7CE"/>' :
+     Math.abs(f)<.02||Math.abs(f-1)<.02 ? '' :
+     '<path d="M20 4a16 16 0 0 1 0 32Z" fill="'+(wassend?"#E8E7CE":"#232E22")+'"/>'+
+     '<path d="M20 4a16 16 0 0 0 0 32Z" fill="'+(wassend?"#232E22":"#E8E7CE")+'"/>'+
+     '<ellipse cx="20" cy="20" rx="'+rx.toFixed(1)+'" ry="16" fill="'+
+       (vol ? "#E8E7CE" : "#232E22")+'"/>')+
+    '<circle cx="20" cy="20" r="16" fill="none" stroke="rgba(201,162,39,.45)" stroke-width="1"/></svg>';
+}
+/* ---- jaarwiel ---- */
+const JAARWIEL = [
+ {nm:"Yule",       m:12, d:21, zeg:"kortste dag, licht keert"},
+ {nm:"Imbolc",     m:2,  d:1,  zeg:"eerste groen, sneeuwklokje"},
+ {nm:"Ostara",     m:3,  d:20, zeg:"dag en nacht gelijk, sap stijgt"},
+ {nm:"Beltane",    m:5,  d:1,  zeg:"volle bloei, meidoorn bloeit"},
+ {nm:"Litha",      m:6,  d:21, zeg:"langste dag, sint-jan"},
+ {nm:"Lammas",     m:8,  d:1,  zeg:"eerste oogst, graan en kruiden"},
+ {nm:"Mabon",      m:9,  d:22, zeg:"tweede oogst, vruchten en noten"},
+ {nm:"Samhain",    m:10, d:31, zeg:"laatste oogst, wortels en zwammen"}
+];
+function jaarstand(nu){
+  const jr = nu.getFullYear();
+  let lijst = [];
+  JAARWIEL.forEach(f=>{ [-1,0,1].forEach(o=> lijst.push({f, t:new Date(jr+o, f.m-1, f.d)})); });
+  lijst.sort((a,b)=>a.t-b.t);
+  let vorige=lijst[0], volgende=lijst[lijst.length-1];
+  for(let i=0;i<lijst.length;i++){
+    if(lijst[i].t<=nu) vorige=lijst[i];
+    if(lijst[i].t>nu){ volgende=lijst[i]; break; }
+  }
+  const dagen = Math.ceil((volgende.t - nu)/DAY);
+  return {vorige:vorige.f, volgende:volgende.f, dagen};
+}
+function hemelHtml(){
+  const nu=new Date(), f=maanfase(nu), i=Math.floor(f*8+0.5)%8, js=jaarstand(nu);
+  return '<div class="hemel"><div class="maan">'+maanSvg(f)+'</div>'+
+    '<div class="t"><b>'+MAANNAMEN[i]+'</b><span>'+js.vorige.nm+' is geweest · '+
+    js.volgende.nm+' over '+js.dagen+' dag'+(js.dagen===1?"":"en")+', '+esc(js.volgende.zeg)+'</span></div>'+
+    '<div class="wiel">'+svg(0,SYM.wiel,1.2)+'</div></div>';
+}
+
+/* =======================================================================
    ORNAMENT
    ======================================================================= */
 const VINE = '<svg class="vine" viewBox="0 0 60 70" fill="none" stroke="#2C2A1F" stroke-width="1.2" stroke-linecap="round">'+
@@ -1506,6 +1775,7 @@ function closeSheet(){
     const p = S.pins.find(x=>x.id===prev);
     if(p) S.markers.get(prev).setIcon(markerIcon(p,false));
   }
+  if(S.scr==="map" && S.map) drawMarkers();
 }
 scrimEl.onclick = closeSheet;
 
@@ -1521,7 +1791,85 @@ function tagsHtml(tags, grp){
   return h;
 }
 const kv = (k,v)=> '<div class="kv"><span>'+esc(k)+'</span><span>'+esc(v)+'</span></div>';
-const sech = (t,extra)=> '<h3><span class="t">'+esc(t)+'</span>'+(extra||"")+'</h3>';
+const sech = (t,extra,g)=> '<h3>'+G(g||"blad")+'<span class="t">'+esc(t)+'</span>'+(extra||"")+'</h3>';
+const FLOURISH = '<svg class="flourish" viewBox="0 0 132 16" fill="none" stroke="currentColor" '+
+ 'stroke-width="1.1" stroke-linecap="round"><path d="M2 8h34M96 8h34"/>'+
+ '<path d="M66 2.4c-3.4 2-5.1 3.9-5.1 5.6s1.7 3.6 5.1 5.6c3.4-2 5.1-3.9 5.1-5.6S69.4 4.4 66 2.4Z"/>'+
+ '<path d="M44 8c3.4-1.5 6.4-1.5 9 0-2.6 1.5-5.6 1.5-9 0Zm44 0c-3.4-1.5-6.4-1.5-9 0 2.6 1.5 5.6 1.5 9 0Z"/></svg>';
+const HOEKRANK = '<svg class="hoekrank" viewBox="0 0 60 70" fill="none" stroke="#2C2A1F" stroke-width="1.2" '+
+ 'stroke-linecap="round"><path d="M50 2C46 14 44 26 46 38c1 8 4 14 9 20"/>'+
+ '<path d="M46 12c-6-1-10-4-12-9 6-1 11 2 12 9Zm2 11c6-2 10-6 11-12-6 0-11 4-11 12Zm-1 12c-7-1-11-4-13-10 6-1 12 3 13 10Z"/></svg>';
+
+/* =======================================================================
+   BETROUWBAARHEID — eigen controle op soorten en recepten
+   ======================================================================= */
+const KEUR = {
+  open:   {lbl:"Niet nagekeken", cls:"k-open",    kleur:"var(--kalk-2)"},
+  na:     {lbl:"Nagekeken",      cls:"k-na",      kleur:"var(--mos)"},
+  twijfel:{lbl:"Twijfel",        cls:"k-twijfel", kleur:"var(--honing)"},
+  fout:   {lbl:"Klopt niet",     cls:"k-fout",    kleur:"var(--meekrap)"}
+};
+/* vooraf nagekeken tegen externe bronnen tijdens de bouw van v0.4 */
+const KEUR_SEED = {
+  "daslook":      {staat:"na", bron:"NVIC (nvic.umcutrecht.nl) · Wildpluk wiki Oogsten zonder Zaaien", notitie:"Geurtest als beslissend kenmerk en de drie verwarringssoorten bevestigd. NVIC meldt hier jaarlijks gevallen van."},
+  "lelietje":     {staat:"na", bron:"NVIC", notitie:"Hartglycosiden; klachten beginnen met misselijkheid en braken, bij grotere hoeveelheid bradycardie en geleidingsstoornissen."},
+  "herfsttijloos":{staat:"na", bron:"NVIC", notitie:"Colchicine, remt celdeling, verloopt in fasen. Meerdere bronnen noemen enkele bladeren al ernstig."},
+  "aronskelk":    {staat:"na", bron:"Wildpluk wiki · Boscursus", notitie:"Calciumoxalaatkristallen, brandend gevoel. Genoemd als derde verwarringssoort bij daslook."},
+  "groeneknolamaniet":{staat:"na", bron:"NVIC · Het Acute Boekje · NMV", notitie:"Verreweg de meeste ernstige paddenstoelvergiftigingen. Verwarring met weidechampignon expliciet gedocumenteerd."},
+  "witteknolamaniet":{staat:"twijfel", bron:"—", notitie:"Kenmerken kloppen met de literatuur, maar de soort is in Nederland zeldzamer dan de tekst suggereert. Nakijken bij de NMV."},
+  "weidechampignon":{staat:"na", bron:"NVIC · NMV", notitie:"Rozé plaatjes als beslissend kenmerk bevestigd; verwarring met jonge knolamaniet is de klassieke fout."},
+  "bundelmosklokje":{staat:"na", bron:"NMV via Nature Today", notitie:"Bevat verhoudingsgewijs meer amatoxinen dan de groene knolamaniet. Verwarring met stobbezwammetje en fluweelpootje."},
+  "morielje":     {staat:"na", bron:"NVIC-literatuur", notitie:"Verwisseling met de voorjaarskluifzwam is een bekende, gedocumenteerde fout."},
+  "cantharel":    {staat:"twijfel", bron:"—", notitie:"Literatuur noemt vooral gordijnzwammen als gevaarlijke verwarring bij cantharel; die staat nog niet in de tekst."}
+};
+async function keurVan(k){
+  try{ const r = await dbGet("keur", k); if(r) return r; }catch(e){}
+  const seed = KEUR_SEED[k];
+  return seed ? {k, staat:seed.staat, bron:seed.bron, notitie:seed.notitie, wanneer:"bij de bouw"}
+              : {k, staat:"open", bron:"", notitie:"", wanneer:null};
+}
+function keurCache(){ return S.keur; }
+function keurSync(k){ return S.keur[k] || (KEUR_SEED[k]
+  ? {k, staat:KEUR_SEED[k].staat, bron:KEUR_SEED[k].bron, notitie:KEUR_SEED[k].notitie, wanneer:"bij de bouw"}
+  : {k, staat:"open", bron:"", notitie:"", wanneer:null}); }
+function keurBadge(k, ink){
+  const r = keurSync(k), d = KEUR[r.staat] || KEUR.open;
+  return '<span class="keur'+(ink?" ink ":" ")+d.cls+'"><span class="keurdot" style="background:'+d.kleur+'"></span>'+d.lbl+'</span>';
+}
+function keurDot(k){
+  const r = keurSync(k), d = KEUR[r.staat] || KEUR.open;
+  return '<span class="keurdot" style="background:'+d.kleur+'"></span>';
+}
+function keurBlok(k, wat){
+  const r = keurSync(k);
+  let h = '<div class="sec">'+sech("Betrouwbaarheid","",'oog')+
+    '<div style="margin-bottom:10px">'+keurBadge(k,true)+'</div>';
+  if(r.bron)    h += kv("Bron", r.bron);
+  if(r.notitie) h += '<div class="prose" style="margin-top:8px">'+esc(r.notitie)+'</div>';
+  if(r.wanneer) h += '<div class="kv"><span>Nagekeken</span><span>'+esc(r.wanneer)+'</span></div>';
+  h += '<div class="seg" style="margin-top:12px" id="keurSeg">'+
+    Object.keys(KEUR).map(x=>'<button data-kv="'+x+'"'+(r.staat===x?' class="on"':'')+'>'+KEUR[x].lbl+'</button>').join("")+'</div>'+
+    '<div class="f" style="margin:12px 0 0"><label>Bron</label><input id="keurBron" value="'+esc(r.bron)+'" placeholder="bv. Heukels\u2019 Flora, blz. 412"></div>'+
+    '<div class="f" style="margin:0"><label>Wat viel op</label><textarea id="keurNot" placeholder="Wat klopte, wat niet?">'+esc(r.notitie)+'</textarea></div>'+
+    '<div class="row" style="padding:10px 0 0"><button class="btn sec2" id="keurSave">Controle bewaren</button></div>'+
+    '<div class="herkomst" style="margin-top:12px"><b>Waarom dit er is.</b> '+esc(wat)+
+    ' is door Claude geschreven en niet extern geverifieerd. Zet hier wat je zelf hebt nagekeken en waarin, '+
+    'zodat je later ziet waar je op kunt bouwen en waar niet.</div></div>';
+  return h;
+}
+function keurWire(k){
+  const seg = document.getElementById("keurSeg"); if(!seg) return;
+  let staat = keurSync(k).staat;
+  seg.querySelectorAll("button").forEach(b=> b.onclick=()=>{
+    staat=b.dataset.kv; seg.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); });
+  document.getElementById("keurSave").onclick = async ()=>{
+    const r = {k, staat, bron:document.getElementById("keurBron").value.trim(),
+      notitie:document.getElementById("keurNot").value.trim(), wanneer:dstr(today())};
+    S.keur[k]=r; await dbPut("keur", r);
+    toast("Controle bewaard: "+KEUR[staat].lbl.toLowerCase());
+    if(S.scr==="spec") renderSpec();
+  };
+}
 
 /* herkomstblok — staat op elk soortenblad */
 function herkomstHtml(s){
@@ -1649,7 +1997,12 @@ async function newPin(lat,lng,acc){
   const pin = {id:uid("pin_"),lat,lng,acc:acc||null,spec:null,naam:"",latijn:"",plek:"",habitat:"",hoev:"",
     toegang:"vrij",zeker:"tebevestigen",vervuiling:[],notitie:"",fotos:[],oogst:[],
     gemaakt:new Date().toISOString(),gewijzigd:new Date().toISOString()};
-  S.pins.push(pin); await dbPut("pins",pin); drawMarkers(); editPin(pin.id,true);
+  S.pins.push(pin); await dbPut("pins",pin);
+  drawMarkers();
+  /* extra zekerheid: als het filter de verse pin zou verbergen, zet die groep aan */
+  if(!S.markers.has(pin.id)){ S.filter.onbekend = true; lsSet("filter",S.filter); drawMarkers(); }
+  S.map.panTo([lat,lng],{animate:true});
+  editPin(pin.id,true);
 }
 function editPin(id,isNew){
   const pin = S.pins.find(p=>p.id===id); if(!pin) return;
@@ -1738,11 +2091,12 @@ async function specSheet(k, terugPin){
   const s = SPEC_BY_K[k]; if(!s) return;
   const mine = S.pins.filter(p=>p.spec===k);
   const dood = s.tags.includes("giftig");
-  let h = '<div class="label">'+VINE+
+  let h = '<div class="label">'+VINE+HOEKRANK+
     '<div class="acc"><span>'+(s.grp==="zwam"?"Paddenstoel":s.grp==="boom"?"Boom of struik":"Kruid")+'</span>'+
     '<span>'+(s.mnd.length?esc(s.mnd.map(m=>MND[m-1]).join(" ")):"—")+'</span></div>'+
     '<h2>'+esc(s.nl)+'</h2><div class="la">'+esc(s.la)+'</div>'+
-    '<div class="tagrow">'+tagsHtml(s.tags,s.grp)+(s.mnd.length?'<span style="margin-left:2px">'+bandHtml(s.mnd,true)+'</span>':'')+'</div></div>';
+    '<div class="tagrow">'+tagsHtml(s.tags,s.grp)+keurBadge(s.k,true)+
+    (s.mnd.length?'<span style="margin-left:2px">'+bandHtml(s.mnd,true)+'</span>':'')+'</div></div>';
 
   if(s.grp==="zwam")
     h += '<div class="warn oker"><b>Paddenstoelen</b>Bij zwammen is één verkeerd kenmerk genoeg voor een fatale afloop. Laat elke eerste vondst van een soort controleren door iemand die hem al jaren kent, of door een paddenstoelenwerkgroep.</div>';
@@ -1750,35 +2104,44 @@ async function specSheet(k, terugPin){
     h += '<div class="warn'+(dood?' dood':'')+'">'+(dood?ZEGEL:'')+'<b>Verwarbaar met</b>'+s.dubbel.map(esc).join(" · ")+'</div>';
   if(s.let) h += '<div class="warn'+(dood?' dood':' oker')+'"><b>Let op</b>'+esc(s.let)+'</div>';
 
-  if(s.herken) h += '<div class="sec">'+sech("Veldkenmerken")+'<div class="prose">'+esc(s.herken)+'</div></div>';
-  if(s.med)    h += '<div class="sec">'+sech("Traditioneel gebruik")+'<div class="prose">'+esc(s.med)+'</div></div>';
+  if(dood)
+    h += '<div class="nood"><b>Bij vermoeden van vergiftiging</b>'+
+      'Bel je huisarts of bij ernstige klachten 112. Zeg welke plant of zwam het is en hoeveel er is gegeten, '+
+      'en bewaar een restant of een foto. De arts kan het Nationaal Vergiftigingen Informatie Centrum raadplegen. '+
+      'Wacht niet op klachten: bij amatoxinen komen die pas na uren, als de schade al begonnen is.</div>';
 
-  h += '<div class="sec">'+sech("Beeld uit GBIF")+'<div class="strip" id="gbifBeeld">'+
+  if(s.herken) h += '<div class="sec">'+sech("Veldkenmerken","",'oog')+'<div class="prose">'+esc(s.herken)+'</div></div>';
+  if(s.med)    h += '<div class="sec">'+sech("Traditioneel gebruik","",'vijzel')+'<div class="prose">'+esc(s.med)+'</div></div>';
+
+  h += '<div class="sec">'+sech("Beeld uit GBIF","",'ster')+'<div class="strip" id="gbifBeeld">'+
        '<div style="font-size:13px;color:var(--inkt-2);padding:6px 0">Ophalen…</div></div></div>';
 
-  h += '<div class="sec">'+sech("Gegevens")+kv("Delen", s.delen)+
+  h += keurBlok(k, "De tekst hierboven over "+s.nl);
+
+  h += '<div class="sec">'+sech("Gegevens","",'boek')+kv("Delen", s.delen)+
     kv("Maanden", s.mnd.length?s.mnd.map(m=>MND[m-1]).join(", "):"—")+
     kv("Eigen plekken", mine.length?mine.length+" plek"+(mine.length===1?"":"ken"):"nog geen")+'</div>';
 
   const rec = RECEPTEN.filter(r=> r.soorten.includes(k));
   if(rec.length){
-    h += '<div class="sec">'+sech("Recepten met deze soort")+'<div class="bron">'+
+    h += '<div class="sec">'+sech("Recepten met deze soort","",'ketel')+'<div class="bron">'+
       rec.map(r=>'<button data-rk="'+r.k+'">'+esc(r.nl)+'</button>').join("")+'</div></div>';
   }
   if(mine.length){
-    h += '<div class="sec">'+sech("Jouw plekken")+
+    h += '<div class="sec">'+sech("Jouw plekken","",'kaart')+
       mine.map(p=>'<div class="kv"><span>'+esc(shortd(p.gemaakt))+'</span><span>'+esc(p.plek||"—")+'</span></div>').join("")+'</div>';
   }
 
-  h += '<div class="sec">'+sech("Bronnen")+'<div class="bron" id="bronRij">'+
+  h += '<div class="sec">'+sech("Bronnen","",'sleutel')+'<div class="bron" id="bronRij">'+
     '<button data-bron="gbif">GBIF-profiel</button>'+
     '<a href="https://nl.wikipedia.org/wiki/'+encodeURIComponent(s.la)+'" target="_blank" rel="noopener">Wikipedia</a>'+
     (s.ema?'<a href="https://www.ema.europa.eu/en/medicines/herbal" target="_blank" rel="noopener">EMA-monografieën</a>':'')+
     '</div>'+herkomstHtml(s)+'</div>';
 
   h += '<div class="row"><button class="btn sec2" data-act="ontdek">Toon op kaart via GBIF</button>'+
-       '<button class="btn sec2" data-act="close">Sluiten</button></div>';
+       '<button class="btn sec2" data-act="close">Sluiten</button></div>'+FLOURISH;
   showSheet(h);
+  keurWire(k);
 
   bodyEl.querySelectorAll("[data-rk]").forEach(b=> b.onclick=()=> receptSheet(b.dataset.rk));
   bodyEl.querySelectorAll("[data-act]").forEach(b=> b.onclick=()=>{
@@ -1837,18 +2200,20 @@ function ontdekSheet(o){
 function receptSheet(k){
   const r = RECEPTEN.find(x=>x.k===k); if(!r) return;
   const soorten = r.soorten.map(x=>SPEC_BY_K[x]).filter(Boolean);
-  let h = '<div class="label">'+VINE+'<div class="acc"><span>'+(r.type==="keuken"?"Keuken":"Voor het lijf")+'</span><span>'+esc(r.tijd)+'</span></div>'+
+  let h = '<div class="label">'+VINE+HOEKRANK+'<div class="acc"><span>'+(r.type==="keuken"?"Keuken":"Voor het lijf")+'</span><span>'+esc(r.tijd)+'</span></div>'+
     '<h2>'+esc(r.nl)+'</h2><div class="la">'+esc(soorten.map(s=>s.nl).join(", "))+'</div>'+
-    '<div class="tagrow"><span class="tag t-eet">'+esc(r.opbrengst)+'</span>'+
+    '<div class="tagrow"><span class="tag t-eet">'+esc(r.opbrengst)+'</span>'+keurBadge("r:"+r.k,true)+
     (r.mnd.length?'<span style="margin-left:2px">'+bandHtml(r.mnd,true)+'</span>':'')+'</div></div>';
   if(r.let) h += '<div class="warn oker"><b>Let op</b>'+esc(r.let)+'</div>';
-  h += '<div class="sec">'+sech("Nodig")+r.ing.map(([a,b])=>'<div class="ing"><b>'+esc(a)+'</b><span>'+esc(b)+'</span></div>').join("")+'</div>';
-  h += '<div class="sec">'+sech("Werkwijze")+r.stap.map((t,i)=>'<div class="stap"><div class="n">'+(i+1)+'</div><div class="t">'+esc(t)+'</div></div>').join("")+'</div>';
-  h += '<div class="sec">'+sech("Soorten")+'<div class="bron">'+soorten.map(s=>'<button data-sk2="'+s.k+'">'+esc(s.nl)+'</button>').join("")+'</div>'+
+  h += '<div class="sec">'+sech("Nodig","",'pot')+r.ing.map(([a,b])=>'<div class="ing"><b>'+esc(a)+'</b><span>'+esc(b)+'</span></div>').join("")+'</div>';
+  h += '<div class="sec">'+sech("Werkwijze","",'ketel')+r.stap.map((t,i)=>'<div class="stap"><div class="n">'+(i+1)+'</div><div class="t">'+esc(t)+'</div></div>').join("")+'</div>';
+  h += keurBlok("r:"+r.k, "Dit recept");
+  h += '<div class="sec">'+sech("Soorten","",'varen')+'<div class="bron">'+soorten.map(s=>'<button data-sk2="'+s.k+'">'+esc(s.nl)+'</button>').join("")+'</div>'+
     '<div class="herkomst"><b>Herkomst.</b> Dit recept is geschreven door Claude, op basis van gangbare verhoudingen. Beproefde vuistregels, geen laboratoriumwaarden. Bij inmaak en fermentatie geldt: vertrouw je neus, en gooi weg bij twijfel.</div></div>';
   if(r.maaksel) h += '<div class="row"><button class="btn" id="rcMaak">Zet in de voorraadkast</button></div>';
-  h += '<div class="row"><button class="btn sec2" id="rcClose">Sluiten</button></div>';
+  h += '<div class="row"><button class="btn sec2" id="rcClose">Sluiten</button></div>'+FLOURISH;
   showSheet(h);
+  keurWire("r:"+r.k);
   bodyEl.querySelectorAll("[data-sk2]").forEach(b=> b.onclick=()=> specSheet(b.dataset.sk2));
   document.getElementById("rcClose").onclick = closeSheet;
   const mk = document.getElementById("rcMaak");
@@ -1884,8 +2249,8 @@ async function renderList(){
   document.getElementById("listSub").textContent = S.pins.length ? rows.length+" van "+S.pins.length+" vondsten" : "Nog geen vondsten";
   const body=document.getElementById("listBody");
   if(!rows.length){
-    body.innerHTML='<div class="empty"><b>'+(S.pins.length?"Niets gevonden":"Leeg veld")+'</b>'+
-      (S.pins.length?"Pas je zoekterm aan.":"Ga naar de kaart en zet je eerste pin bij iets dat je herkent.")+'</div>';
+    body.innerHTML='<div class="empty">'+G("varen")+'<b>'+(S.pins.length?"Niets gevonden":"Leeg veld")+'</b>'+
+      (S.pins.length?"Pas je zoekterm aan.":"Ga naar de kaart en tik ergens. Er verschijnt een voorbeeldpin; nog een tik maakt hem echt.")+'</div>';
     return;
   }
   body.innerHTML = rows.map(p=>{
@@ -1911,6 +2276,7 @@ function specRow(s){
   return '<button class="rec" data-sk="'+s.k+'"><div class="th"><span class="dot d-'+klass(s)+'" style="width:13px;height:13px"></span></div>'+
     '<div class="body"><div class="nm">'+esc(s.nl)+'</div><div class="la">'+esc(s.la)+'</div>'+
     '<div class="meta">'+esc(s.delen)+'</div>'+bandHtml(s.mnd)+'</div>'+
+    keurDot(s.k)+
     (s.dubbel&&s.dubbel.length?'<span class="dot d-gif"></span>':'')+'</button>';
 }
 function renderSpec(){
@@ -1922,15 +2288,24 @@ function renderSpec(){
   if(v==="boom") pool = SPECIES.filter(s=>s.grp==="boom" && !s.tags.includes("giftig"));
   if(v==="zwam") pool = SPECIES.filter(s=>s.grp==="zwam");
   if(v==="gif")  pool = SPECIES.filter(s=>s.tags.includes("giftig"));
+  if(v==="keur") pool = SPECIES.filter(s=>{ const st=keurSync(s.k).staat; return st==="open"||st==="twijfel"; });
   const hits = pool.filter(s=> !q || s.nl.toLowerCase().includes(q) || s.la.toLowerCase().includes(q));
   document.getElementById("specTitle").textContent =
     v==="nu" ? MND[m-1].charAt(0).toUpperCase()+MND[m-1].slice(1) : "Gids";
   const mijn = v==="nu" ? S.pins.filter(p=>p.spec && SPEC_BY_K[p.spec] && SPEC_BY_K[p.spec].mnd.includes(m)) : [];
+  const na = SPECIES.filter(s=>keurSync(s.k).staat==="na").length;
   document.getElementById("specSub").textContent = v==="nu"
     ? hits.length+" soorten in seizoen · "+mijn.length+" van jouw plekken zijn nu actueel"
-    : hits.length+" van "+SPECIES.length+" soorten in de gids";
+    : v==="keur"
+      ? hits.length+" nog na te kijken · "+na+" van "+SPECIES.length+" staan op nagekeken"
+      : hits.length+" van "+SPECIES.length+" soorten in de gids";
 
   let h="";
+  if(v==="nu") h += hemelHtml();
+  if(v==="keur") h += '<div class="empty" style="margin:0 12px 14px;padding:13px;background:rgba(217,164,65,.08);border:1px solid rgba(217,164,65,.28);border-radius:14px;text-align:left">'+
+    '<b style="font-size:15px">Wat is hier al nagekeken</b><span style="font-size:13px;color:var(--kalk-2)">'+
+    'Tien soorten zijn tijdens de bouw vergeleken met het NVIC en de NMV. De rest staat op open: de tekst komt van een taalmodel en is niet geverifieerd. '+
+    'Werk deze lijst af met een flora ernaast, dan weet je precies waar je op kunt bouwen.</span></div>';
   if(v==="zwam") h += '<div class="empty" style="margin:0 12px 14px;padding:13px;background:rgba(192,133,82,.09);border:1px solid rgba(192,133,82,.3);border-radius:14px;text-align:left"><b style="font-size:15px">Zwammen zijn een vak apart</b><span style="font-size:13px;color:var(--kalk-2)">Deze lijst is om te lezen en te leren, niet om op te determineren. Laat elke eerste vondst van een soort nakijken door een kenner.</span></div>';
   if(v==="nu" && mijn.length){
     h += '<p class="grouphd">Jouw plekken, nu</p>' + mijn.map(p=>'<button class="rec" data-id="'+p.id+'">'+
@@ -2028,7 +2403,7 @@ function renderKast(){
       ? keys.map(g=>'<p class="grouphd">'+esc(g)+'</p>'+idx[g].map(jarRow).join("")).join("")
       : '<div class="empty"><b>Nog geen gebruiken</b>Geef een maaksel een of meer gebruiken, dan kun je hier zoeken op waar iets voor is.</div>';
   } else if(!rows.length){
-    body.innerHTML='<div class="empty"><b>'+(S.maaksels.length?"Niets gevonden":"Lege kast")+'</b>'+
+    body.innerHTML='<div class="empty">'+G("pot")+'<b>'+(S.maaksels.length?"Niets gevonden":"Lege kast")+'</b>'+
       (S.maaksels.length?"Pas je zoekterm of filter aan."
         :"Zet hier wat je van je oogst maakt. Begin bij de recepten hiernaast, of voeg zelf iets toe.")+'</div>'+
       '<button class="startbtn" data-new="1" style="margin-top:18px">Eerste maaksel toevoegen</button>';
@@ -2219,7 +2594,7 @@ function renderLeer(){
     (klaarVandaag?"Nog een ronde":"Begin de oefening")+
     '<small>'+(klaarVandaag?"Vandaag al gedaan — mooi. Extra mag altijd."
       :Math.min(S.leer.doel,Math.max(due.length,4))+" vragen · ongeveer twee minuten")+'</small></button>';
-  h+='<p class="grouphd">Waar je op geoefend wordt</p>'+
+  h+=hemelHtml()+'<p class="grouphd">'+G("boek")+'Waar je op geoefend wordt</p>'+
     '<div class="srow" style="cursor:default"><div class="t"><b>Namen</b><span>Nederlands ↔ Latijn</span></div><span class="v">'+SPECIES.length+'</span></div>'+
     '<div class="srow" style="cursor:default"><div class="t"><b>Verwarringsgevaar</b><span>Waarmee je een soort kunt verwisselen</span></div><span class="v" style="color:#D4837B">'+SPECIES.filter(s=>s.dubbel&&s.dubbel.length).length+'</span></div>'+
     '<div class="srow" style="cursor:default"><div class="t"><b>Veldkenmerken</b><span>Waar je in het veld naar kijkt</span></div><span class="v">'+SPECIES.filter(s=>s.herken).length+'</span></div>'+
@@ -2409,7 +2784,7 @@ async function testNotif(){
   const reg=await navigator.serviceWorker.ready;
   reg.showNotification("Tijd voor de veldschool",{
     body:dueKeys().length+" soorten staan klaar. Twee minuten en je streak blijft staan.",
-    icon:"icon-192.png", badge:"icon-192.png", tag:"wildpluk-quiz", data:{scr:"leer"}});
+    icon:"icon-192.png", badge:"badge-96.png", tag:"wildpluk-quiz", data:{scr:"leer"}});
   toast("Melding verstuurd");
 }
 setInterval(async ()=>{
@@ -2430,6 +2805,11 @@ async function renderSet(){
     try{ const e=await navigator.storage.estimate(); t+=" · "+(e.usage/1048576).toFixed(1)+" MB"; }catch(e){}
   }
   document.getElementById("cacheInfo").textContent=t;
+  const tel={na:0,twijfel:0,fout:0,open:0};
+  SPECIES.forEach(x=>tel[keurSync(x.k).staat||"open"]++);
+  RECEPTEN.forEach(x=>tel[keurSync("r:"+x.k).staat||"open"]++);
+  const ks=document.getElementById("keurStand");
+  if(ks) ks.textContent = tel.na+" nagekeken · "+tel.twijfel+" twijfel · "+tel.fout+" fout · "+tel.open+" open";
   try{ const g=await dbAll("gbif"); document.getElementById("gbifInfo").textContent=g.length+" bewaarde GBIF-antwoorden"; }catch(e){}
   document.getElementById("notifState").textContent=S.push.aan?"Aan, elke dag rond "+S.push.tijd:"Uit";
   document.getElementById("notifV").textContent=S.push.aan?"●":"○";
@@ -2450,7 +2830,8 @@ function dataURLtoBlob(d){
 async function doExport(withPhotos){
   toast("Back-up maken…");
   const out={app:"wildpluk",v:APP_VERSION,t:new Date().toISOString(),
-    pins:S.pins,maaksels:S.maaksels,srs:Object.values(S.srs),leer:S.leer,taxa:S.taxa,fotos:[]};
+    pins:S.pins,maaksels:S.maaksels,srs:Object.values(S.srs),leer:S.leer,taxa:S.taxa,
+    keur:Object.values(S.keur),fotos:[]};
   if(withPhotos){
     for(const p of await dbAll("photos"))
       out.fotos.push({id:p.id,pin:p.pin,stage:p.stage,t:p.t,data:await blobToDataURL(p.blob)});
@@ -2470,12 +2851,14 @@ function doImport(){
       for(const p of (d.pins||[])) await dbPut("pins",p);
       for(const m of (d.maaksels||[])) await dbPut("maaksels",m);
       for(const r of (d.srs||[])) await dbPut("srs",r);
+      for(const r of (d.keur||[])) await dbPut("keur",r);
       if(d.leer){ S.leer=d.leer; lsSet("leer",S.leer); }
       if(d.taxa){ S.taxa=Object.assign(S.taxa,d.taxa); lsSet("taxa",S.taxa); }
       for(const ph of (d.fotos||[]))
         await dbPut("photos",{id:ph.id,pin:ph.pin,stage:ph.stage,t:ph.t,blob:dataURLtoBlob(ph.data)});
       S.pins=await dbAll("pins"); S.maaksels=await dbAll("maaksels");
       S.srs=Object.fromEntries((await dbAll("srs")).map(r=>[r.k,r]));
+      S.keur=Object.fromEntries((await dbAll("keur")).map(r=>[r.k,r]));
       drawMarkers(); renderSet();
       toast("Hersteld: "+(d.pins||[]).length+" vondsten, "+(d.maaksels||[]).length+" maaksels");
     }catch(e){ toast("Bestand kon niet gelezen worden"); }
@@ -2493,7 +2876,8 @@ function ontdekKiezer(){
     '<div class="warn oker"><b>Lees dit eerst</b>Dit zijn meldingen van anderen, vaak jaren oud en meestal afgerond op honderden meters tot een kilometer. Gebruik het om een zoekgebied te kiezen, nooit als bewijs dat er iets staat.</div>'+
     '<div class="f" style="margin-top:14px"><input id="okQ" placeholder="Zoek soort"></div>'+
     '<div id="okSel" class="usetags" style="margin:0 18px 8px"></div><div class="pick" id="okPick"></div>'+
-    '<div class="row"><button class="btn" id="okGo">Toon op kaart</button><button class="btn sec2" id="okOff">Laag uitzetten</button></div>';
+    '<div class="row"><button class="btn" id="okGo">Toon op kaart</button><button class="btn sec2" id="okOff">Laag uitzetten</button></div>'+
+    '<div class="row"><button class="btn sec2" id="okVul">Vul de kaart met alles wat hier bekend is</button></div>'+FLOURISH;
   showSheet(h);
   const q=document.getElementById("okQ"), pk=document.getElementById("okPick"), ch=document.getElementById("okSel");
   function drawSel(){
@@ -2512,12 +2896,14 @@ function ontdekKiezer(){
   }
   q.oninput=drawPick; drawSel(); drawPick();
   document.getElementById("okOff").onclick=()=>{
-    S.ontdekAan=false; lsSet("ontdekAan",false);
+    S.ontdekAan=false; lsSet("ontdekAan",false); S.ontdekVol=null;
     document.getElementById("btnOntdek").classList.remove("mos");
     S.ontdekLaag.clearLayers(); closeSheet(); toast("Ontdek-laag uit");
   };
+  document.getElementById("okVul").onclick=()=>{ closeSheet(); vulKaart(); };
   document.getElementById("okGo").onclick=()=>{
     if(!sel.length){ toast("Kies eerst een soort"); return; }
+    S.ontdekVol = null;
     S.ontdekSoorten=sel; lsSet("ontdekSoorten",sel);
     S.ontdekAan=true; lsSet("ontdekAan",true);
     document.getElementById("btnOntdek").classList.add("mos");
@@ -2544,6 +2930,27 @@ document.getElementById("setExport").onclick=()=>doExport(false);
 document.getElementById("setExportPh").onclick=()=>doExport(true);
 document.getElementById("setImport").onclick=doImport;
 document.getElementById("setCache").onclick=renderSet;
+document.getElementById("setVul").onclick=()=>{ go("map"); setTimeout(vulKaart, 300); };
+document.getElementById("setKeurExport").onclick=()=>{
+  const rijen = SPECIES.map(s=>({nm:s.nl, la:s.la, r:keurSync(s.k)}))
+    .concat(RECEPTEN.map(r=>({nm:r.nl, la:"recept", r:keurSync("r:"+r.k)})));
+  const groep = {na:[], twijfel:[], fout:[], open:[]};
+  rijen.forEach(x=> groep[x.r.staat||"open"].push(x));
+  let md = "# Wildpluk controlelijst\n\n"+dstr(today())+"\n\n";
+  [["na","Nagekeken"],["twijfel","Twijfel"],["fout","Klopt niet"],["open","Nog niet nagekeken"]].forEach(([k,t])=>{
+    md += "## "+t+" ("+groep[k].length+")\n\n";
+    groep[k].forEach(x=>{
+      md += "- **"+x.nm+"** — _"+x.la+"_";
+      if(x.r.bron) md += "  \n  Bron: "+x.r.bron;
+      if(x.r.notitie) md += "  \n  "+x.r.notitie;
+      md += "\n";
+    });
+    md += "\n";
+  });
+  const url=URL.createObjectURL(new Blob([md],{type:"text/markdown"}));
+  const a=document.createElement("a"); a.href=url; a.download="wildpluk-controlelijst-"+today()+".md"; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),4000);
+};
 document.getElementById("setGbifWipe").onclick=async ()=>{
   await dbClear("gbif"); toast("GBIF-cache geleegd"); renderSet();
 };
@@ -2565,11 +2972,13 @@ document.getElementById("setWipe").onclick=async ()=>{
   drawMarkers(); renderSet(); toast("Alles gewist");
 };
 
+document.getElementById("brandBox").insertAdjacentHTML("afterbegin", DRYADE);
 document.getElementById("verLbl").textContent="v"+APP_VERSION;
 document.getElementById("verLbl2").textContent="v"+APP_VERSION;
 
 window.addEventListener("popstate",()=>{
   if(quizEl.classList.contains("on")) quizEl.classList.remove("on");
+  else if(S.spook) wisSpook();
   else if(sheetEl.classList.contains("on")) closeSheet();
   else if(S.scr!=="map") go("map");
   history.pushState({},"");
@@ -2582,6 +2991,7 @@ history.pushState({},"");
     S.pins=await dbAll("pins");
     S.maaksels=await dbAll("maaksels");
     S.srs=Object.fromEntries((await dbAll("srs")).map(r=>[r.k,r]));
+    S.keur=Object.fromEntries((await dbAll("keur")).map(r=>[r.k,r]));
     await loadPush();
   }catch(e){ toast("Opslag niet beschikbaar"); }
   drawMarkers();
