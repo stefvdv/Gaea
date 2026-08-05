@@ -1,91 +1,81 @@
-# Wildpluk v0.2.0
+# Wildpluk v0.3.0
 
-Persoonlijke PWA voor eetbare en medicinale planten: vinden, herkennen, pinnen, gebruiken.
-Vanilla JS, één `index.html`. Alles lokaal op het toestel (IndexedDB). Geen server, geen account.
+Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
+vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
+Alles lokaal (IndexedDB). Geen account, geen server, behalve de GBIF-proxy.
 
-## Deployen
-Zet deze map in een Git-repo en koppel aan Netlify (of sleep de map naar Netlify Drop).
-Geen build step. Publish directory = de map zelf.
+## Deployen (Netlify)
+Map in een Git-repo, koppelen aan Netlify. Geen build step.
+`_redirects` moet mee in de publish directory — die regelt de GBIF-proxy:
 
-Lokaal testen:
-    npx serve .
-Let op: geolocatie en service worker vereisen https of localhost.
+    /gbif/*  https://api.gbif.org/v1/:splat  200
+
+De app valt automatisch terug op `https://api.gbif.org/v1/` als de proxy er niet is.
+
+Lokaal: `npx serve .` — geolocatie en service worker vragen https of localhost.
 
 ## Bestanden
-    index.html            app (UI, data, kaart, opslag) + SPECIES-lijst
-    sw.js                 service worker, VERSION altijd gelijk aan APP_VERSION
+    index.html            app: stijl, soorten, recepten, logica
+    sw.js                 service worker; VERSION == APP_VERSION
+    _redirects            GBIF-proxy voor Netlify
     manifest.webmanifest  PWA-manifest
     icon-*.png            iconen
 
 ## Conventies
-- APP_VERSION (index.html) en VERSION (sw.js) altijd in lockstep.
-- localStorage-prefix `wildpluk:` — alleen voor voorkeuren (kaartlaag, kaartpositie, filters).
-- IndexedDB `wildpluk`, stores `pins` en `photos`. Foto's als Blob, nooit in localStorage.
-- Tegelcache (`wildpluk-tiles`) overleeft versiewissels; LRU op 1500 tegels.
+- APP_VERSION en sw.js VERSION altijd in lockstep.
+- localStorage-prefix `wildpluk:` — alleen voorkeuren (kaartlaag, positie, filters, taxonKeys, streak).
+- IndexedDB `wildpluk` v3, stores: `pins`, `photos`, `maaksels`, `srs`, `meta`, `gbif`.
+- Foto's als Blob, nooit in localStorage.
+- Tegelcache `wildpluk-tiles` overleeft versiewissels, LRU op 1500.
+- De service worker cachet GBIF nooit — dat doet de app zelf met een TTL van 30 dagen.
 
-## Kaartlagen
-Doorlopen met de lagenknop rechtsboven:
-1. PDOK BRT achtergrondkaart (topografie)
-2. PDOK BRT grijs
-3. PDOK luchtfoto (Actueel_ortho25)
-4. OpenStreetMap
+## Waar de informatie vandaan komt
+Drie soorten herkomst, en de app zegt het er per soortenblad bij:
 
-Controleer de PDOK-URL's op het toestel; PDOK herziet endpoints af en toe.
-Vervangen kan bovenin `index.html`, in de `LAYERS`-array.
+1. **Namen en taxonomie** — GBIF. Elk soortenblad heeft een knop naar het GBIF-profiel.
+   `species/match` levert de taxonKey, die wordt lokaal onthouden.
+2. **Beeld** — waarnemingen in GBIF met `mediaType=StillImage`, inclusief fotograaf
+   en licentie onder elke foto.
+3. **Veldkenmerken, waarschuwingen, gebruik en recepten** — geschreven door Claude.
+   Algemene kennis, geen geverifieerde bron, geen citaties. Voor 16 soorten bestaat
+   een Europese HMPC-monografie; die is leidend en staat gelinkt.
 
-## Datamodel (pin)
-    { id, lat, lng, acc, spec, naam, latijn, plek, habitat, hoev,
-      toegang, zeker, vervuiling[], notitie, fotos[], oogst[], gemaakt, gewijzigd }
+Dat onderscheid staat ook in Instellingen, onder "Waar komt de informatie vandaan".
 
-Foto: `{ id, pin, blob, stage, t }` — stage uit STAGES
-(kiemplant, blad, knop, bloei, vrucht, winter, standplaats).
+## Gids
+122 soorten: 70 kruiden, 24 bomen en struiken, 28 paddenstoelen.
+30 daarvan zijn giftig en staan er juist in om te leren kennen en te pinnen.
+30 soorten hebben expliciete verwarringssoorten.
 
-## Back-up
-Instellingen → exporteer. Zonder foto's = klein JSON-bestand. Met foto's = volledig herstelbaar.
-Import voegt samen en overschrijft op id.
+## Ontdek-laag (GBIF)
+Vergrootglasknop op de kaart. Kies maximaal 3 soorten; de app haalt waarnemingen
+op voor het huidige kaartbeeld vanaf zoom 11. Gestippelde open markers, visueel
+apart van je eigen volle pins. Seriële wachtrij op 140 ms.
 
-## Voorraadkast
-Store `maaksels`. Per maaksel:
+Belangrijk: veel records zijn afgerond op honderden meters tot een kilometer en
+gevoelige soorten worden bewust vervaagd. Het is een zoekgebied, geen vindplaats.
+"Eigen vondst hier zetten" maakt een pin met status "nog te bevestigen".
 
-    { id, naam, type, soorten[], pin, gemaakt, rijp, houdbaar,
-      verhouding, hoeveelheid, restant, locatie, gebruik[], notitie, batch }
+## Voorraadkast en recepten
+Store `maaksels`; 16 typen met eigen rijpingstijd en houdbaarheid, batchcode
+WP-JJMM-NN, status rijpend/klaar/over datum/op, en de weergave "Waarvoor" die
+alles groepeert op gebruik.
 
-- 16 typen (tinctuur, oxymel, azijn, siroop, gedroogd, zout, ferment, ingelegd,
-  olie, zalf, jam, likeur, thee, pesto, poeder, honing), elk met standaard
-  rijpingstijd en houdbaarheid — datums worden automatisch ingevuld en blijven
-  handmatig aanpasbaar.
-- Batchcode WP-JJMM-NN, oplopend per maand.
-- Status wordt berekend: rijpend / klaar / over datum / op.
-- Weergave "Waarvoor" groepeert alles op gebruik, van dressing tot hoest & keel.
-- Vanuit een vondst: "Hier iets van maken" vult soort en herkomst voor.
-- "Etikettekst kopiëren" levert de regels voor een label; de ZD421-koppeling
-  komt in een volgende versie.
+22 recepten (12 keuken, 10 lijf) met ingrediëntenlijst en stappen. "Zet in de
+voorraadkast" maakt het maaksel aan met de juiste rijpings- en houdbaarheidsdatum.
 
 ## Veldschool
-Leitner-systeem, dozen 0–7, intervallen 0/1/2/4/8/16/32/64 dagen.
-Store `srs`: `{ k, box, due, goed, fout }`. Streak in `wildpluk:leer`.
-
-Vraagsoorten: NL↔Latijn, verwarringsgevaar, let-op-regel, plantdeel, oogstmaand,
-en vanaf drie gefotografeerde soorten ook herkenning op je eigen foto's.
-Selectie weegt eigen plekken, gifplanten en eerdere fouten zwaarder.
+Leitner, dozen 0–7, intervallen 0/1/2/4/8/16/32/64 dagen. Zeven vraagsoorten:
+NL↔Latijn, verwarringsgevaar, let-op-regel, veldkenmerk, plantdeel, oogstmaand,
+en vanaf drie gefotografeerde soorten herkenning op je eigen foto's.
+Weging: eigen plekken > gifplanten > paddenstoelen > eerder foute antwoorden.
 
 ## Dagelijkse herinnering
-Zonder server bestaat echte web push niet. Wildpluk gebruikt
-**Periodic Background Sync** (`wildpluk-dagelijks`, min. 6 u). De service worker
-leest `meta.push` uit IndexedDB, kijkt of het ingestelde tijdstip vandaag
-gepasseerd is en of er nog niet gemeld is, en toont dan de melding.
+Periodic Background Sync (`wildpluk-dagelijks`, min. 6 u). Werkt alleen als de app
+op het startscherm staat. Chrome bepaalt het exacte moment; marge van ongeveer een uur.
 
-Voorwaarden op Android:
-1. App op het startscherm zetten (geïnstalleerd, niet als tab).
-2. Meldingen toestaan.
-3. Chrome bepaalt zelf het exacte moment — reken op een marge van een uur.
-
-Op iOS werkt periodic sync niet; daar port de app alleen als je hem opent.
-Test met Instellingen → Test de melding.
-
-## Nog te doen (v0.3+)
-- GBIF / Nederlands Soortenregister import om de soortenlijst te vullen
-- EMA HMPC-monografieën als bron voor het medicinale deel
-- Recepten: van maaksel naar bereiding, met verhoudingen en timers
-- Determinatiehulp via Pl@ntNet API, met verplichte verwarringscheck
-- Zebra ZD421-labels vanuit de voorraadkast
+## Nog te doen
+- Waarneming.nl-koppeling (API-sleutel aanvragen) voor veel dichtere NL-dekking
+- Determinatiehulp via Pl@ntNet, met verplichte verwarringscheck vóór "eetbaar"
+- Zebra ZD421-labels rechtstreeks vanuit de voorraadkast
+- Per-veld bronvermelding zodra er een geverifieerde tekstbron is gekozen

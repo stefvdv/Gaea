@@ -1,0 +1,2 @@
+# GBIF-proxy — zelfde patroon als de EDHREC-proxy
+/gbif/*  https://api.gbif.org/v1/:splat  200

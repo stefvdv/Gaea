@@ -1,14 +1,15 @@
 {
   "name": "Wildpluk",
   "short_name": "Wildpluk",
-  "description": "Eetbare en medicinale planten vinden, herkennen, pinnen en gebruiken.",
+  "description": "Eetbare en medicinale planten en paddenstoelen vinden, herkennen, pinnen, bewaren en gebruiken.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#161B12",
-  "theme_color": "#161B12",
+  "background_color": "#14201A",
+  "theme_color": "#14201A",
   "lang": "nl",
+  "categories": ["food", "education", "lifestyle"],
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
