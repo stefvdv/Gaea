@@ -452,6 +452,42 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   .sp-ring{stroke-dashoffset:0}.sp-blad,.sp-kop,.sp-vial,#splash .naam{opacity:1}
 }
 
+/* ---------- gebruikstekening ---------- */
+.tekening{background:rgba(255,255,255,.42);border:1px solid rgba(44,42,31,.16);border-radius:14px;
+  padding:10px;display:flex;gap:12px;align-items:center}
+.tekening svg{width:112px;height:auto;flex:0 0 auto}
+.tekening .lg{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.tekening .lg div{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--inkt)}
+.tekening .lg i{width:13px;height:13px;border-radius:3px;flex:0 0 auto;border:1px solid rgba(44,42,31,.3)}
+.tekening .lg span.uit{color:var(--inkt-2);opacity:.6}
+
+/* ---------- vergrootglas ---------- */
+#loep{position:fixed;inset:0;z-index:9500;background:rgba(8,13,9,.95);display:none;
+  align-items:center;justify-content:center;touch-action:none}
+#loep.on{display:flex}
+#loep img{max-width:100%;max-height:100%;transition:transform .22s ease;transform-origin:center;
+  will-change:transform}
+#loep .bijschrift{position:absolute;left:0;right:0;bottom:0;padding:16px 18px calc(var(--safe-b) + 18px);
+  background:linear-gradient(180deg,transparent,rgba(8,13,9,.9));color:var(--kalk);font-size:12.5px;text-align:center}
+#loep .sluit{position:absolute;top:calc(var(--safe-t) + 12px);right:12px;width:40px;height:40px;
+  border-radius:12px;background:rgba(31,46,36,.9);border:1px solid var(--line);color:var(--kalk);
+  display:grid;place-items:center;z-index:2}
+.ph{cursor:zoom-in}
+
+/* ---------- kwalen ---------- */
+.kwaal{display:flex;gap:12px;align-items:center;margin:0 12px 8px;padding:12px;
+  background:var(--schors);border:1px solid var(--line);border-radius:15px;width:calc(100% - 24px);text-align:left;position:relative;overflow:hidden}
+.kwaal .ic{width:38px;height:38px;border-radius:11px;background:rgba(156,184,112,.13);
+  display:grid;place-items:center;color:var(--mos);flex:0 0 auto}
+.kwaal .ic .glyph{width:19px;height:19px}
+.kwaal .b{flex:1;min-width:0}
+.kwaal .b b{display:block;font-family:var(--slab);font-size:16px;font-weight:600;font-variation-settings:'SOFT' 50}
+.kwaal .b span{font-size:12px;color:var(--kalk-2)}
+.kwaal .n{font-family:var(--mono);font-size:11px;color:var(--mos)}
+.emabadge{font-size:9.5px;font-weight:700;letter-spacing:.06em;padding:2px 7px;border-radius:5px;
+  background:rgba(201,162,39,.16);color:var(--goud);border:1px solid rgba(201,162,39,.4);white-space:nowrap}
+.emabadge.ink{background:rgba(138,110,34,.12);color:#7A5A12;border-color:rgba(138,110,34,.4)}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -521,6 +557,7 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
     <button data-v="boom">Bomen &amp; struiken</button>
     <button data-v="zwam">Paddenstoelen</button>
     <button data-v="gif">Giftig</button>
+    <button data-v="waarvoor">Waarvoor</button>
     <button data-v="keur">Te controleren</button>
     <button data-v="alle">Alles</button>
   </div>
@@ -550,6 +587,7 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   <button class="srow" id="setImport"><div class="t"><b>Herstel uit back-up</b><span>Voegt samen, overschrijft op id</span></div><span class="v">↑</span></button>
   <button class="srow" id="setCache"><div class="t"><b>Opslag</b><span id="cacheInfo">—</span></div><span class="v">i</span></button>
   <button class="srow" id="setVul"><div class="t"><b>Vul de kaart</b><span>Haal waarnemingen op voor dit kaartbeeld</span></div><span class="v">GBIF</span></button>
+  <button class="srow" id="setBeeld"><div class="t"><b>Beeld voorladen</b><span id="beeldInfo">Haal foto's op zodat ze offline blijven werken</span></div><span class="v">↓</span></button>
   <button class="srow" id="setKeurExport"><div class="t"><b>Exporteer controlelijst</b><span>Alles wat je hebt nagekeken, als tekst</span></div><span class="v">.md</span></button>
   <button class="srow" id="setGbifWipe"><div class="t"><b>Leeg GBIF-cache</b><span id="gbifInfo">—</span></div><span class="v">↺</span></button>
   <button class="srow" id="setWipe"><div class="t"><b>Wis alle gegevens</b><span>Kan niet ongedaan gemaakt worden</span></div><span class="v" style="color:var(--meekrap)">!</span></button>
@@ -580,6 +618,7 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   <button data-scr="leer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 5.6C5.7 4.3 8.3 4.3 12 6c3.7-1.7 6.3-1.7 9-.4v12c-2.7-1.3-5.3-1.3-9 .4-3.7-1.7-6.3-1.7-9-.4Z"/><path d="M12 6v12"/></svg>Leren</button>
 </nav>
 
+<div id="loep"><button class="sluit" id="loepSluit" aria-label="Sluiten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button><img id="loepImg" alt=""><div class="bijschrift" id="loepBij"></div></div>
 <div class="spookhint" id="spookhint"></div>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet"><div class="grab"></div><div id="sheetBody"></div></div>
@@ -604,7 +643,7 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.5.0";
+const APP_VERSION = "0.6.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -1057,6 +1096,341 @@ const SPECIES = [
  herken:"Bleekgele hoed met vuilwitte vlokken, ring, ronde knol met een scherpe rand. Ruikt naar rauwe aardappel.",
  let:"Zelf licht giftig, maar vooral belangrijk als oefening: wie deze niet van de groene knolamaniet kan onderscheiden, moet geen amanieten verzamelen.",dubbel:[]}
 ];
+
+/* =======================================================================
+   KWALEN — waar gebruik je iets voor
+   EMA-vlag betekent: het Comité voor Kruidengeneesmiddelen van het Europees
+   Geneesmiddelenbureau heeft hiervoor een monografie vastgesteld. Dat is
+   erkenning van traditioneel gebruik, geen bewijs van werkzaamheid.
+   Alles zonder die vlag is volksgebruik: interessant, niet gedekt.
+   ======================================================================= */
+const KWALEN = [
+ {k:"hoest",        nm:"Hoest en slijm",            grp:"Luchtwegen", g:"vlam",
+  uitleg:"Slijmstoffen verzachten een geprikkelde keel, saponinen maken vastzittend slijm losser."},
+ {k:"keel",         nm:"Keelpijn en heesheid",      grp:"Luchtwegen", g:"fles",
+  uitleg:"Samentrekkende en verzachtende kruiden, meestal als spoeling of lauwe thee."},
+ {k:"verkoudheid",  nm:"Verkoudheid en koorts",     grp:"Luchtwegen", g:"maan",
+  uitleg:"Zweetdrijvende thee, warm gedronken, bij het begin van een verkoudheid."},
+ {k:"spijsvertering",nm:"Trage spijsvertering",     grp:"Buik",       g:"vijzel",
+  uitleg:"Bitterstoffen zetten speeksel, maagsap en gal aan. Voor de maaltijd innemen."},
+ {k:"kramp",        nm:"Buikkramp",                 grp:"Buik",       g:"hand",
+  uitleg:"Krampstillende kruiden, vaak met vluchtige olie. Warm en afgedekt trekken."},
+ {k:"diarree",      nm:"Lichte diarree",            grp:"Buik",       g:"pot",
+  uitleg:"Looistoffen trekken het darmslijmvlies samen. Kort gebruiken, veel drinken."},
+ {k:"maagzuur",     nm:"Maagzuur en brandend maagslijmvlies", grp:"Buik", g:"kolf",
+  uitleg:"Slijmstoffen leggen een laagje over het slijmvlies. Koud trekken, niet koken."},
+ {k:"eetlust",      nm:"Weinig eetlust",            grp:"Buik",       g:"eikel",
+  uitleg:"Bitter opent de eetlust. Een klein glaasje voor het eten is genoeg."},
+ {k:"wond",         nm:"Kleine wonden",             grp:"Huid",       g:"zalf",
+  uitleg:"Wondkruiden werken samentrekkend en houden de plek schoon. Alleen op ongebroken of oppervlakkige huid."},
+ {k:"huid",         nm:"Jeukende of schrale huid",  grp:"Huid",       g:"bloem",
+  uitleg:"Verkoelend kompres of zalf. Bij aanhoudende uitslag naar de huisarts."},
+ {k:"insect",       nm:"Beten en netelplekken",     grp:"Huid",       g:"blad",
+  uitleg:"Gekneusd blad ter plekke, het klassieke veldverband."},
+ {k:"kneuzing",     nm:"Kneuzing en blauwe plek",   grp:"Spieren",    g:"hand",
+  uitleg:"Uitwendig, koelend en afzwellend. Nooit op een open wond."},
+ {k:"gewricht",     nm:"Stijve gewrichten",         grp:"Spieren",    g:"gewei",
+  uitleg:"Aanvullend bij spier- en gewrichtsklachten, uitwendig of als kuur."},
+ {k:"slaap",        nm:"Slecht slapen",             grp:"Hoofd",      g:"maan",
+  uitleg:"Kalmerende kruiden, een tot twee uur voor het slapen. Niet bij het stuur."},
+ {k:"onrust",       nm:"Onrust en spanning",        grp:"Hoofd",      g:"veder",
+  uitleg:"Zenuwkruiden, overdag in kleine hoeveelheid."},
+ {k:"somber",       nm:"Sombere stemming",          grp:"Hoofd",      g:"ster",
+  uitleg:"Zeer beperkt terrein, met flinke wisselwerkingen. Altijd met een arts overleggen."},
+ {k:"plassen",      nm:"Doorspoelen urinewegen",    grp:"Water",      g:"kolf",
+  uitleg:"Doorspoelkuur: het kruid werkt alleen als je er veel bij drinkt. Niet bij vochtbeperking."},
+ {k:"vocht",        nm:"Vocht vasthouden",          grp:"Water",      g:"fles",
+  uitleg:"Mild vochtafdrijvend. Bij hart- of nierklachten eerst een arts."},
+ {k:"hart",         nm:"Hart en bloedvaten",        grp:"Hart",       g:"hart",
+  uitleg:"Alleen bij lichte klachten en nooit naast hartmedicatie zonder overleg."},
+ {k:"menstruatie",  nm:"Menstruatieklachten",       grp:"Vrouw",      g:"bloem",
+  uitleg:"Krampstillend of samentrekkend. Niet tijdens zwangerschap."},
+ {k:"mond",         nm:"Mond en tandvlees",         grp:"Mond",       g:"blad",
+  uitleg:"Spoelen met een lauw, sterk aftreksel. Niet doorslikken."},
+ {k:"bloeding",     nm:"Kleine bloedingen",         grp:"Huid",       g:"waarschuw",
+  uitleg:"Samentrekkende kruiden bij een neusbloeding of een sneetje. Bij een echte bloeding: druk en een arts."},
+ {k:"weerstand",    nm:"Voorjaarsmoeheid",          grp:"Algemeen",   g:"varen",
+  uitleg:"De oude voorjaarskuur: veel vers groen, veel bitter, veel mineraal."},
+ {k:"bindweefsel",  nm:"Nagels, haar, bindweefsel", grp:"Algemeen",   g:"wortel",
+  uitleg:"Kiezelzuurrijke kruiden. Traag werkend, weken tot maanden."}
+];
+const KWAAL_BY_K = Object.fromEntries(KWALEN.map(x=>[x.k,x]));
+
+/* Soorten met een EU-monografie: welk deel, en waarvoor het is vastgelegd. */
+const EMA_MAP = {
+ brandnetel:   {ref:"Urticae folium / herba",           deel:"blad en kruid", waarvoor:["gewricht","plassen"]},
+ weegbree:     {ref:"Plantaginis lanceolatae folium",   deel:"blad",          waarvoor:["hoest","keel","mond"]},
+ linde:        {ref:"Tiliae flos",                      deel:"bloesem",       waarvoor:["verkoudheid","hoest"]},
+ duizendblad:  {ref:"Millefolii herba / flos",          deel:"kruid en bloem",waarvoor:["spijsvertering","kramp","eetlust","wond"]},
+ herderstasje: {ref:"Bursae pastoris herba",            deel:"kruid",         waarvoor:["menstruatie","bloeding"]},
+ moerasspirea: {ref:"Filipendulae ulmariae herba / flos",deel:"kruid en bloem",waarvoor:["verkoudheid","gewricht"]},
+ kamille:      {ref:"Matricariae flos",                 deel:"bloem",         waarvoor:["kramp","spijsvertering","huid","mond"]},
+ vlier:        {ref:"Sambuci flos",                     deel:"bloesem",       waarvoor:["verkoudheid"]},
+ heemst:       {ref:"Althaeae radix",                   deel:"wortel",        waarvoor:["hoest","keel","maagzuur"]},
+ heermoes:     {ref:"Equiseti herba",                   deel:"kruid",         waarvoor:["plassen","bindweefsel"]},
+ sintjanskruid:{ref:"Hyperici herba",                   deel:"bloeiende top", waarvoor:["somber","wond"]},
+ meidoorn:     {ref:"Crataegi folium cum flore",        deel:"blad met bloesem",waarvoor:["hart"]},
+ valeriaan:    {ref:"Valerianae radix",                 deel:"wortel",        waarvoor:["slaap","onrust"]},
+ melisse:      {ref:"Melissae folium",                  deel:"blad",          waarvoor:["onrust","slaap","kramp"]},
+ hop:          {ref:"Lupuli flos",                      deel:"bel",           waarvoor:["slaap","onrust"]},
+ berk:         {ref:"Betulae folium",                   deel:"blad",          waarvoor:["plassen"]},
+ kaasjeskruid: {ref:"Malvae folium / flos",             deel:"blad en bloem", waarvoor:["hoest","keel","maagzuur"]},
+ paardenbloem: {ref:"Taraxaci folium / radix cum herba",deel:"blad en wortel",waarvoor:["spijsvertering","eetlust","plassen"]},
+ koningskaars: {ref:"Verbasci flos",                    deel:"bloem",         waarvoor:["hoest","keel"]},
+ wilg:         {ref:"Salicis cortex",                   deel:"bast",          waarvoor:["gewricht","verkoudheid"]},
+ viooltje3:    {ref:"Violae herba cum flore",           deel:"kruid met bloem",waarvoor:["huid"]},
+ klimop:       {ref:"Hederae folium",                   deel:"blad",          waarvoor:["hoest"]},
+ dovenetel:    {ref:"Lamii albi flos",                  deel:"bloem",         waarvoor:["keel","huid"]},
+ sleutelbloem: {ref:"Primulae flos / radix",            deel:"bloem en wortel",waarvoor:["hoest"]},
+ tijm:         {ref:"Thymi herba",                      deel:"kruid",         waarvoor:["hoest","keel"]},
+ zwartebes:    {ref:"Ribis nigri folium",               deel:"blad",          waarvoor:["gewricht","plassen"]}
+};
+
+/* Traditioneel gebruik per soort. Alles wat niet in EMA_MAP staat is volksgebruik. */
+const KWALEN_MAP = {
+ brandnetel:["gewricht","plassen","weerstand","bloeding"],
+ weegbree:["hoest","keel","mond","wond","insect"],
+ groteweegbree:["hoest","wond","insect","mond"],
+ linde:["verkoudheid","hoest","onrust"],
+ duizendblad:["spijsvertering","kramp","eetlust","wond","menstruatie"],
+ herderstasje:["menstruatie","bloeding"],
+ moerasspirea:["verkoudheid","gewricht","maagzuur"],
+ kamille:["kramp","spijsvertering","huid","mond","onrust"],
+ vlier:["verkoudheid","hoest"],
+ heemst:["hoest","keel","maagzuur"],
+ heermoes:["plassen","bindweefsel","wond"],
+ sintjanskruid:["somber","wond","kneuzing"],
+ meidoorn:["hart","onrust"],
+ valeriaan:["slaap","onrust"],
+ melisse:["onrust","slaap","kramp"],
+ hop:["slaap","onrust","eetlust"],
+ berk:["plassen","vocht","huid"],
+ kaasjeskruid:["hoest","keel","maagzuur","huid"],
+ paardenbloem:["spijsvertering","eetlust","plassen","weerstand"],
+ klit:["huid","spijsvertering","weerstand"],
+ cichorei:["spijsvertering","eetlust"],
+ bijvoet:["spijsvertering","eetlust","menstruatie"],
+ hondsdraf:["hoest","keel","spijsvertering"],
+ kleefkruid:["huid","plassen","weerstand"],
+ brunel:["keel","mond","wond"],
+ agrimonie:["keel","diarree","mond"],
+ marjolein:["hoest","spijsvertering"],
+ tijm:["hoest","keel","spijsvertering"],
+ watermunt:["kramp","spijsvertering"],
+ smeerwortel:["kneuzing","gewricht"],
+ kleinhoefblad:["hoest"],
+ vogelmuur:["huid","insect"],
+ braam:["diarree","keel","mond"],
+ bosbes:["diarree","mond"],
+ hondsroos:["weerstand","verkoudheid"],
+ engelwortel:["spijsvertering","eetlust","kramp"],
+ madeliefje:["hoest","wond","kneuzing"],
+ elfenbankje:["weerstand"],
+ berkenzwam:["weerstand","spijsvertering"],
+ judasoor:["keel"]
+};
+
+/* =======================================================================
+   NIEUWE SOORTEN
+   ======================================================================= */
+const SPECIES_EXTRA = [
+/* ---------------- kruiden: eetbaar ---------------- */
+{k:"winterpostelein",nl:"Winterpostelein",la:"Claytonia perfoliata",grp:"kruid",tags:["eetbaar"],delen:"Blad, stengel, bloem",mnd:[1,2,3,4,10,11,12],
+ herken:"Twee bladeren zijn rond de stengel vergroeid tot één schotel waar het bloemtrosje middenuit komt. Sappig en mild.",
+ let:"Verwilderde exoot uit Noord-Amerika, groeit op zandige, omgewerkte grond. Bevat oxaalzuur, dus matig bij nierstenen.",dubbel:[]},
+{k:"veldsla",nl:"Gewone veldsla",la:"Valerianella locusta",grp:"kruid",tags:["eetbaar"],delen:"Rozet",mnd:[1,2,3,4,10,11,12],
+ herken:"Klein rozet van spatelvormige, iets vlezige blaadjes, vaak op akkerranden en muurtjes. Zacht en notig.",
+ let:"Vroeg in het jaar het lekkerst, na de bloei taai.",dubbel:[]},
+{k:"dovenetel",nl:"Witte dovenetel",la:"Lamium album",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Jong blad, bloem",mnd:[4,5,6,7,8,9],
+ herken:"Ziet er precies uit als een brandnetel maar brandt niet, en draagt kransen van witte lipbloemen. Vierkante stengel.",
+ let:"Zuig aan de bloem: er zit een druppel nectar in. Mild kruid zonder bekende risico's.",
+ dubbel:["Grote brandnetel (eetbaar, brandt wel)"],
+ med:"EU-monografie voor de bloem bij keelirritatie en lichte huidklachten."},
+{k:"paarsedovenetel",nl:"Paarse dovenetel",la:"Lamium purpureum",grp:"kruid",tags:["eetbaar"],delen:"Top",mnd:[2,3,4,5,9,10,11],
+ herken:"Lage plant met paarsgetinte topbladeren en kleine roze lipbloemen. Bloeit bijna het hele jaar door.",
+ let:"Mild en licht kruidig, prima rauw door een salade.",dubbel:[]},
+{k:"raket",nl:"Gewone raket",la:"Sisymbrium officinale",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Blad, bloem, zaad",mnd:[4,5,6,7,8],
+ herken:"Stijve, wijd uitstaande zijtakken die haaks van de stengel af staan, met kleine gele bloemetjes en zaadhauwen die tegen de stengel aan liggen.",
+ let:"Scherp als mosterd. Bekend als zangerskruid bij hese stem; dat is traditie, geen bewijs.",dubbel:[],
+ med:"Volksmiddel bij heesheid, vandaar de naam zangerskruid."},
+{k:"klaproos",nl:"Grote klaproos",la:"Papaver rhoeas",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Bloemblad, jong blad, zaad",mnd:[5,6,7],
+ herken:"Vier zijdeachtige rode bloembladen met vaak een zwarte vlek onderaan, behaarde stengel, bolvormige zaaddoos met een dekseltje.",
+ let:"Niet te verwarren met de slaapbol; klaproos bevat geen morfine, maar wel sporen van andere alkaloïden. Bloembladen in siroop, zaad op brood.",
+ dubbel:["Slaapbol (Papaver somniferum, blauwgroen en onbehaard)"]},
+{k:"rodeklaver",nl:"Rode klaver",la:"Trifolium pratense",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Bloemhoofd, jong blad",mnd:[5,6,7,8,9],
+ herken:"Drietallig blad met een lichte v-vormige vlek, bolvormig roze bloemhoofd met een paar blaadjes er direct onder.",
+ let:"Bevat plantaardige oestrogeenachtige stoffen. Terughoudend zijn bij hormoongevoelige aandoeningen.",dubbel:[]},
+{k:"zilverschoon",nl:"Zilverschoon",la:"Potentilla anserina",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Wortel, blad",mnd:[9,10,11,4,5],
+ herken:"Geveerd blad, zilverwit viltig aan de onderkant, met afwisselend grote en kleine blaadjes. Gele vijftallige bloem aan een lange steel.",
+ let:"Wortel is klein maar zoet, oogsten in het najaar op zandige oevers.",dubbel:[],
+ med:"Traditioneel bij menstruatiekramp en lichte diarree."},
+{k:"tormentil",nl:"Tormentil",la:"Potentilla erecta",grp:"kruid",tags:["medicinaal"],delen:"Wortelstok",mnd:[9,10],
+ herken:"Enige inheemse ganzerik met vier bloemblaadjes in plaats van vijf. Wortelstok kleurt bloedrood bij doorsnijden.",
+ let:"Zeer looizuurrijk. Kort gebruiken, niet op een lege maag, en niet bij darmontsteking.",dubbel:[],
+ med:"Klassiek bij lichte diarree en als mondspoeling bij ontstoken tandvlees."},
+{k:"bosaardbei",nl:"Bosaardbei",la:"Fragaria vesca",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Vrucht, blad",mnd:[5,6,7],
+ herken:"Drietallig gezaagd blad, kleine witte bloem, en de vrucht laat los van het kelkje. De zaadjes zitten bovenop, niet in putjes.",
+ let:"Pluk boven kniehoogte in verband met vossenlintworm. Blad gefermenteerd geeft een goede thee.",
+ dubbel:["Indische schijnaardbei (Potentilla indica, gele bloem, smakeloos maar onschadelijk)"]},
+{k:"lisdodde",nl:"Grote lisdodde",la:"Typha latifolia",grp:"kruid",tags:["eetbaar"],delen:"Jonge scheut, wortelstok, stuifmeel",mnd:[4,5,6,7],
+ herken:"De bekende sigaar op een lange stengel, met breed lintvormig blad. In ondiep water en rietkragen.",
+ let:"Groeit in oppervlaktewater dat vervuild kan zijn en neemt zware metalen op. Alleen uit schoon water, en niet in beschermd rietland.",
+ dubbel:["Gele lis (giftig, zwaardvormig blad, gele bloem)"]},
+{k:"aardaker",nl:"Aardaker",la:"Lathyrus tuberosus",grp:"kruid",tags:["eetbaar"],delen:"Wortelknolletje",mnd:[9,10,11],
+ herken:"Klimmende lathyrus met roze geurende bloemen en één paar blaadjes per blad met een rank ertussen. Onder de grond kleine bruine knolletjes.",
+ let:"Alleen de knolletjes; zaden van lathyrussen zijn bij langdurig gebruik schadelijk. Graven verstoort de plek, dus spaarzaam.",dubbel:[]},
+{k:"teunisbloem",nl:"Grote teunisbloem",la:"Oenothera glazioviana",grp:"kruid",tags:["eetbaar"],delen:"Wortel eerste jaar, bloem, zaad",mnd:[10,11,3,4],
+ herken:"Rozet van lancetvormig blad met een rode middennerf, later een hoge stengel met grote gele bloemen die 's avonds opengaan.",
+ let:"Wortel alleen van eerstejaars rozetten. Smaakt peperig, koken in twee wateren maakt hem milder.",dubbel:[]},
+{k:"viooltje3",nl:"Driekleurig viooltje",la:"Viola tricolor",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Kruid met bloem",mnd:[5,6,7,8],
+ herken:"Kleine viool met drie kleuren in één bloem: paars, geel en wit, met donkere streepjes naar het hart.",
+ let:"Mild. EU-monografie voor uitwendig gebruik bij lichte huidklachten.",dubbel:[]},
+{k:"maartsviooltje",nl:"Maarts viooltje",la:"Viola odorata",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Bloem, blad",mnd:[2,3,4],
+ herken:"Hartvormig blad in een rozet, donkerpaarse bloem met een sterke zoete geur — het enige viooltje dat echt ruikt.",
+ let:"Bloemen gekonfijt of in siroop. Wortel werkt braakverwekkend, dus die laat je staan.",dubbel:[]},
+{k:"sleutelbloem",nl:"Gulden sleutelbloem",la:"Primula veris",grp:"kruid",tags:["medicinaal","eetbaar"],delen:"Bloem, wortel",mnd:[4,5],
+ herken:"Trosje diepgele klokjes die allemaal naar één kant hangen, op een rechte behaarde stengel boven een rozet gerimpeld blad.",
+ let:"In Nederland plaatselijk zeldzaam en op sommige plekken beschermd — controleer voor je plukt. Saponinen kunnen de maag prikkelen.",dubbel:[],
+ med:"EU-monografie voor bloem en wortel bij vastzittende hoest."},
+{k:"koningskaars",nl:"Koningskaars",la:"Verbascum thapsus",grp:"kruid",tags:["medicinaal"],delen:"Bloem",mnd:[6,7,8],
+ herken:"Manshoge kaars van dicht opeen staande gele bloemen op een viltig wit behaarde stengel, rozet van grote wollige bladeren.",
+ let:"Zeef het aftreksel door een doek: de fijne haartjes prikkelen de keel enorm.",dubbel:[],
+ med:"EU-monografie voor de bloem bij hoest en keelirritatie."},
+{k:"klimop",nl:"Klimop",la:"Hedera helix",grp:"boom",tags:["giftig","medicinaal"],delen:"—",mnd:[],
+ herken:"Klimmende houtige plant met hechtwortels; jong blad drie- tot vijflobbig, bloeiend blad ruitvormig. Zwarte bessen in het voorjaar.",
+ let:"Bessen en blad zijn giftig bij inname; sap kan huiduitslag geven. Er bestaat een EU-monografie voor gestandaardiseerd bladextract bij hoest, maar dat is fabriekswerk. Zelf klimop innemen is geen goed idee.",dubbel:[]},
+{k:"gagel",nl:"Wilde gagel",la:"Myrica gale",grp:"boom",tags:["eetbaar"],delen:"Blad, katje",mnd:[5,6,7,8],
+ herken:"Lage struik op natte heide en veen, blad grijsgroen met harsklieren en een sterke, harsachtige geur bij wrijven.",
+ let:"Niet tijdens zwangerschap. Groeit vaak in beschermd veengebied, dus check het terrein. Historisch bierkruid vóór de hop.",dubbel:[]},
+{k:"kalmoes",nl:"Kalmoes",la:"Acorus calamus",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Wortelstok",mnd:[9,10],
+ herken:"Zwaardvormig blad met een golvende rand aan één kant en een gerimpelde middennerf. De wortelstok ruikt sterk aromatisch, naar mandarijn en gember.",
+ let:"Europese kalmoes bevat bèta-asaron, dat bij langdurig gebruik schadelijk is. Als kruiderij spaarzaam, niet als kuur. Blad lijkt op gele lis en op grote lisdodde.",
+ dubbel:["Gele lis (giftig, geen aroma)"]},
+
+/* ---------------- kust en kwelder ---------------- */
+{k:"zeeaster",nl:"Zulte of zeeaster",la:"Tripolium pannonicum",grp:"kruid",tags:["eetbaar"],delen:"Blad, jonge scheut",mnd:[4,5,6,7],
+ herken:"Vlezig, glanzend lancetvormig blad op de kwelder, later lila straalbloemen met een geel hart.",
+ let:"Veel kwelders zijn beschermd. Van nature zilt, dus niet bijzouten.",dubbel:[]},
+{k:"strandbiet",nl:"Strandbiet",la:"Beta vulgaris subsp. maritima",grp:"kruid",tags:["eetbaar"],delen:"Blad",mnd:[4,5,6,7,8,9],
+ herken:"Glanzend, dik, golvend blad met een roodachtige steel, op vloedmerk en dijkvoeten. De wilde voorouder van snijbiet.",
+ let:"Oxaalzuur zoals bij spinazie; kort koken en het kookvocht weggooien.",dubbel:[]},
+{k:"zeesla",nl:"Zeesla",la:"Ulva lactuca",grp:"kruid",tags:["eetbaar"],delen:"Thallus",mnd:[4,5,6,7,8,9],
+ herken:"Doorschijnend grasgroen vel wier, dun als twee cellagen, vastgehecht aan steen in het getijdengebied.",
+ let:"Alleen van schone, stromende plekken en nooit uit een haven of bij een lozingspunt. Goed spoelen.",dubbel:[]},
+{k:"blaaswier",nl:"Blaaswier",la:"Fucus vesiculosus",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Thallus",mnd:[1,2,3,4,5,6,7,8,9,10,11,12],
+ herken:"Olijfbruin, gevorkt vertakt wier met paarsgewijze luchtblazen langs een duidelijke middennerf.",
+ let:"Zeer jodiumrijk. Niet bij schildklierklachten en niet dagelijks. Snijd de toppen, laat de voet zitten.",dubbel:[]},
+{k:"suikerwier",nl:"Suikerwier",la:"Saccharina latissima",grp:"kruid",tags:["eetbaar"],delen:"Thallus",mnd:[3,4,5,6],
+ herken:"Lange bruine riem met een gegolfde rand en een gerimpeld midden, zonder middennerf. Gedroogd slaat er wit mannitol op uit.",
+ let:"Ook jodiumrijk, dus met mate. Uitstekend voor bouillon.",dubbel:[]},
+
+/* ---------------- bomen en struiken ---------------- */
+{k:"wilg",nl:"Schietwilg",la:"Salix alba",grp:"boom",tags:["medicinaal"],delen:"Bast van jonge twijgen",mnd:[3,4],
+ herken:"Smal lancetvormig blad, zilverachtig behaard aan de onderkant, diep gegroefde schors bij oude bomen.",
+ let:"Salicylaten: niet bij aspirine-allergie, niet bij bloedverdunners, niet aan kinderen met koorts. Schil alleen dunne twijgen, nooit de stam rondom.",dubbel:[],
+ med:"EU-monografie voor wilgenbast bij lichte gewrichtspijn en koortsige verkoudheid."},
+{k:"krent",nl:"Krentenboompje",la:"Amelanchier lamarckii",grp:"boom",tags:["eetbaar"],delen:"Vrucht",mnd:[6,7],
+ herken:"Struik of kleine boom, blad koperkleurig bij het uitlopen, witte sterbloemen in april, daarna donkerpaarse bessen met een kroontje.",
+ let:"Ingeburgerde exoot, staat in half Nederland in het openbaar groen. Smaakt naar bosbes met marsepein. Merels zijn eerder.",
+ dubbel:["Aalbes en bosbes (ook eetbaar)"]},
+{k:"zwartebes",nl:"Zwarte bes",la:"Ribes nigrum",grp:"boom",tags:["eetbaar","medicinaal"],delen:"Vrucht, blad",mnd:[5,6,7,8],
+ herken:"Handvormig gelobd blad met gele klierpuntjes aan de onderkant en een onmiskenbare geur bij wrijven.",
+ let:"Verwilderd uit tuinen. Blad heeft een EU-monografie bij gewrichtsklachten en als doorspoelkuur.",dubbel:[]},
+{k:"kruisbes",nl:"Wilde kruisbes",la:"Ribes uva-crispa",grp:"boom",tags:["eetbaar"],delen:"Vrucht",mnd:[6,7],
+ herken:"Doornige struik met kleine gelobde blaadjes en hangende, gestreepte, licht behaarde bessen.",
+ let:"Onrijp zuur en prima voor gelei, rijp zoet. Let op de doorns.",dubbel:[]},
+{k:"iep",nl:"Gladde iep",la:"Ulmus minor",grp:"boom",tags:["eetbaar"],delen:"Jonge zaadvleugel, jong blad",mnd:[4,5],
+ herken:"Blad met een duidelijk scheve voet, ruw als schuurpapier. In april hangen de takken vol platte, ronde groene zaadvleugeltjes.",
+ let:"De zaadjes zijn maar twee weken zacht en zoet; daarna papierachtig. Eet ze rauw door een salade.",dubbel:[]},
+{k:"esdoorn",nl:"Gewone esdoorn",la:"Acer pseudoplatanus",grp:"boom",tags:["eetbaar"],delen:"Sap, jong blad, zaad",mnd:[2,3,4,5],
+ herken:"Vijflobbig blad met grof gezaagde rand, gepaarde gevleugelde zaden die onder een scherpe hoek staan.",
+ let:"Sap tappen als bij berk, en alleen bij dikke bomen. Zaden van sommige esdoorns bevatten hypoglycine; eet ze niet in hoeveelheid.",dubbel:[]},
+{k:"robinia",nl:"Robinia",la:"Robinia pseudoacacia",grp:"boom",tags:["eetbaar","giftig"],delen:"Alleen de bloem",mnd:[5,6],
+ herken:"Geveerd blad met ovale blaadjes, paarsgewijze doorns bij de bladvoet, hangende trossen witte, zwaar geurende vlinderbloemen.",
+ let:"Alléén de bloem. Bast, blad en zaad bevatten robine en zijn giftig. Gebruik geen zwavelzwam van deze boom.",dubbel:[]},
+{k:"zoetekers",nl:"Zoete kers",la:"Prunus avium",grp:"boom",tags:["eetbaar"],delen:"Vrucht",mnd:[6,7],
+ herken:"Glanzende horizontaal gestreepte schors, blad met twee rode kliertjes op de bladsteel, kersen aan lange stelen.",
+ let:"Pitten niet kraken. Verwilderde bomen dragen kleinere maar vaak zoetere kersen.",dubbel:[]},
+{k:"vogelkers",nl:"Gewone vogelkers",la:"Prunus padus",grp:"boom",tags:["eetbaar","giftig"],delen:"Vruchtvlees, met beleid",mnd:[7,8],
+ herken:"Lange hangende trossen witte bloemen in mei, schors ruikt onaangenaam bij kneuzen, kleine zwarte kersjes.",
+ let:"Erg wrang, en pit, blad en bast bevatten blauwzuurglycosiden. Alleen het vruchtvlees, en liever verwerkt dan rauw.",dubbel:[]},
+
+/* ---------------- gifplanten erbij ---------------- */
+{k:"gouderegen",nl:"Gouden regen",la:"Laburnum anagyroides",grp:"boom",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Lange hangende trossen felgele vlinderbloemen, drietallig blad, later peulen die op tuinbonen lijken.",
+ let:"Zeer giftig, vooral de zaden. De peulen zijn precies wat een kind wil openmaken.",dubbel:[]},
+{k:"kardinaalsmuts",nl:"Wilde kardinaalsmuts",la:"Euonymus europaeus",grp:"boom",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Vierkante groene twijgen, in het najaar felroze vierlobbige vruchtjes die openspringen en oranje zaden tonen.",
+ let:"Giftig. De vruchtjes zien er eetbaar uit en zijn dat niet.",dubbel:[]},
+{k:"hulst",nl:"Hulst",la:"Ilex aquifolium",grp:"boom",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Leerachtig glanzend blad met stekelige rand, felrode bessen op de vrouwelijke struik.",
+ let:"Bessen giftig; enkele stuks geven al braken en diarree.",dubbel:[]},
+{k:"sneeuwbes",nl:"Sneeuwbes",la:"Symphoricarpos albus",grp:"boom",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Struik in openbaar groen met opvallende witte, sponzige bessen die knappen als je erop stapt.",
+ let:"Giftig. Vaak vlak bij speelplaatsen geplant.",dubbel:[]},
+{k:"heggenrank",nl:"Heggenrank",la:"Bryonia dioica",grp:"kruid",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Klimmer met spiraalranken, ruw handvormig blad, en trossen rode bessen. Enige inheemse komkommerachtige.",
+ let:"Zeer giftig, alle delen, vooral de dikke witte wortel.",dubbel:[]},
+{k:"bosrank",nl:"Bosrank",la:"Clematis vitalba",grp:"kruid",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Houtige klimmer die zich met bladstelen vastklemt, roomwitte bloemen, later pluizige zaadbollen.",
+ let:"Prikkelt huid en slijmvliezen sterk, blaren bij aanraking van het sap.",dubbel:[]},
+{k:"gelelis",nl:"Gele lis",la:"Iris pseudacorus",grp:"kruid",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Zwaardvormig blad zonder aroma, forse gele irisbloem, in slootkant en rietland.",
+ let:"Giftig. Het blad lijkt op kalmoes en op jonge lisdodde — het verschil zit in de geur.",dubbel:[]},
+
+/* ---------------- paddenstoelen: eetbaar ---------------- */
+{k:"berkenboleet",nl:"Gewone berkenboleet",la:"Leccinum scabrum",grp:"zwam",tags:["eetbaar"],delen:"Hoed",mnd:[7,8,9,10],
+ herken:"Grijsbruine hoed, witte buisjes die vuilgrijs worden, en een lange steel met donkere schubjes als een berkenstam. Altijd onder berk.",
+ let:"Vlees wordt zacht bij bakken; jong plukken. Geen giftige berkenboleet bekend, wel smakeloze verwanten.",
+ dubbel:["Galboleet (oneetbaar bitter, roze buisjes, donker netje)"]},
+{k:"stobbezwam",nl:"Stobbezwammetje",la:"Kuehneromyces mutabilis",grp:"zwam",tags:["eetbaar"],delen:"Hoed",mnd:[4,5,6,9,10,11],
+ herken:"Bruine hoed die van buiten naar binnen opdroogt en daardoor twee kleuren heeft, ring aan de steel, en onder de ring duidelijke bruine schubjes.",
+ let:"Alleen voor wie het bundelmosklokje blindelings herkent — dat groeit op dezelfde stronken, heeft géén schubjes onder de ring, en is dodelijk. Bij de minste twijfel laten staan.",
+ dubbel:["Bundelmosklokje (Galerina marginata, dodelijk)","Gewone zwavelkop (giftig, bitter)"]},
+{k:"weidekringzwam",nl:"Weidekringzwam",la:"Marasmius oreades",grp:"zwam",tags:["eetbaar"],delen:"Hoed",mnd:[5,6,7,8,9,10],
+ herken:"Lichtbruine hoed met een bult in het midden, plaatjes wijd uiteen en vrij van de steel, steel taai als een touwtje. In kringen op gras.",
+ let:"Groeit in dezelfde kringen als de giftige weidetrechterzwam, die wit is en aflopende plaatjes heeft. Kijk altijd naar de plaatjesaanhechting.",
+ dubbel:["Giftige weidetrechterzwam (Clitocybe rivulosa, wit, aflopende plaatjes)"]},
+{k:"parelamaniet",nl:"Parelamaniet",la:"Amanita rubescens",grp:"zwam",tags:["eetbaar"],delen:"Hoed",mnd:[7,8,9,10],
+ herken:"Roodbruine hoed met vuilroze vlokken, en het beslissende kenmerk: elke beschadiging, madegang of snee kleurt na een tijdje wijnrood. Ring met groeven.",
+ let:"Rauw giftig, altijd goed doorbakken. Dit is een amaniet, en amanieten zijn het geslacht waar de dodelijke soorten in zitten. Niet aan beginnen zonder iemand die het je in het veld leert.",
+ dubbel:["Panteramaniet (giftig, witte vlokken, geen roodkleuring, gordelknol)"]},
+{k:"hertenzwam",nl:"Gewone hertenzwam",la:"Pluteus cervinus",grp:"zwam",tags:["eetbaar"],delen:"Hoed",mnd:[4,5,6,7,8,9,10],
+ herken:"Grijsbruine hoed met radiale vezels, plaatjes vrij van de steel en van wit naar roze verkleurend, geen ring en geen knol. Op dood loofhout.",
+ let:"Roze sporen en vrije plaatjes zonder ring: dat combineert geen giftige soort. Smaak is matig, textuur zacht. Goed doorbakken.",dubbel:[]},
+
+/* ---------------- paddenstoelen: giftig, de tegenhangers ---------------- */
+{k:"kluifzwam",nl:"Voorjaarskluifzwam",la:"Gyromitra esculenta",grp:"zwam",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Onregelmatig geplooide, hersenachtige roodbruine hoed die massief of kamerig is, niet één holle ruimte zoals de morielje.",
+ let:"Bevat gyromitrine, dat de lever aantast; er zijn dodelijke gevallen bekend, ook na koken. De naam esculenta betekent eetbaar en is een historische vergissing.",dubbel:[]},
+{k:"gordijnzwam",nl:"Gordijnzwammen",la:"Cortinarius",grp:"zwam",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Jong hangt er een spinnenwebachtig vlies tussen hoedrand en steel. Sporen roestbruin, waardoor de plaatjes en vaak ook de steel roestig verkleuren.",
+ let:"Een groot geslacht met enkele soorten die maanden later onherstelbare nierschade geven. Laat elke zwam met een spinnenwebvlies en roestbruine sporen staan.",dubbel:[]},
+{k:"valsehanenkam",nl:"Valse hanenkam",la:"Hygrophoropsis aurantiaca",grp:"zwam",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Oranje trechtertje met échte, dunne, herhaald gevorkte plaatjes — geen dikke ribben zoals de hanenkam. Vaak feller oranje.",
+ let:"Niet dodelijk, wel goed voor maag- en darmklachten bij een deel van de mensen. Het onderscheid ribben tegenover plaatjes is de hele les.",dubbel:[]},
+{k:"karbolchampignon",nl:"Karbolchampignon",la:"Agaricus xanthodermus",grp:"zwam",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Ziet eruit als een champignon, maar snijd de steelvoet door: die kleurt fel chroomgeel. Ruikt naar inkt of carbol, sterker bij verhitting.",
+ let:"Geeft heftige maag- en darmklachten. Snijd bij elke champignon de voet door voor je hem meeneemt.",dubbel:[]},
+{k:"aardappelbovist",nl:"Gewone aardappelbovist",la:"Scleroderma citrinum",grp:"zwam",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Harde, geelbruine, grofschubbige bal met een dikke leerachtige wand; binnenin al vroeg paarszwart met een witte marmering.",
+ let:"Giftig. Snijd elke bal door: puur wit betekent bovist, donker binnenwerk betekent weggooien.",dubbel:[]},
+{k:"braakrussula",nl:"Braakrussula",la:"Russula emetica",grp:"zwam",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Fel scharlakenrode hoed waarvan het velletje makkelijk af te trekken is, sneeuwwitte plaatjes en steel, broos vlees.",
+ let:"Scherp en braakverwekkend. Vuistregel bij russula's: brandend scherp op de tong betekent laten staan.",dubbel:[]},
+
+/* ---------------- paddenstoelen: medicinaal ---------------- */
+{k:"lakzwam",nl:"Gelakte houtzwam",la:"Ganoderma lucidum",grp:"zwam",tags:["medicinaal"],delen:"Vruchtlichaam",mnd:[7,8,9,10],
+ herken:"Niervormige hoed met een glanzende, als gelakte roodbruine bovenkant en een wit porieoppervlak, vaak met een zijdelingse steel. Op loofhoutstronken.",
+ let:"Te hard om te eten; wordt gedroogd en lang gekookt als aftreksel. Het onderzoek bij mensen is beperkt en de handel zit vol verkeerd benoemde soorten. Beschouw dit als traditie.",dubbel:[]}
+];
+
+SPECIES.push(...SPECIES_EXTRA);
+SPECIES.forEach(x=>{
+  if(KWALEN_MAP[x.k]) x.kwalen = KWALEN_MAP[x.k];
+  if(EMA_MAP[x.k]){ x.emaInfo = EMA_MAP[x.k]; x.ema = true;
+    x.kwalen = [...new Set([...(x.kwalen||[]), ...EMA_MAP[x.k].waarvoor])]; }
+});
 const SPEC_BY_K = Object.fromEntries(SPECIES.map(s=>[s.k,s]));
 
 /* =======================================================================
@@ -1236,6 +1610,156 @@ const RECEPTEN = [
  let:"Traditioneel als doorspoelkuur met veel water erbij. Niet bij hart- of nieraandoeningen waarbij je vocht moet beperken."}
 ];
 
+const RECEPTEN_EXTRA = [
+/* ---------------- keuken ---------------- */
+{k:"krentensaus",nl:"Krentenboompjessaus",type:"keuken",soorten:["krent"],mnd:[6,7],tijd:"25 min",opbrengst:"2 potjes",maaksel:"jam",
+ ing:[["500 g","krentenboompjesbessen"],["120 g","suiker"],["1","citroen, sap en zeste"],["1","kaneelstokje"],["1 el","rode wijnazijn"]],
+ stap:["Rits de bessen van de trosjes en spoel ze kort.",
+   "Zet op met suiker, citroensap en kaneel en breng zachtjes aan de kook.",
+   "Laat 15 minuten pruttelen tot de bessen barsten en de saus indikt.",
+   "Kaneelstokje eruit, azijn en zeste erdoor, en heet afvullen.",
+   "Lekker bij wildgerechten, geitenkaas en gebakken bloedworst."],
+ let:"Smaakt naar bosbes met een amandeltoon. De pitjes zijn zacht en mogen mee."},
+{k:"iepenzaadsalade",nl:"Salade van iepenzaadjes",type:"keuken",soorten:["iep","vogelmuur","dovenetel"],mnd:[4,5],tijd:"10 min",opbrengst:"2 personen",
+ ing:[["2 handen","jonge iepenzaadvleugels"],["2 handen","vogelmuur"],["1 hand","witte dovenetelbloemen"],["1 el","hazelnootolie"],["2 tl","appelazijn"],["","zout, zwarte peper"]],
+ stap:["Pluk de zaadvleugels zolang ze nog helder groen en zacht zijn — dat duurt maar twee weken.",
+   "Spoel alles voorzichtig en zwier droog.",
+   "Meng olie, azijn, zout en peper tot een dressing.",
+   "Meng op het laatste moment, anders slaat de vogelmuur in.",
+   "Afmaken met de dovenetelbloemen erover."],
+ let:"Iepenzaad wordt binnen twee weken papierachtig. Pluk niet van bomen langs drukke wegen."},
+{k:"robiniabeignets",nl:"Beignets van robiniabloesem",type:"keuken",soorten:["robinia","vlier"],mnd:[5,6],tijd:"25 min",opbrengst:"4 personen",
+ ing:[["12","volle trossen robiniabloesem"],["120 g","bloem"],["200 ml","koud bier of bruiswater"],["1","ei"],["1 snuf","zout"],["","zonnebloemolie om te frituren"],["","poedersuiker"]],
+ stap:["Gebruik uitsluitend de bloemtrossen. Bast, blad en zaad van robinia zijn giftig.",
+   "Schud de trossen uit maar was ze niet.",
+   "Klop bloem, ei, zout en bier tot een dun beslag; laat 10 minuten rusten.",
+   "Verhit de olie tot 175 °C.",
+   "Houd elke tros aan de steel, haal hem door het beslag en frituur 1 tot 2 minuten goudbruin.",
+   "Uit laten lekken, steel afknippen, bestuiven met poedersuiker."],
+ let:"Werkt net zo goed met vlierbloesem. Alleen de bloem, nooit iets anders van de robinia."},
+{k:"lisdoddesoep",nl:"Soep van lisdoddescheuten",type:"keuken",soorten:["lisdodde","brandnetel"],mnd:[5,6],tijd:"35 min",opbrengst:"4 personen",
+ ing:[["300 g","jonge lisdoddescheuten, geschild"],["1","ui"],["1","aardappel"],["1 l","bouillon"],["1 hand","brandneteltoppen"],["30 g","boter"],["","citroensap, zout"]],
+ stap:["Trek de jonge scheut uit de plant en pel de buitenste lagen tot het witte, malse hart.",
+   "Snijd in stukken en fruit met ui in boter.",
+   "Aardappel en bouillon erbij, 20 minuten koken.",
+   "Netels de laatste twee minuten erdoor, dan pureren.",
+   "Op smaak met citroen en zout."],
+ let:"Alleen uit water waarvan je de herkomst kent — lisdodde neemt zware metalen op. Niet in beschermd rietland oogsten."},
+{k:"zeewierbouillon",nl:"Zeewierbouillon",type:"keuken",soorten:["suikerwier","zeesla"],mnd:[3,4,5,6],tijd:"40 min",opbrengst:"1,5 l",
+ ing:[["20 g","gedroogd suikerwier"],["1,5 l","koud water"],["2","gedroogde shiitake of judasoor"],["1","ui, gehalveerd en aangebakken"],["1 el","lichte sojasaus"]],
+ stap:["Week het wier een uur in koud water; niet spoelen, dat witte poeder is mannitol en smaak.",
+   "Verwarm langzaam tot net onder het kookpunt en houd daar 20 minuten. Niet laten koken, dan wordt het slijmerig.",
+   "Wier eruit, zwammen en ui erin, nog 15 minuten trekken.",
+   "Zeef en breng op smaak met sojasaus."],
+ let:"Het uitgetrokken wier kun je in reepjes snijden en meegeven in de soep."},
+{k:"zeekraalpickle",nl:"Zeekraal in zoetzuur",type:"keuken",soorten:["zeekraal","zeeaster"],mnd:[6,7,8],tijd:"1 week",opbrengst:"1 pot 500 ml",maaksel:"ingelegd",
+ ing:[["300 g","zeekraal"],["250 ml","rijstazijn"],["80 g","suiker"],["1 tl","korianderzaad"],["1","sjalot, in ringen"]],
+ stap:["Spoel de zeekraal grondig; er zit altijd slib tussen.",
+   "Blancheer 30 seconden en koel direct in ijswater, zo blijft hij knappend.",
+   "Kook azijn, suiker en koriander op tot de suiker weg is.",
+   "Doe zeekraal en sjalot in een schone pot en giet het warme zoetzuur erover.",
+   "Een week laten staan. Blijft koel een half jaar goed."],
+ let:"Geen zout toevoegen. Controleer of plukken op die kwelder is toegestaan."},
+{k:"eikelmeel",nl:"Eikelmeel",type:"keuken",soorten:["eik"],mnd:[9,10,11],tijd:"3 dagen",opbrengst:"ca. 400 g",maaksel:"poeder",
+ ing:[["1,5 kg","eikels"],["","ruim koud water"]],
+ stap:["Gooi eikels met gaatjes weg; die zitten vol larven. De rest gaat in water: drijvers weg.",
+   "Pel ze en maal grof in een keukenmachine.",
+   "Zet de gemalen eikels onder koud water in een grote pot. Ververs het water twee tot drie keer per dag.",
+   "Ga door tot het water helder blijft en een korreltje niet meer samentrekt op de tong. Reken op twee tot drie dagen.",
+   "Zeef door een doek, spreid dun uit en droog volledig. Maal daarna fijn."],
+ let:"Wateren in koud water houdt het zetmeel intact; met heet water krijg je een bindende brij in plaats van meel."},
+{k:"bramenblaadthee",nl:"Gefermenteerde bramenbladthee",type:"keuken",soorten:["braam","framboos","bosaardbei"],mnd:[5,6,7],tijd:"3 dagen",opbrengst:"1 pot",maaksel:"thee",
+ ing:[["300 g","jong bramenblad"]],
+ stap:["Laat het blad een dag slap worden op een doek.",
+   "Rol elk blad stevig tussen je handen tot het donker wordt en vochtig aanvoelt — je breekt de celwanden.",
+   "Doe de gerolde blaadjes in een afgesloten pot of onder een vochtige doek, 12 tot 24 uur op kamertemperatuur.",
+   "Ze ruiken dan fruitig, bijna naar rozen. Zodra het zuur of muf ruikt is het te ver.",
+   "Droog daarna snel en volledig, bij 50 °C of in de zon."],
+ let:"Het verschil met gewoon gedroogd blad is enorm: de fermentatie haalt het hooiachtige eruit."},
+{k:"kruidenboterbloesem",nl:"Kruidenboter van lentegroen",type:"keuken",soorten:["daslook","lookzonderlook","hondsdraf","dovenetel"],mnd:[3,4,5],tijd:"20 min",opbrengst:"250 g",
+ ing:[["250 g","zachte roomboter"],["1 hand","daslook"],["1 hand","look-zonder-look"],["1 kl hand","hondsdraf"],["1 tl","citroenrasp"],["1 tl","zout"]],
+ stap:["Ruik elk daslookblad apart op knoflook voordat er iets in de kom gaat.",
+   "Hak alle kruiden zeer fijn; hondsdraf spaarzaam, dat is een sterk kruid.",
+   "Meng door de boter met zout en citroenrasp.",
+   "Rol in bakpapier tot een worst en laat in de koelkast opstijven.",
+   "Blijft twee weken goed in de koelkast, drie maanden in de vriezer."],
+ let:"Hondsdraf niet tijdens zwangerschap. Houd het bij een klein handje."},
+{k:"zilverschoonwortel",nl:"Geroosterde zilverschoonwortels",type:"keuken",soorten:["zilverschoon","klit"],mnd:[9,10,11],tijd:"45 min",opbrengst:"2 personen",
+ ing:[["400 g","zilverschoon- en klitwortels"],["3 el","olijfolie"],["2","takjes tijm"],["1 tl","zout"],["1 el","honing"]],
+ stap:["Schrob de wortels; schillen hoeft niet, dat kost te veel.",
+   "Klitwortel eerst 10 minuten voorkoken, zilverschoon niet.",
+   "Meng met olie, tijm en zout en spreid uit op een plaat.",
+   "Rooster 30 minuten op 200 °C, halverwege omscheppen.",
+   "Laatste vijf minuten de honing erover."],
+ let:"Zilverschoon groeit graag op betreden oevers; grondig wassen en niet vlak langs paden oogsten."},
+
+/* ---------------- lijf ---------------- */
+{k:"borstthee",nl:"Borstthee",type:"lijf",soorten:["heemst","weegbree","linde","vlier","koningskaars","tijm"],mnd:[5,6,7,8],tijd:"15 min",opbrengst:"1 pot",maaksel:"thee",
+ ing:[["20 g","heemstwortel, gedroogd"],["20 g","smalle weegbree, blad"],["15 g","lindebloesem"],["15 g","vlierbloesem"],["15 g","koningskaarsbloem"],["15 g","wilde tijm"]],
+ stap:["Meng alle gedroogde delen heel; pas malen als je zet.",
+   "Zeef de koningskaarsbloemen apart door een fijne doek, de haartjes prikkelen de keel.",
+   "Zetten: twee theelepels op een kop, tien minuten afgedekt trekken.",
+   "Heemstwortel geeft zijn slijmstoffen beter af als je die apart een uur koud zet en er daarna bij giet.",
+   "Bewaar de melange luchtdicht en donker, maximaal een jaar."],
+ let:"Deze combinatie staat in de EU-monografie Species pectorales. Dat is erkenning van traditioneel gebruik, geen bewijs dat het werkt. Bij hoest langer dan een week naar de huisarts."},
+{k:"wilgenbastaftreksel",nl:"Wilgenbastaftreksel",type:"lijf",soorten:["wilg"],mnd:[3,4],tijd:"1 uur",opbrengst:"ca. 500 ml",
+ ing:[["15 g","gedroogde wilgenbast van jonge twijgen"],["600 ml","water"]],
+ stap:["Schil dunne twijgen van niet dikker dan een duim; nooit een strook rondom een stam, dan sterft de boom.",
+   "Snijd de bast klein en droog volledig.",
+   "Week een nacht in koud water.",
+   "Breng aan de kook en laat 15 minuten zacht trekken.",
+   "Zeef. Maximaal twee dagen koel bewaren."],
+ let:"Salicylaten. Niet bij aspirine-allergie, niet naast bloedverdunners, en nooit aan kinderen met koorts. Bij twijfel de huisarts."},
+{k:"tormentiltinctuur",nl:"Tormentiltinctuur",type:"lijf",soorten:["tormentil"],mnd:[9,10],tijd:"4 weken",opbrengst:"ca. 200 ml",maaksel:"tinctuur",
+ ing:[["40 g","verse tormentilwortelstok"],["250 ml","alcohol 40%"]],
+ stap:["Was de wortelstok en snijd hem klein; hij kleurt bloedrood aan de lucht.",
+   "Doe in een pot en overgiet ruim met alcohol.",
+   "Vier weken donker wegzetten, dagelijks schudden.",
+   "Zeven en in donkere flesjes bewaren.",
+   "Ook bruikbaar als mondspoeling, verdund in lauw water."],
+ let:"Zeer looizuurrijk. Kort gebruiken, niet op een lege maag, en niet bij een ontstoken darm. Deze app geeft geen doseringen."},
+{k:"koningskaarsolie",nl:"Koningskaarsolie",type:"lijf",soorten:["koningskaars"],mnd:[6,7,8],tijd:"3 weken",opbrengst:"ca. 200 ml",maaksel:"olie",
+ ing:[["30 g","gedroogde koningskaarsbloemen"],["250 ml","olijfolie"]],
+ stap:["Pluk de bloemen die op die dag opengaan; ze verwelken binnen een dag.",
+   "Droog ze volledig — vers materiaal in olie geeft schimmel en botulismerisico.",
+   "Zeef ze door een fijne doek om de haartjes kwijt te raken.",
+   "Overgiet met olie en zet drie weken warm en donker weg.",
+   "Zeef door een doek en bewaar koel en donker."],
+ let:"Uitwendig gebruik. Niet in een oor gieten bij een mogelijk gescheurd trommelvlies; dat hoort bij de huisarts."},
+{k:"viooltjeszalf",nl:"Zalf van driekleurig viooltje",type:"lijf",soorten:["viooltje3","weegbree"],mnd:[5,6,7,8],tijd:"3 weken",opbrengst:"ca. 120 ml",maaksel:"zalf",
+ ing:[["25 g","gedroogd viooltjeskruid met bloem"],["10 g","gedroogd weegbreeblad"],["250 ml","zonnebloemolie"],["25 g","bijenwas"]],
+ stap:["Droog beide kruiden volledig.",
+   "Zet ze samen in de olie, drie weken warm en donker, of drie uur au bain-marie op 40 °C.",
+   "Zeef door een doek en pers goed uit.",
+   "Smelt de bijenwas erin, ongeveer 1 deel op 10 delen olie.",
+   "Test een druppel op een koud bord en giet warm in potjes."],
+ let:"EU-monografie voor viooltje betreft uitwendig gebruik bij lichte, droge huidklachten. Bij aanhoudende uitslag naar de huisarts."},
+{k:"herderstasjethee",nl:"Herderstasjethee",type:"lijf",soorten:["herderstasje"],mnd:[4,5,6,9,10],tijd:"15 min",opbrengst:"1 kop",
+ ing:[["2 tl","gedroogd herderstasjekruid"],["250 ml","kokend water"]],
+ stap:["Oogst het hele kruid als de eerste hartvormige zaaddoosjes zichtbaar zijn.",
+   "Droog het snel en luchtig; traag drogen maakt het zwart en waardeloos.",
+   "Overgiet twee theelepels met kokend water.",
+   "Tien minuten afgedekt laten trekken en zeven."],
+ let:"Niet tijdens zwangerschap. EU-monografie noemt kortdurend gebruik bij hevige menstruatie; bij aanhoudend bloedverlies hoort een arts."},
+{k:"moerasspireathee",nl:"Moerasspireathee",type:"lijf",soorten:["moerasspirea"],mnd:[6,7,8],tijd:"15 min",opbrengst:"1 kop",
+ ing:[["2 tl","gedroogde bloesem of kruid"],["250 ml","heet water van 90 °C"]],
+ stap:["Pluk de schuimige bloempluimen op een droge dag, ze ruiken naar amandel en honing.",
+   "Droog snel en luchtig.",
+   "Overgiet met water van 90 graden, niet met kokend water — dat verjaagt het aroma.",
+   "Tien minuten afgedekt trekken."],
+ let:"Bevat salicylaten. Niet bij aspirine-allergie, voorzichtig naast bloedverdunners. Dit is de plant waar aspirine naar vernoemd is."},
+{k:"heermoesspoeling",nl:"Heermoes-nagelbad",type:"lijf",soorten:["heermoes"],mnd:[5,6,7],tijd:"30 min",opbrengst:"1 bad",
+ ing:[["20 g","gedroogde groene zomerscheuten"],["1 l","water"]],
+ stap:["Gebruik alleen de groene zomerscheuten, niet de bleke voorjaarsstengels.",
+   "Controleer op lidrus: bij heermoes zijn de eerste zijtakleden lánger dan de schede van de hoofdstengel.",
+   "Week een nacht in koud water.",
+   "Kook daarna 20 minuten met deksel — kiezelzuur komt alleen bij langdurig koken vrij.",
+   "Laat afkoelen tot handwarm en houd handen of voeten er een kwartier in."],
+ let:"Uitwendig gebruik. Inwendig bevat heermoes thiaminase en hoort het niet in een langdurige kuur."}
+];
+
+RECEPTEN.push(...RECEPTEN_EXTRA);
+
 /* =======================================================================
    CONSTANTEN
    ======================================================================= */
@@ -1326,7 +1850,7 @@ const S = {
   leer:lsGet("leer",{streak:0,laatst:null,totaal:0,doel:10}),
   push:{aan:false,tijd:"09:00",laatst:null},
   specView:"nu", kastView:"alles", kastMode:"kast", recView:"alles",
-  keur:{}, spook:null, ontdekVol:null,
+  keur:{}, spook:null, ontdekVol:null, concept:null,
   taxa:lsGet("taxa",{})   /* soortsleutel -> gbif taxonKey */
 };
 
@@ -1632,10 +2156,10 @@ function initTik(){
     if(quizEl.classList.contains("on") || sheetEl.classList.contains("on")) return;
     if(doel && doel.closest && doel.closest(".leaflet-control, .leaflet-popup")) return;
     laatsteTik = Date.now();
-    /* op de spookpin zelf: maak hem echt */
+    /* op de spookpin zelf: pas nu een echte vondst beginnen */
     if(doel && doel.closest && doel.closest(".spook")){
       const p = S.spook; wisSpook();
-      if(p) newPin(p.lat, p.lng, null);
+      if(p) nieuweVondst(p.lat, p.lng);
       return;
     }
     /* op een bestaande pin: laat Leaflet zijn werk doen */
@@ -1674,7 +2198,7 @@ function wisSpook(){
   spookHint.classList.remove("on");
 }
 function zetSpook(lat, lng){
-  wisSpook();
+  wisSpook();          /* een nieuwe spookpin laat de vorige altijd vallen */
   const m = L.marker([lat,lng],{icon:spookIcon(), zIndexOffset:900}).addTo(S.map);
   m.on("click", (ev)=>{
     if(ev && ev.originalEvent) L.DomEvent.stopPropagation(ev.originalEvent);
@@ -1997,6 +2521,48 @@ const ZEGEL = '<svg class="zegel" viewBox="0 0 40 40"><circle cx="20" cy="20" r=
  '<circle cx="20" cy="20" r="14" fill="none" stroke="#F1E9D6" stroke-width="1" opacity=".7"/>'+
  '<path d="M20 11v11M20 26v2.4" stroke="#F1E9D6" stroke-width="2.6" stroke-linecap="round"/></svg>';
 
+/* ---------- vergrootglas voor alle foto's ---------- */
+const loepEl = document.getElementById("loep");
+const loepImg = document.getElementById("loepImg");
+let loepSchaal = 1, loepX = 0, loepY = 0;
+function loepZet(){ loepImg.style.transform = "translate("+loepX+"px,"+loepY+"px) scale("+loepSchaal+")"; }
+function openLoep(src, bij){
+  if(!src) return;
+  loepImg.src = src;
+  document.getElementById("loepBij").textContent = bij || "";
+  loepSchaal = 1; loepX = 0; loepY = 0; loepZet();
+  loepEl.classList.add("on");
+}
+function sluitLoep(){ loepEl.classList.remove("on"); loepImg.src = ""; }
+document.getElementById("loepSluit").onclick = sluitLoep;
+loepEl.addEventListener("click", e=>{ if(e.target === loepEl) sluitLoep(); });
+(function loepGebaren(){
+  let d0 = 0, s0 = 1, px = 0, py = 0, x0 = 0, y0 = 0, sleep = false, laatsteTap = 0;
+  const afst = t => Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY);
+  loepImg.addEventListener("touchstart", e=>{
+    if(e.touches.length === 2){ d0 = afst(e.touches); s0 = loepSchaal; sleep = false; }
+    else if(e.touches.length === 1){
+      sleep = true; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; px = loepX; py = loepY;
+      const nu = Date.now();
+      if(nu - laatsteTap < 300){ loepSchaal = loepSchaal > 1.2 ? 1 : 2.6; loepX = 0; loepY = 0; loepZet(); }
+      laatsteTap = nu;
+    }
+  }, {passive:true});
+  loepImg.addEventListener("touchmove", e=>{
+    if(e.touches.length === 2 && d0){
+      loepSchaal = Math.min(6, Math.max(1, s0 * afst(e.touches) / d0)); loepZet();
+    } else if(sleep && loepSchaal > 1.05 && e.touches.length === 1){
+      loepX = px + (e.touches[0].clientX - x0);
+      loepY = py + (e.touches[0].clientY - y0);
+      loepZet();
+    }
+  }, {passive:true});
+  loepImg.addEventListener("touchend", ()=>{
+    d0 = 0; sleep = false;
+    if(loepSchaal <= 1.05){ loepSchaal = 1; loepX = 0; loepY = 0; loepZet(); }
+  }, {passive:true});
+})();
+
 const sheetEl = document.getElementById("sheet");
 const scrimEl = document.getElementById("scrim");
 const bodyEl  = document.getElementById("sheetBody");
@@ -2006,8 +2572,18 @@ function showSheet(html){
   bodyEl.innerHTML = html;
   sheetEl.classList.add("on"); scrimEl.classList.add("on");
   sheetEl.scrollTop = 0; hydratePhotos(bodyEl);
+  bodyEl.querySelectorAll(".ph img").forEach(img=>{
+    img.addEventListener("click", e=>{
+      e.stopPropagation();
+      const kaart = img.closest(".ph");
+      const lic = kaart && kaart.querySelector(".lic");
+      const st  = kaart && kaart.querySelector(".st");
+      openLoep(img.src, (lic && lic.textContent) || (st && st.textContent) || "");
+    });
+  });
 }
 function closeSheet(){
+  if(S.concept) S.concept = null;
   sheetEl.classList.remove("on"); scrimEl.classList.remove("on");
   const prev = S.open; S.open = null;
   if(prev && S.markers.has(prev)){
@@ -2039,6 +2615,138 @@ const FLOURISH = '<svg class="flourish" viewBox="0 0 132 16" fill="none" stroke=
 const HOEKRANK = '<svg class="hoekrank" viewBox="0 0 60 70" fill="none" stroke="#2C2A1F" stroke-width="1.2" '+
  'stroke-linecap="round"><path d="M50 2C46 14 44 26 46 38c1 8 4 14 9 20"/>'+
  '<path d="M46 12c-6-1-10-4-12-9 6-1 11 2 12 9Zm2 11c6-2 10-6 11-12-6 0-11 4-11 12Zm-1 12c-7-1-11-4-13-10 6-1 12 3 13 10Z"/></svg>';
+
+/* =======================================================================
+   GEBRUIKSTEKENING
+   Schematische pentekening per groeivorm. Wat je gebruikt is ingekleurd,
+   de rest blijft lijn. De kleur zegt welk soort deel het is.
+   Dit is een schema, geen soortgetrouwe botanische plaat.
+   ======================================================================= */
+const DEELKLEUR = {
+  blad:   ["#7C9E58", "Blad en scheut"],
+  bloem:  ["#E0B45F", "Bloem en knop"],
+  vrucht: ["#A8443A", "Vrucht, bes of zaad"],
+  wortel: ["#B0813F", "Wortel of knol"],
+  stengel:["#9FB27A", "Stengel of steel"],
+  bast:   ["#8A6A46", "Bast of sap"],
+  hoed:   ["#C08552", "Hoed"],
+  steel:  ["#D9C39B", "Steel"],
+  thallus:["#6F9E86", "Thallus"]
+};
+function welkeDelen(sp){
+  const t = (sp.delen || "").toLowerCase();
+  const uit = new Set();
+  if(sp.grp === "zwam"){
+    if(/hoed|vruchtlichaam|rand/.test(t)) uit.add("hoed");
+    if(/vruchtlichaam/.test(t)) uit.add("steel");
+    return uit;
+  }
+  if(/thallus|wier/.test(t)) { uit.add("thallus"); return uit; }
+  /* Nederlandse samenstellingen: wel een grens aan het begin, niet aan het eind,
+     zodat wortelknolletje en bladsteel ook meetellen. Korte woorden als aar en
+     sap krijgen wel een grens, anders vangt jaar of sappig ze op. */
+  if(/\bblad|\btop|\bkruid|\bscheut|\brozet|\bnaald|hele plant/.test(t)) uit.add("blad");
+  if(/\bbloem|\bbloesem|\bknop|\bkatje|\bbel|\baar\b|\baren\b|\bpluim|bloeiende|stuifmeel/.test(t)) uit.add("bloem");
+  if(/\bvrucht|\bbes|\bbottel|\bnoot|\bzaad|\bpeul|\bpit\b|\beikel|\bsigaar|\bvleugel|\bkastanje|\bpruim|\bkers/.test(t)) uit.add("vrucht");
+  if(/\bwortel|\bknol|\bbol\b/.test(t)) uit.add("wortel");
+  if(/\bstengel|steel|\bscheut/.test(t)) uit.add("stengel");
+  if(/\bbast|\bsap\b/.test(t)) uit.add("bast");
+  if(!uit.size) uit.add("blad");
+  return uit;
+}
+const INKT = "#2C2A1F";
+function vul(aan, soort){
+  return aan ? 'fill="'+DEELKLEUR[soort][0]+'" fill-opacity=".85" stroke="'+INKT+'" stroke-width="1.5"'
+             : 'fill="none" stroke="'+INKT+'" stroke-opacity=".5" stroke-width="1.3"';
+}
+function tekeningKruid(d){
+  let g = '<svg viewBox="0 0 150 230" stroke-linejoin="round" stroke-linecap="round">';
+  /* wortel */
+  g += '<g '+vul(d.has("wortel"),"wortel")+'>'+
+       '<path d="M75 176c7 8 10 20 8 36-2 12-6 16-8 16s-6-4-8-16c-2-16 1-28 8-36Z"/>'+
+       '<path d="M68 192c-8 2-13 7-16 15M82 192c8 2 13 7 16 15M70 208c-6 2-10 6-12 12M80 208c6 2 10 6 12 12" fill="none"/></g>';
+  /* stengel */
+  g += d.has("stengel")
+    ? '<path d="M75 176V56" fill="none" stroke="'+DEELKLEUR.stengel[0]+'" stroke-width="6"/>'
+    : '<path d="M75 176V56" fill="none" stroke="'+INKT+'" stroke-opacity=".5" stroke-width="2.6"/>';
+  /* bladeren */
+  const bl = [[75,152,-34,40,17],[75,152,214,40,17],[75,120,-30,34,15],[75,120,210,34,15],[75,92,-26,27,12],[75,92,206,27,12]];
+  g += '<g '+vul(d.has("blad"),"blad")+'>';
+  bl.forEach(([x,y,r,l,w])=>{
+    g += '<path transform="rotate('+r+' '+x+' '+y+')" d="M'+x+' '+y+'c'+l*0.35+' -'+w+' '+l*0.8+' -'+w+' '+l+' 0 -'+l*0.2+' '+w+' -'+l*0.65+' '+w+' -'+l+' 0Z"/>';
+  });
+  g += '</g>';
+  /* bloem */
+  g += '<g '+vul(d.has("bloem"),"bloem")+'>';
+  for(let i=0;i<7;i++){
+    const a = -Math.PI + i*(Math.PI/6);
+    g += '<ellipse cx="'+(75+Math.cos(a)*20).toFixed(1)+'" cy="'+(46+Math.sin(a)*11).toFixed(1)+
+         '" rx="7.5" ry="5.5"/>';
+  }
+  g += '<circle cx="75" cy="44" r="7"/></g>';
+  /* vrucht */
+  g += '<g '+vul(d.has("vrucht"),"vrucht")+'>'+
+       '<circle cx="52" cy="70" r="6.5"/><circle cx="63" cy="62" r="5.5"/><circle cx="99" cy="70" r="6.5"/>'+
+       '<circle cx="88" cy="62" r="5.5"/></g>';
+  return g + '</svg>';
+}
+function tekeningBoom(d){
+  let g = '<svg viewBox="0 0 150 230" stroke-linejoin="round" stroke-linecap="round">';
+  g += '<g '+vul(d.has("wortel"),"wortel")+'>'+
+       '<path d="M60 208c-8 4-13 10-16 18M90 208c8 4 13 10 16 18M75 210v16" fill="none"/></g>';
+  /* stam en bast */
+  g += '<path d="M67 210V132h16v78Z" '+vul(d.has("bast"),"bast")+'/>';
+  if(d.has("bast")) g += '<path d="M71 200v-58M79 198v-54" fill="none" stroke="'+INKT+'" stroke-opacity=".45" stroke-width="1.2"/>';
+  g += '<path d="M75 140 46 108M75 150l30-34M75 122 58 96M75 128l20-24" fill="none" stroke="'+INKT+'" stroke-opacity=".5" stroke-width="2"/>';
+  /* kroon */
+  g += '<g '+vul(d.has("blad"),"blad")+'>'+
+       '<path d="M75 26c26 0 44 16 44 38 0 24-20 40-44 40S31 88 31 64c0-22 18-38 44-38Z"/></g>';
+  if(!d.has("blad")) g += '<path d="M52 52c8 6 12 14 12 24M98 52c-8 6-12 14-12 24M75 40v56" fill="none" stroke="'+INKT+'" stroke-opacity=".35" stroke-width="1.1"/>';
+  /* bloesem */
+  g += '<g '+vul(d.has("bloem"),"bloem")+'><circle cx="47" cy="46" r="6"/><circle cx="103" cy="46" r="6"/>'+
+       '<circle cx="75" cy="24" r="6"/></g>';
+  /* vrucht */
+  g += '<g '+vul(d.has("vrucht"),"vrucht")+'><circle cx="55" cy="86" r="7"/><circle cx="94" cy="82" r="7"/>'+
+       '<circle cx="75" cy="96" r="7"/></g>';
+  return g + '</svg>';
+}
+function tekeningZwam(d){
+  let g = '<svg viewBox="0 0 150 230" stroke-linejoin="round" stroke-linecap="round">';
+  g += '<path d="M62 196c0-8 3-14 3-30v-46h20v46c0 16 3 22 3 30Z" '+vul(d.has("steel"),"steel")+'/>';
+  g += '<path d="M75 62c31 0 52 20 52 40 0 6-4 10-12 10H35c-8 0-12-4-12-10 0-20 21-40 52-40Z" '+vul(d.has("hoed"),"hoed")+'/>';
+  g += '<path d="M32 112c8-14 24-22 43-22s35 8 43 22" fill="none" stroke="'+INKT+'" stroke-opacity=".45" stroke-width="1.2"/>';
+  for(let i=1;i<9;i++){
+    const x = 30 + i*11;
+    g += '<path d="M'+x+' 112c1-8 3-14 6-19" fill="none" stroke="'+INKT+'" stroke-opacity=".3" stroke-width="1"/>';
+  }
+  g += '<path d="M55 196c0 8 9 14 20 14s20-6 20-14Z" fill="none" stroke="'+INKT+'" stroke-opacity=".4" stroke-width="1.3"/>';
+  return g + '</svg>';
+}
+function tekeningWier(d){
+  let g = '<svg viewBox="0 0 150 230" stroke-linejoin="round" stroke-linecap="round">';
+  g += '<g '+vul(d.has("thallus"),"thallus")+'>'+
+       '<path d="M75 206c-24-14-36-44-32-78 3-26 14-44 32-56 18 12 29 30 32 56 4 34-8 64-32 78Z"/></g>';
+  g += '<path d="M75 72v130" fill="none" stroke="'+INKT+'" stroke-opacity=".4" stroke-width="1.4"/>';
+  g += '<path d="M62 214c-6 4-10 8-12 14M88 214c6 4 10 8 12 14" fill="none" stroke="'+INKT+'" stroke-opacity=".5" stroke-width="1.6"/>';
+  return g + '</svg>';
+}
+function gebruiksTekening(sp){
+  const d = welkeDelen(sp);
+  let svgs;
+  if(sp.grp === "zwam") svgs = tekeningZwam(d);
+  else if(d.has("thallus")) svgs = tekeningWier(d);
+  else if(sp.grp === "boom") svgs = tekeningBoom(d);
+  else svgs = tekeningKruid(d);
+  const volgorde = sp.grp === "zwam" ? ["hoed","steel"]
+    : d.has("thallus") ? ["thallus"]
+    : ["blad","bloem","vrucht","wortel","stengel","bast"];
+  const lg = volgorde.map(x=>{
+    const aan = d.has(x), c = DEELKLEUR[x];
+    return '<div><i style="background:'+(aan?c[0]:"transparent")+'"></i>'+
+      '<span'+(aan?'':' class="uit"')+'>'+c[1]+(aan?'':' — niet')+'</span></div>';
+  }).join("");
+  return '<div class="tekening">'+svgs+'<div class="lg">'+lg+'</div></div>';
+}
 
 /* =======================================================================
    BETROUWBAARHEID — eigen controle op soorten en recepten
@@ -2233,19 +2941,27 @@ function harvestForm(pinId){
     await dbPut("pins",pin); toast("Oogst genoteerd"); openSheet(pinId);
   };
 }
-async function newPin(lat,lng,acc){
-  const pin = {id:uid("pin_"),lat,lng,acc:acc||null,spec:null,naam:"",latijn:"",plek:"",habitat:"",hoev:"",
+function leegPin(lat,lng,acc){
+  return {id:uid("pin_"),lat,lng,acc:acc||null,spec:null,naam:"",latijn:"",plek:"",habitat:"",hoev:"",
     toegang:"vrij",zeker:"tebevestigen",vervuiling:[],notitie:"",fotos:[],oogst:[],
     gemaakt:new Date().toISOString(),gewijzigd:new Date().toISOString()};
+}
+/* Opent het formulier zonder iets op te slaan. Pas bij Bewaren komt de vondst
+   in de lijst en op de kaart. Weggooien laat niets achter. */
+function nieuweVondst(lat,lng,acc){
+  S.concept = leegPin(lat,lng,acc);
+  editPin(S.concept.id, true);
+}
+async function newPin(lat,lng,acc){   /* nog gebruikt vanuit de GBIF-laag */
+  const pin = leegPin(lat,lng,acc);
   S.pins.push(pin); await dbPut("pins",pin);
   drawMarkers();
-  /* extra zekerheid: als het filter de verse pin zou verbergen, zet die groep aan */
   if(!S.markers.has(pin.id)){ S.filter.onbekend = true; lsSet("filter",S.filter); drawMarkers(); }
-  S.map.panTo([lat,lng],{animate:true});
-  editPin(pin.id,true);
+  return pin;
 }
 function editPin(id,isNew){
-  const pin = S.pins.find(p=>p.id===id); if(!pin) return;
+  const pin = (S.concept && S.concept.id===id) ? S.concept : S.pins.find(p=>p.id===id);
+  if(!pin) return;
   const sp = pin.spec?SPEC_BY_K[pin.spec]:null;
   let h = '<div class="label">'+VINE+'<div class="acc"><span>'+(isNew?"Nieuwe vondst":"Bewerken")+'</span>'+
     '<span class="coords">'+pin.lat.toFixed(5)+", "+pin.lng.toFixed(5)+'</span></div>'+
@@ -2288,7 +3004,10 @@ function editPin(id,isNew){
     document.getElementById("edTitle").textContent="Welke soort?";
     document.getElementById("edLa").textContent="nog niet bepaald"; renderPick();
   };
-  document.getElementById("edCancel").onclick = ()=> isNew ? delPin(pin.id,true) : openSheet(pin.id);
+  document.getElementById("edCancel").onclick = ()=>{
+    if(isNew){ S.concept = null; closeSheet(); toast("Weggegooid, niets bewaard"); }
+    else openSheet(pin.id);
+  };
   document.getElementById("edSave").onclick = async ()=>{
     pin.spec = sel;
     if(!sel && custom) pin.naam = custom;
@@ -2298,6 +3017,10 @@ function editPin(id,isNew){
     pin.hoev=segVal("edHoev"); pin.toegang=segVal("edToe")||"vrij";
     pin.zeker=segVal("edZeker")||"tebevestigen"; pin.vervuiling=segVals("edVerv");
     pin.gewijzigd=new Date().toISOString();
+    if(S.concept && S.concept.id===pin.id){
+      S.pins.push(pin); S.concept = null;
+      if(!S.filter.onbekend && !pin.spec){ S.filter.onbekend = true; lsSet("filter",S.filter); }
+    }
     await dbPut("pins",pin); drawMarkers(); toast("Vondst bewaard"); openSheet(pin.id);
   };
 }
@@ -2350,8 +3073,30 @@ async function specSheet(k, terugPin){
       'en bewaar een restant of een foto. De arts kan het Nationaal Vergiftigingen Informatie Centrum raadplegen. '+
       'Wacht niet op klachten: bij amatoxinen komen die pas na uren, als de schade al begonnen is.</div>';
 
+  h += '<div class="sec">'+sech("Wat je gebruikt","",'hand')+gebruiksTekening(s)+
+    '<div class="kv" style="margin-top:9px"><span>Delen</span><span>'+esc(s.delen)+'</span></div></div>';
+
   if(s.herken) h += '<div class="sec">'+sech("Veldkenmerken","",'oog')+'<div class="prose">'+esc(s.herken)+'</div></div>';
-  if(s.med)    h += '<div class="sec">'+sech("Traditioneel gebruik","",'vijzel')+'<div class="prose">'+esc(s.med)+'</div></div>';
+
+  if(s.kwalen && s.kwalen.length){
+    const ema = s.emaInfo ? s.emaInfo.waarvoor : [];
+    h += '<div class="sec">'+sech("Waarvoor het gebruikt wordt","",'vijzel')+
+      '<div class="bron">'+s.kwalen.map(k=>{
+        const kw = KWAAL_BY_K[k]; if(!kw) return "";
+        return '<button data-kw="'+k+'">'+esc(kw.nm)+(ema.includes(k)?' <span class="emabadge ink">EMA</span>':'')+'</button>';
+      }).join("")+'</div>';
+    if(s.emaInfo){
+      h += '<div class="herkomst" style="border-left-color:var(--goud)"><b>Europese monografie.</b> '+
+        esc(s.emaInfo.ref)+' — '+esc(s.emaInfo.deel)+'. Het Comité voor Kruidengeneesmiddelen van het EMA heeft dit '+
+        'vastgelegd als traditioneel gebruik. Dat betekent: lang en veilig genoeg gebruikt om te registreren, '+
+        'niet dat werkzaamheid is aangetoond. Wat hier met EMA staat is gedekt, de rest is volksgebruik.</div>';
+    } else {
+      h += '<div class="herkomst"><b>Volksgebruik.</b> Voor deze soort bestaat geen Europese monografie. '+
+        'Wat hier staat komt uit de kruidentraditie en is niet officieel beoordeeld.</div>';
+    }
+    h += '</div>';
+  }
+  if(s.med)    h += '<div class="sec">'+sech("Toelichting","",'boek')+'<div class="prose">'+esc(s.med)+'</div></div>';
 
   h += '<div class="sec">'+sech("Beeld uit GBIF","",'ster')+'<div class="strip" id="gbifBeeld">'+
        '<div style="font-size:13px;color:var(--inkt-2);padding:6px 0">Ophalen…</div></div></div>';
@@ -2384,6 +3129,7 @@ async function specSheet(k, terugPin){
   keurWire(k);
 
   bodyEl.querySelectorAll("[data-rk]").forEach(b=> b.onclick=()=> receptSheet(b.dataset.rk));
+  bodyEl.querySelectorAll("[data-kw]").forEach(b=> b.onclick=()=> kwaalSheet(b.dataset.kw));
   bodyEl.querySelectorAll("[data-act]").forEach(b=> b.onclick=()=>{
     const a=b.dataset.act;
     if(a==="close"){ terugPin ? openSheet(terugPin) : closeSheet(); }
@@ -2413,6 +3159,45 @@ async function specSheet(k, terugPin){
   }
 }
 
+function kwaalSheet(k){
+  const kw = KWAAL_BY_K[k]; if(!kw) return;
+  const soorten = SPECIES.filter(x=> (x.kwalen||[]).includes(k));
+  const ema = soorten.filter(x=> x.emaInfo && x.emaInfo.waarvoor.includes(k));
+  const rest = soorten.filter(x=> !ema.includes(x));
+  const rec = RECEPTEN.filter(r=> r.type==="lijf" && r.soorten.some(x=> soorten.some(y=>y.k===x)));
+
+  let h = '<div class="label">'+VINE+HOEKRANK+'<div class="acc"><span>'+esc(kw.grp)+'</span><span>'+soorten.length+' soorten</span></div>'+
+    '<h2>'+esc(kw.nm)+'</h2><div class="la">'+esc(kw.uitleg)+'</div></div>';
+  h += '<div class="warn oker"><b>Lees dit eerst</b>Kruiden zijn aanvulling, geen vervanging. Bij klachten die aanhouden, '+
+    'verergeren of gepaard gaan met koorts, bloed of kortademigheid hoort een huisarts. Deze app geeft geen doseringen.</div>';
+  if(ema.length){
+    h += '<div class="sec">'+sech("Met Europese monografie","",'ster')+
+      '<div style="font-size:13px;color:var(--inkt-2);margin-bottom:9px">Vastgelegd als traditioneel gebruik door het EMA.</div>'+
+      ema.map(x=>'<button class="rec" data-sk3="'+x.k+'" style="margin:0 0 8px;width:100%;background:rgba(44,42,31,.05);border-color:rgba(44,42,31,.16)">'+
+        '<div class="th" style="background:rgba(44,42,31,.06)"><span class="dot d-'+klass(x)+'" style="width:13px;height:13px"></span></div>'+
+        '<div class="body"><div class="nm" style="color:var(--inkt)">'+esc(x.nl)+'</div>'+
+        '<div class="la">'+esc(x.la)+'</div><div class="meta" style="color:var(--inkt-2)">'+esc(x.emaInfo.deel)+' · '+esc(x.emaInfo.ref)+'</div></div>'+
+        '<span class="emabadge ink">EMA</span></button>').join("")+'</div>';
+  }
+  if(rest.length){
+    h += '<div class="sec">'+sech("Uit de kruidentraditie","",'veder')+
+      '<div style="font-size:13px;color:var(--inkt-2);margin-bottom:9px">Niet officieel beoordeeld.</div>'+
+      rest.map(x=>'<button class="rec" data-sk3="'+x.k+'" style="margin:0 0 8px;width:100%;background:rgba(44,42,31,.05);border-color:rgba(44,42,31,.16)">'+
+        '<div class="th" style="background:rgba(44,42,31,.06)"><span class="dot d-'+klass(x)+'" style="width:13px;height:13px"></span></div>'+
+        '<div class="body"><div class="nm" style="color:var(--inkt)">'+esc(x.nl)+'</div>'+
+        '<div class="la">'+esc(x.la)+'</div><div class="meta" style="color:var(--inkt-2)">'+esc(x.delen)+'</div></div></button>').join("")+'</div>';
+  }
+  if(rec.length){
+    h += '<div class="sec">'+sech("Recepten","",'ketel')+'<div class="bron">'+
+      rec.map(r=>'<button data-rk4="'+r.k+'">'+esc(r.nl)+'</button>').join("")+'</div></div>';
+  }
+  h += '<div class="row"><button class="btn sec2" id="kwClose">Sluiten</button></div>'+FLOURISH;
+  showSheet(h);
+  bodyEl.querySelectorAll("[data-sk3]").forEach(b=> b.onclick=()=> specSheet(b.dataset.sk3));
+  bodyEl.querySelectorAll("[data-rk4]").forEach(b=> b.onclick=()=> receptSheet(b.dataset.rk4));
+  document.getElementById("kwClose").onclick = closeSheet;
+}
+
 /* blad: losse GBIF-waarneming */
 function ontdekSheet(o){
   const s = o.k ? SPEC_BY_K[o.k] : null;
@@ -2430,8 +3215,7 @@ function ontdekSheet(o){
   if(o.k) ovs.onclick = ()=> specSheet(o.k);
   else { ovs.textContent = "Niet in de gids"; ovs.style.opacity = ".55"; }
   document.getElementById("ovPin").onclick = async ()=>{
-    await newPin(o.lat, o.lng, o.onzeker||null);
-    const p = S.pins[S.pins.length-1];
+    const p = await newPin(o.lat, o.lng, o.onzeker||null);
     if(o.k) p.spec = o.k; else p.naam = o.naam || "Onbekend";
     p.zeker = "tebevestigen";
     p.notitie = "Aanwijzing uit GBIF ("+(o.bron||"onbekend")+(o.jaar?", "+o.jaar:"")+"). Nog ter plaatse controleren.";
@@ -2469,6 +3253,7 @@ function receptSheet(k){
    SCHERMEN
    ======================================================================= */
 function go(scr){
+  if(typeof wisSpook === "function") wisSpook();
   S.scr = scr;
   ["map","list","kast","spec","leer","set"].forEach(k=>{
     const el=document.getElementById("scr-"+k); if(el) el.classList.toggle("on",k===scr); });
@@ -2534,6 +3319,30 @@ function renderSpec(){
   if(v==="zwam") pool = SPECIES.filter(s=>s.grp==="zwam");
   if(v==="gif")  pool = SPECIES.filter(s=>s.tags.includes("giftig"));
   if(v==="keur") pool = SPECIES.filter(s=>{ const st=keurSync(s.k).staat; return st==="open"||st==="twijfel"; });
+  if(v==="waarvoor"){
+    const q2 = q;
+    const groepen = {};
+    KWALEN.forEach(kw=>{
+      if(q2 && !(kw.nm+" "+kw.uitleg).toLowerCase().includes(q2)) return;
+      (groepen[kw.grp] = groepen[kw.grp] || []).push(kw);
+    });
+    const keys = Object.keys(groepen);
+    document.getElementById("specTitle").textContent = "Waarvoor";
+    document.getElementById("specSub").textContent =
+      KWALEN.length+" kwalen · "+SPECIES.filter(x=>x.emaInfo).length+" soorten met een Europese monografie";
+    const body2 = document.getElementById("specBody");
+    body2.innerHTML = keys.length ? keys.map(g=>'<p class="grouphd">'+esc(g)+'</p>'+groepen[g].map(kw=>{
+      const n = SPECIES.filter(x=>(x.kwalen||[]).includes(kw.k)).length;
+      const e = SPECIES.filter(x=>x.emaInfo && x.emaInfo.waarvoor.includes(kw.k)).length;
+      return '<button class="kwaal" data-kwk="'+kw.k+'"><div class="ic">'+G(kw.g)+'</div>'+
+        '<div class="b"><b>'+esc(kw.nm)+'</b><span>'+esc(kw.uitleg)+'</span></div>'+
+        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">'+
+        '<span class="n">'+n+'</span>'+(e?'<span class="emabadge">'+e+'× EMA</span>':'')+'</div></button>';
+    }).join("")).join("")
+      : '<div class="empty">'+G("vijzel")+'<b>Niets gevonden</b>Pas je zoekterm aan.</div>';
+    body2.querySelectorAll("[data-kwk]").forEach(b=> b.onclick=()=> kwaalSheet(b.dataset.kwk));
+    return;
+  }
   const hits = pool.filter(s=> !q || s.nl.toLowerCase().includes(q) || s.la.toLowerCase().includes(q));
   document.getElementById("specTitle").textContent =
     v==="nu" ? MND[m-1].charAt(0).toUpperCase()+MND[m-1].slice(1) : "Gids";
@@ -2816,6 +3625,9 @@ function maakEdit(id, prefill){
    VELDSCHOOL
    ======================================================================= */
 const BOXDAGEN=[0,1,2,4,8,16,32,64];
+/* Afleiders moeten uit dezelfde wereld komen. Een zwamvraag met drie planten
+   ernaast is geen vraag maar een weggevertje. */
+const zelfdeWereld = s => SPECIES.filter(x=> x.k!==s.k && (x.grp==="zwam") === (s.grp==="zwam"));
 const dueKeys = ()=> SPECIES.filter(s=>{ const r=S.srs[s.k]; return !r || r.due<=today(); }).map(s=>s.k);
 function leerGewicht(k){
   let w=0; const s=SPEC_BY_K[k];
@@ -2861,24 +3673,30 @@ function renderLeer(){
   document.getElementById("leerStart").onclick=startQuiz;
 }
 function qLatijn(s){
+  const pool = zelfdeWereld(s);
+  if(pool.length < 3) return null;
   return {kind:"Naam",risk:false,q:"Wat is de wetenschappelijke naam van <em>"+esc(s.nl)+"</em>?",
-    opts:shuffle([s.la,...pickN(SPECIES.filter(x=>x.k!==s.k),3).map(x=>x.la)]).map(t=>"<i>"+esc(t)+"</i>"),
+    opts:shuffle([s.la,...pickN(pool,3).map(x=>x.la)]).map(t=>"<i>"+esc(t)+"</i>"),
     aTxt:"<i>"+esc(s.la)+"</i>", uitleg:s.nl+" is "+s.la+"."};
 }
 function qNL(s){
+  const pool = zelfdeWereld(s);
+  if(pool.length < 3) return null;
   return {kind:"Naam",risk:false,q:"Welke soort is <em>"+esc(s.la)+"</em>?",
-    opts:shuffle([s.nl,...pickN(SPECIES.filter(x=>x.k!==s.k),3).map(x=>x.nl)]).map(esc),
+    opts:shuffle([s.nl,...pickN(pool,3).map(x=>x.nl)]).map(esc),
     aTxt:esc(s.nl), uitleg:s.la+" heet in het Nederlands "+s.nl+"."};
 }
 function qDubbel(s){
   const goed=s.dubbel[Math.floor(Math.random()*s.dubbel.length)];
   const kort=goed.replace(/\s*\(.*\)$/,"");
+  const pool = zelfdeWereld(s).filter(x=>x.nl!==kort);
+  if(pool.length < 3) return null;
   return {kind:"Verwarringsgevaar",risk:true,q:"Waarmee kun je <em>"+esc(s.nl)+"</em> verwarren?",
-    opts:shuffle([kort,...pickN(SPECIES.filter(x=>x.k!==s.k&&x.nl!==kort),3).map(x=>x.nl)]).map(esc),
+    opts:shuffle([kort,...pickN(pool,3).map(x=>x.nl)]).map(esc),
     aTxt:esc(kort), uitleg:goed+". "+(s.let||"")};
 }
 function qDeel(s){
-  const w=pickN(SPECIES.filter(x=>x.k!==s.k&&x.delen!=="—"&&x.delen!==s.delen),3).map(x=>x.delen);
+  const w=pickN(zelfdeWereld(s).filter(x=>x.delen!=="—"&&x.delen!==s.delen),3).map(x=>x.delen);
   if(w.length<3) return null;
   return {kind:"Gebruik",risk:false,q:"Welk deel gebruik je van <em>"+esc(s.nl)+"</em>?",
     opts:shuffle([s.delen,...w]).map(esc), aTxt:esc(s.delen), uitleg:"Van "+s.nl+" gebruik je: "+s.delen+"."};
@@ -2886,7 +3704,7 @@ function qDeel(s){
 function qMaand(s){
   const fmt=a=>a.map(m=>MND[m-1]).join(", ");
   const goed=fmt(s.mnd), w=[];
-  for(const x of shuffle(SPECIES.filter(x=>x.mnd.length&&fmt(x.mnd)!==goed))){
+  for(const x of shuffle(zelfdeWereld(s).filter(x=>x.mnd.length&&fmt(x.mnd)!==goed))){
     const f=fmt(x.mnd); if(!w.includes(f)) w.push(f); if(w.length===3) break;
   }
   if(w.length<3) return null;
@@ -2894,13 +3712,13 @@ function qMaand(s){
     opts:shuffle([goed,...w]).map(esc), aTxt:esc(goed), uitleg:s.nl+" oogst je in "+goed+"."};
 }
 function qLet(s){
-  const pool=SPECIES.filter(x=>x.k!==s.k&&x.let&&x.let.length>40);
+  const pool=zelfdeWereld(s).filter(x=>x.let&&x.let.length>40);
   if(pool.length<3) return null;
   return {kind:"Let op",risk:true,q:"Wat moet je onthouden bij <em>"+esc(s.nl)+"</em>?",
     opts:shuffle([s.let,...pickN(pool,3).map(x=>x.let)]).map(esc), aTxt:esc(s.let), uitleg:s.let};
 }
 function qHerken(s){
-  const pool=SPECIES.filter(x=>x.k!==s.k&&x.herken&&x.herken.length>40);
+  const pool=zelfdeWereld(s).filter(x=>x.herken&&x.herken.length>40);
   if(pool.length<3) return null;
   return {kind:"Veldkenmerk",risk:s.grp==="zwam",q:"Welk kenmerk hoort bij <em>"+esc(s.nl)+"</em>?",
     opts:shuffle([s.herken,...pickN(pool,3).map(x=>x.herken)]).map(esc), aTxt:esc(s.herken), uitleg:s.herken};
@@ -2912,12 +3730,26 @@ async function qFoto(){
   const pick=c[Math.floor(Math.random()*c.length)];
   const s=SPEC_BY_K[pick.k], url=await photoURL(pick.f), rec=await dbGet("photos",pick.f);
   if(!url) return null;
+  const pool = zelfdeWereld(s);
+  if(pool.length < 3) return null;
   return {kind:"Jouw foto"+(rec?" · "+rec.stage:""),risk:false,img:url,q:"Welke soort staat hier?",
-    opts:shuffle([s.nl,...pickN(SPECIES.filter(x=>x.k!==pick.k),3).map(x=>x.nl)]).map(esc),
+    opts:shuffle([s.nl,...pickN(pool,3).map(x=>x.nl)]).map(esc),
     aTxt:esc(s.nl), uitleg:"Dit is "+s.nl+" ("+s.la+"), op je eigen plek gefotografeerd.", key:pick.k};
+}
+function qWaarvoor(s){
+  if(!s.kwalen || !s.kwalen.length) return null;
+  const goed = KWAAL_BY_K[s.kwalen[Math.floor(Math.random()*s.kwalen.length)]];
+  if(!goed) return null;
+  const w = pickN(KWALEN.filter(x=> !(s.kwalen||[]).includes(x.k)), 3).map(x=>x.nm);
+  if(w.length < 3) return null;
+  return {kind:"Gebruik",risk:false,q:"Waarvoor wordt <em>"+esc(s.nl)+"</em> traditioneel gebruikt?",
+    opts:shuffle([goed.nm, ...w]).map(esc), aTxt:esc(goed.nm),
+    uitleg:s.nl+" wordt gebruikt bij: "+s.kwalen.map(x=>KWAAL_BY_K[x]?KWAAL_BY_K[x].nm.toLowerCase():x).join(", ")+"."+
+      (s.emaInfo?" Hiervoor bestaat een EU-monografie ("+s.emaInfo.ref+").":" Volksgebruik, niet officieel beoordeeld.")};
 }
 function makeQuestion(k){
   const s=SPEC_BY_K[k], gens=[];
+  if(s.kwalen && s.kwalen.length) gens.push(qWaarvoor);
   if(s.dubbel&&s.dubbel.length){ gens.push(qDubbel,qDubbel); }
   if(s.let) gens.push(qLet);
   if(s.herken) gens.push(qHerken,qHerken);
@@ -2925,7 +3757,8 @@ function makeQuestion(k){
   if(s.delen&&s.delen!=="—") gens.push(qDeel);
   if(s.mnd.length) gens.push(qMaand);
   for(const g of shuffle(gens)){ const q=g(s); if(q) return Object.assign(q,{key:k}); }
-  return Object.assign(qLatijn(s),{key:k});
+  const val = qLatijn(s) || qNL(s) || qHerken(s);
+  return val ? Object.assign(val,{key:k}) : null;
 }
 const QZ={list:[],i:0,goed:0,cur:null,sel:-1,done:false};
 async function startQuiz(){
@@ -2938,8 +3771,9 @@ async function startQuiz(){
     let q=null;
     if(i>0 && i%3===0) q=await qFoto();
     if(!q) q=makeQuestion(keys[i]);
-    QZ.list.push(q);
+    if(q) QZ.list.push(q);
   }
+  if(!QZ.list.length){ toast("Geen vragen te maken"); return; }
   quizEl.classList.add("on"); showQ();
 }
 function showQ(){
@@ -3177,9 +4011,9 @@ function ontdekKiezer(){
    KNOPPEN EN OPSTART
    ======================================================================= */
 document.getElementById("btnAdd").onclick=()=>{
-  if(S.pos) newPin(S.pos.lat,S.pos.lng,S.pos.acc);
-  else { const c=S.map.getCenter(); newPin(c.lat,c.lng,null);
-    toast("Pin op het midden van de kaart. Zet GPS aan voor je echte positie."); }
+  if(S.pos) nieuweVondst(S.pos.lat,S.pos.lng,S.pos.acc);
+  else { const c=S.map.getCenter(); nieuweVondst(c.lat,c.lng,null);
+    toast("Op het midden van de kaart. Zet GPS aan voor je echte positie."); }
 };
 document.getElementById("btnGps").onclick=()=>setFollow(!S.follow);
 document.getElementById("btnOntdek").onclick=ontdekKiezer;
@@ -3193,6 +4027,31 @@ document.getElementById("setExportPh").onclick=()=>doExport(true);
 document.getElementById("setImport").onclick=doImport;
 document.getElementById("setCache").onclick=renderSet;
 document.getElementById("setVul").onclick=()=>{ go("map"); setTimeout(vulKaart, 300); };
+let beeldBezig = false;
+document.getElementById("setBeeld").onclick = async ()=>{
+  if(beeldBezig){ beeldBezig = false; toast("Gestopt"); return; }
+  if(!confirm("Foto's ophalen voor alle "+SPECIES.length+" soorten? Dit kost een paar minuten en enkele tientallen MB. Doe dit op wifi.")) return;
+  beeldBezig = true;
+  const info = document.getElementById("beeldInfo");
+  let n = 0, plaatjes = 0;
+  for(const sp of SPECIES){
+    if(!beeldBezig) break;
+    n++;
+    try{
+      const b = await soortBeeld(sp.k);
+      for(const x of b.slice(0,3)){
+        if(!beeldBezig) break;
+        /* no-cors: we mogen de inhoud niet lezen, maar de service worker
+           bewaart het antwoord wel, en dan werkt het offline */
+        try{ await fetch(x.url, {mode:"no-cors", cache:"force-cache"}); plaatjes++; }catch(e){}
+      }
+    }catch(e){}
+    if(info) info.textContent = n+" van "+SPECIES.length+" · "+plaatjes+" foto's · tik om te stoppen";
+  }
+  beeldBezig = false;
+  if(info) info.textContent = plaatjes+" foto's opgehaald voor "+n+" soorten";
+  toast("Klaar: "+plaatjes+" foto's staan offline klaar");
+};
 document.getElementById("setKeurExport").onclick=()=>{
   const rijen = SPECIES.map(s=>({nm:s.nl, la:s.la, r:keurSync(s.k)}))
     .concat(RECEPTEN.map(r=>({nm:r.nl, la:"recept", r:keurSync("r:"+r.k)})));

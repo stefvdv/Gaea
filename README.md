@@ -1,4 +1,4 @@
-# Wildpluk v0.5.0
+# Wildpluk v0.6.0
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -45,9 +45,41 @@ Drie soorten herkomst, en de app zegt het er per soortenblad bij:
 Dat onderscheid staat ook in Instellingen, onder "Waar komt de informatie vandaan".
 
 ## Gids
-122 soorten: 70 kruiden, 24 bomen en struiken, 28 paddenstoelen.
-30 daarvan zijn giftig en staan er juist in om te leren kennen en te pinnen.
-30 soorten hebben expliciete verwarringssoorten.
+175 soorten: 96 kruiden, 39 bomen en struiken, 40 paddenstoelen.
+46 daarvan zijn giftig en staan er juist in om te leren kennen en te pinnen.
+Nieuw in v0.6 onder meer: de kust (zeekraal, zulte, strandbiet, zeesla, blaaswier,
+suikerwier), de klassieke lookalike-paren bij zwammen (stobbezwammetje naast
+bundelmosklokje, weidekringzwam naast weidetrechterzwam, parelamaniet naast
+panteramaniet, morielje naast voorjaarskluifzwam, champignon naast
+karbolchampignon, hanenkam naast valse hanenkam en gordijnzwam), en de
+medicinale soorten met een Europese monografie die nog ontbraken: koningskaars,
+wilg, sleutelbloem, driekleurig viooltje, witte dovenetel, zwarte bes.
+
+## Waarvoor — kwalen
+24 kwalen in zeven groepen, elk met soorten en recepten. Per soort staat
+`kwalen[]`; 26 soorten hebben daarnaast `emaInfo` met de monografiereferentie,
+het plantendeel en waarvoor het is vastgelegd.
+
+Het onderscheid dat de app overal maakt:
+- **EMA** — het Comité voor Kruidengeneesmiddelen heeft een monografie
+  vastgesteld. Dat is erkenning van traditioneel gebruik, geen bewijs van
+  werkzaamheid. Geverifieerd tijdens de bouw voor Urtica, Plantago lanceolata,
+  Tilia, Achillea, Capsella, Filipendula, Matricaria, Sambucus, Althaea en
+  Equisetum, plus de combinatiemonografie *Species pectorales* voor borstthee.
+- **Volksgebruik** — alles zonder die vlag. Interessant, niet gedekt.
+
+## Gebruikstekening
+Elk soortenblad opent met een schematische pentekening. Wat je gebruikt is
+ingekleurd, de rest blijft lijn, en de kleur zegt welk soort deel het is:
+groen blad, oker bloem, rood vrucht, bruin wortel, schors bast.
+
+Vier groeivormen (kruid, boom, zwam, wier) en een parser die `delen` leest.
+Nederlandse samenstellingen tellen mee — wortelknolletje kleurt de wortel,
+bladsteel kleurt blad én stengel. Bij giftige zwammen blijft alles lijn,
+want daar gebruik je niets van.
+
+Dit is een schema, geen soortgetrouwe botanische plaat. Voor herkenning zijn
+je eigen foto's en het GBIF-beeld leidend.
 
 ## Ontdek-laag (GBIF)
 Vergrootglasknop op de kaart. Kies maximaal 3 soorten; de app haalt waarnemingen
@@ -160,6 +192,36 @@ en als GBIF wel records geeft maar niets koppelt zie je dat ook.
 Duke's is Engelstalig en Amerikaans-gecentreerd, en zegt weinig over
 verwarringssoorten in Nederlandse bermen. Het vult de kolom "gebruik" goed,
 niet de kolom "gevaar".
+
+## Beeld
+Foto's komen uit GBIF-waarnemingen, met fotograaf en licentie eronder.
+Elke foto is aan te tikken voor het vergrootglas: knijpen om te zoomen tot 6×,
+dubbeltik voor 2,6×, slepen om te pannen.
+
+**Instellingen → Beeld voorladen** loopt alle soorten af en haalt maximaal drie
+foto's per soort op. Dat gebeurt met `fetch(url, {mode:"no-cors"})`: we mogen de
+inhoud niet lezen, maar de service worker bewaart het ondoorzichtige antwoord in
+de cache `wildpluk-beeld` (LRU op 900), en daarna werkt het offline. Nogmaals
+tikken stopt de kuur. Reken op enkele tientallen MB — doe het op wifi.
+
+## Spookpin
+De spookpin slaat niets op. Hij is puur om te zien of je de juiste plek raakt.
+- Nieuwe spookpin laat de vorige vallen.
+- Terug-knop laat hem vallen.
+- Van scherm wisselen laat hem vallen.
+- Pas een tik óp de spookpin opent het formulier, en pas **Bewaren** maakt de
+  vondst aan. Weggooien laat niets achter — er zit geen half opgeslagen pin meer
+  in de lijst zoals in v0.5.
+
+Intern: `nieuweVondst()` zet een concept in `S.concept` en slaat pas op bij
+Bewaren. `newPin()` bestaat nog voor de GBIF-laag, waar je een waarneming
+direct wilt overnemen.
+
+## Veldschool
+Afleiders komen nu altijd uit dezelfde wereld: bij een zwamvraag alleen zwammen,
+bij een plantvraag alleen planten. Drie planten naast één paddenstoel maakt de
+vraag te makkelijk en leert je niets. Nieuwe vraagsoort: waarvoor een soort
+traditioneel gebruikt wordt, met in de uitleg of het EMA-gedekt is.
 
 ## Nog te doen
 - Waarneming.nl-koppeling (API-sleutel aanvragen) voor veel dichtere NL-dekking

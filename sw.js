@@ -1,8 +1,10 @@
 /* Wildpluk service worker — VERSION altijd gelijk aan APP_VERSION in index.html */
-const VERSION = "0.5.0";
+const VERSION = "0.6.0";
 const SHELL = "wildpluk-shell-v" + VERSION;
 const LIB   = "wildpluk-lib-v" + VERSION;
 const TILES = "wildpluk-tiles";          /* niet versiegebonden */
+const BEELD = "wildpluk-beeld";          /* foto's van soorten, ook niet versiegebonden */
+const BEELD_MAX = 900;
 const TILE_MAX = 1500;
 
 const SHELL_FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./badge-96.png"];
@@ -23,7 +25,7 @@ self.addEventListener("install", e => {
 self.addEventListener("activate", e => {
   e.waitUntil((async () => {
     for (const k of await caches.keys()) {
-      if (k !== SHELL && k !== LIB && k !== TILES && k.startsWith("wildpluk-")) await caches.delete(k);
+      if (k !== SHELL && k !== LIB && k !== TILES && k !== BEELD && k.startsWith("wildpluk-")) await caches.delete(k);
     }
     await self.clients.claim();
   })());
@@ -56,6 +58,26 @@ self.addEventListener("fetch", e => {
         if (res && (res.ok || res.type === "opaque")) { c.put(req, res.clone()); trimTiles(); }
         return res;
       } catch (err) { return new Response("", {status:504}); }
+    })());
+    return;
+  }
+
+  /* soortfoto's van willekeurige hosts: cache-first, ook ondoorzichtige antwoorden.
+     Zo blijft alles wat je een keer hebt gezien of voorgeladen offline werken. */
+  if (req.destination === "image" && url.origin !== self.location.origin && !isTile(url)) {
+    e.respondWith((async () => {
+      const c = await caches.open(BEELD);
+      const hit = await c.match(req);
+      if (hit) return hit;
+      try {
+        const res = await fetch(req);
+        if (res && (res.ok || res.type === "opaque")) {
+          c.put(req, res.clone());
+          const keys = await c.keys();
+          for (let i = 0; i < keys.length - BEELD_MAX; i++) await c.delete(keys[i]);
+        }
+        return res;
+      } catch (err) { return new Response("", { status: 504 }); }
     })());
     return;
   }
