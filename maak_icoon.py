@@ -1,212 +1,339 @@
 import math
 from PIL import Image, ImageDraw, ImageFilter
 
-SS = 8  # supersampling
+SS = 6
 
-BOS      = (20, 32, 26, 255)
-GOUD     = (201, 162, 39, 255)
-HUID     = (150, 178, 118, 255)
-HUID_D   = (108, 138, 84, 255)
-HUID_L   = (183, 205, 152, 255)
-BLAD     = (124, 158, 88, 255)
-BLAD_D   = (78, 106, 56, 255)
-BLAD_L   = (168, 196, 124, 255)
-SCHORS   = (96, 74, 48, 255)
-OOG      = (28, 44, 30, 255)
-IRIS     = (196, 214, 140, 255)
-LICHT    = (238, 244, 214, 255)
+BOS_D   = (12, 22, 16)
+BOS_L   = (32, 52, 38)
+GOUD    = (201, 162, 39)
+SCHORS  = (92, 68, 44)
+SCHORS_D= (58, 42, 26)
+SCHORS_L= (134, 104, 70)
+HUID    = (156, 184, 124)
+HUID_D  = (104, 134, 82)
+HUID_DD = (74, 100, 60)
+HUID_L  = (196, 216, 166)
+HUID_LL = (226, 238, 202)
+BLAD    = (118, 154, 82)
+BLAD_D  = (72, 102, 52)
+BLAD_DD = (48, 72, 38)
+BLAD_L  = (166, 196, 118)
+BLAD_LL = (206, 228, 158)
+OOG_D   = (24, 38, 26)
+IRIS    = (168, 208, 118)
+IRIS_D  = (86, 128, 62)
+LICHT   = (244, 250, 226)
+GLAS    = (196, 224, 214)
+DRANK   = (126, 196, 122)
+DRANK_L = (186, 232, 160)
 
 
-def leafpts(cx, cy, ang, ln, wd, curve=0.55, n=26):
-    """Blad als lensvorm met punt aan beide uiteinden, gedraaid over ang (radialen)."""
-    pts = []
-    for i in range(n + 1):
-        t = i / n
-        x = -ln / 2 + ln * t
-        y = math.sin(math.pi * t) * (wd / 2) * (1 - curve * (t - .5))
-        pts.append((x, y))
-    for i in range(n, -1, -1):
-        t = i / n
-        x = -ln / 2 + ln * t
-        y = -math.sin(math.pi * t) * (wd / 2) * (1 - curve * (t - .5))
-        pts.append((x, y))
+def A(c, a=255):
+    return (c[0], c[1], c[2], a)
+
+
+def laag(W):
+    return Image.new("RGBA", (W, W), (0, 0, 0, 0))
+
+
+def zacht(im, r):
+    return im.filter(ImageFilter.GaussianBlur(r))
+
+
+def bocht(p0, p1, p2, n=22):
+    return [((1-t)**2*p0[0] + 2*(1-t)*t*p1[0] + t**2*p2[0],
+             (1-t)**2*p0[1] + 2*(1-t)*t*p1[1] + t**2*p2[1])
+            for t in [i/n for i in range(n+1)]]
+
+
+def bocht3(p0, p1, p2, p3, n=26):
+    return [((1-t)**3*p0[0] + 3*(1-t)**2*t*p1[0] + 3*(1-t)*t**2*p2[0] + t**3*p3[0],
+             (1-t)**3*p0[1] + 3*(1-t)**2*t*p1[1] + 3*(1-t)*t**2*p2[1] + t**3*p3[1])
+            for t in [i/n for i in range(n+1)]]
+
+
+def leafpts(cx, cy, ang, ln, wd, curve=.55, punt=1.0, n=30):
+    boven, onder = [], []
+    for i in range(n+1):
+        t = i/n
+        x = -ln/2 + ln*t
+        s = math.sin(math.pi*t) ** punt
+        y = s * (wd/2) * (1 - curve*(t-.5))
+        boven.append((x, y)); onder.append((x, -y))
+    pts = boven + onder[::-1]
     ca, sa = math.cos(ang), math.sin(ang)
-    return [(cx + x * ca - y * sa, cy + x * sa + y * ca) for x, y in pts]
+    return [(cx + x*ca - y*sa, cy + x*sa + y*ca) for x, y in pts]
 
 
-def leaf(d, cx, cy, ang, ln, wd, fill, nerf=None, curve=.55):
-    d.polygon(leafpts(cx, cy, ang, ln, wd, curve), fill=fill)
-    if nerf:
+def blad(d, cx, cy, ang, ln, wd, kleur, donker, licht, curve=.55, punt=1.0, tanden=0):
+    pts = leafpts(cx, cy, ang, ln, wd, curve, punt)
+    if tanden:
         ca, sa = math.cos(ang), math.sin(ang)
-        x0, y0 = cx - ln / 2 * ca, cy - ln / 2 * sa
-        x1, y1 = cx + ln / 2 * ca, cy + ln / 2 * sa
-        d.line([(x0, y0), (x1, y1)], fill=nerf, width=max(1, int(wd * .07)))
+        nieuw = []
+        for i, (x, y) in enumerate(pts):
+            f = 1 + (tanden if i % 4 < 2 else -tanden)
+            lx = (x - cx)*ca + (y - cy)*sa
+            ly = (-(x - cx)*sa + (y - cy)*ca) * f
+            nieuw.append((cx + lx*ca - ly*sa, cy + lx*sa + ly*ca))
+        pts = nieuw
+    d.polygon(pts, fill=A(kleur))
+    ca, sa = math.cos(ang), math.sin(ang)
+    half = pts[len(pts)//2:]
+    d.polygon(half + [(cx + ln/2*ca, cy + ln/2*sa), (cx - ln/2*ca, cy - ln/2*sa)], fill=A(donker))
+    x0, y0 = cx - ln/2*ca, cy - ln/2*sa
+    x1, y1 = cx + ln/2*ca, cy + ln/2*sa
+    d.line([(x0, y0), (x1, y1)], fill=A(licht), width=max(1, int(wd*.055)))
+    for t in (.30, .48, .66):
+        mx, my = x0 + (x1-x0)*t, y0 + (y1-y0)*t
+        for zij in (-1, 1):
+            d.line([(mx, my), (mx + math.cos(ang + zij*1.05)*ln*.20,
+                               my + math.sin(ang + zij*1.05)*ln*.20)],
+                   fill=A(licht, 150), width=max(1, int(wd*.032)))
 
 
-def rank(d, pts, w, fill):
-    """Dikke gebogen tak/rank langs een reeks punten, taps toelopend."""
+def streng(d, pts, w, kleur, licht=None):
     n = len(pts)
-    for i in range(n - 1):
-        ww = w * (1 - .62 * i / max(1, n - 2))
-        d.line([pts[i], pts[i + 1]], fill=fill, width=max(1, int(ww)))
-        d.ellipse([pts[i + 1][0] - ww / 2, pts[i + 1][1] - ww / 2,
-                   pts[i + 1][0] + ww / 2, pts[i + 1][1] + ww / 2], fill=fill)
+    for i in range(n-1):
+        ww = w * (1 - .70*i/max(1, n-2))
+        d.line([pts[i], pts[i+1]], fill=A(kleur), width=max(1, int(ww)))
+        d.ellipse([pts[i+1][0]-ww/2, pts[i+1][1]-ww/2,
+                   pts[i+1][0]+ww/2, pts[i+1][1]+ww/2], fill=A(kleur))
+    if licht:
+        for i in range(n-1):
+            ww = w * (1 - .70*i/max(1, n-2))
+            dx, dy = pts[i+1][0]-pts[i][0], pts[i+1][1]-pts[i][1]
+            L = math.hypot(dx, dy) or 1
+            nx, ny = -dy/L*ww*.24, dx/L*ww*.24
+            d.line([(pts[i][0]+nx, pts[i][1]+ny), (pts[i+1][0]+nx, pts[i+1][1]+ny)],
+                   fill=A(licht, 130), width=max(1, int(ww*.26)))
 
 
-def bocht(p0, p1, p2, n=16):
-    return [((1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * p1[0] + t ** 2 * p2[0],
-             (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * p1[1] + t ** 2 * p2[1])
-            for t in [i / n for i in range(n + 1)]]
-
-
-def dryade(S, pad=0.10, achtergrond=True, ring=True):
-    W = S * SS
-    im = Image.new("RGBA", (W, W), (0, 0, 0, 0))
+def keltische_ring(im, W, r, dikte, kleur, lussen=16):
     d = ImageDraw.Draw(im)
-    p = W * pad
-    cx = W / 2
+    cx = cy = W/2
+    d.ellipse([cx-r, cy-r, cx+r, cy+r], outline=A(kleur, 95), width=max(2, int(dikte*.30)))
+    for faze in (0, math.pi):
+        pts = []
+        for i in range(721):
+            a = math.radians(i/2)
+            rr = r + math.sin(a*lussen + faze) * dikte*0.72
+            pts.append((cx + math.cos(a)*rr, cy + math.sin(a)*rr))
+        for i in range(len(pts)-1):
+            d.line([pts[i], pts[i+1]], fill=A(kleur, 205), width=max(2, int(dikte*.40)))
+
+
+def gezicht(im, W, cx, fy, fw, fh):
+    d = ImageDraw.Draw(im)
+    vorm = bocht3((cx - fw*.50, fy - fh*.16), (cx - fw*.52, fy + fh*.30),
+                  (cx - fw*.26, fy + fh*.56), (cx, fy + fh*.60)) + \
+           bocht3((cx, fy + fh*.60), (cx + fw*.26, fy + fh*.56),
+                  (cx + fw*.52, fy + fh*.30), (cx + fw*.50, fy - fh*.16)) + \
+           bocht3((cx + fw*.50, fy - fh*.16), (cx + fw*.48, fy - fh*.56),
+                  (cx - fw*.48, fy - fh*.56), (cx - fw*.50, fy - fh*.16))
+    d.polygon(vorm, fill=A(HUID))
+
+    sch = laag(W); ds = ImageDraw.Draw(sch)
+    ds.polygon(vorm, fill=A(HUID_DD, 195))
+    ds.polygon([(cx + (x-cx)*.80, fy + (y-fy)*.84 - fh*.03) for x, y in vorm], fill=(0, 0, 0, 0))
+    im.alpha_composite(zacht(sch, W*.013))
+
+    lic = laag(W); dl = ImageDraw.Draw(lic)
+    dl.ellipse([cx - fw*.22, fy - fh*.44, cx + fw*.22, fy - fh*.10], fill=A(HUID_L, 155))
+    dl.ellipse([cx - fw*.055, fy - fh*.16, cx + fw*.055, fy + fh*.16], fill=A(HUID_L, 140))
+    for zij in (-1, 1):
+        dl.ellipse([cx + zij*fw*.34 - fw*.15, fy + fh*.02,
+                    cx + zij*fw*.34 + fw*.15, fy + fh*.24], fill=A(HUID_L, 110))
+    im.alpha_composite(zacht(lic, W*.017))
+
+
+def ogen(im, W, cx, fy, fw, fh):
+    ow, oh = fw*.235, fh*.050
+    oy = fy - fh*.02
+    for zij in (-1, 1):
+        ox = cx + zij*fw*.225
+        kas = laag(W); dk = ImageDraw.Draw(kas)
+        dk.ellipse([ox - ow*.80, oy - oh*3.6, ox + ow*.80, oy + oh*3.4], fill=A(HUID_DD, 125))
+        im.alpha_composite(zacht(kas, W*.011))
+        d = ImageDraw.Draw(im)
+        d.polygon(leafpts(ox, oy, math.radians(-4*zij), ow, oh*4, curve=.16, punt=.72), fill=A(LICHT))
+        r = oh*1.62
+        d.ellipse([ox-r, oy-r, ox+r, oy+r], fill=A(IRIS_D))
+        d.ellipse([ox-r*.86, oy-r*.86, ox+r*.86, oy+r*.86], fill=A(IRIS))
+        for i in range(14):
+            a = i/14*2*math.pi
+            d.line([(ox + math.cos(a)*r*.22, oy + math.sin(a)*r*.22),
+                    (ox + math.cos(a)*r*.84, oy + math.sin(a)*r*.84)],
+                   fill=A(IRIS_D, 170), width=max(1, int(W*.0022)))
+        d.ellipse([ox-r*.40, oy-r*.40, ox+r*.40, oy+r*.40], fill=A(OOG_D))
+        d.ellipse([ox-r*.46, oy-r*.62, ox-r*.10, oy-r*.26], fill=A(LICHT, 235))
+        d.ellipse([ox+r*.16, oy+r*.24, ox+r*.40, oy+r*.48], fill=A(LICHT, 110))
+        d.line(bocht((ox-ow/2, oy+oh*.4), (ox, oy-oh*2.6), (ox+ow/2, oy+oh*.2)),
+               fill=A(OOG_D), width=max(2, int(W*.0078)), joint="curve")
+        d.line(bocht((ox-ow/2, oy+oh*.4), (ox, oy+oh*2.2), (ox+ow/2, oy+oh*.2)),
+               fill=A(HUID_DD), width=max(1, int(W*.0042)), joint="curve")
+
+
+def flacon(im, W, cx, cy, h):
+    gl = laag(W); dg = ImageDraw.Draw(gl)
+    b = h*.50
+    dg.ellipse([cx-b*1.2, cy-h*.10, cx+b*1.2, cy+h*.66], fill=A(DRANK, 130))
+    im.alpha_composite(zacht(gl, W*.024))
+    d = ImageDraw.Draw(im)
+    hals = h*.28
+    lw = max(2, int(W*.0058))
+    d.ellipse([cx-b/2, cy+h*.06, cx+b/2, cy+h*.54], fill=A(GLAS, 95), outline=A(GLAS, 210), width=lw)
+    d.rounded_rectangle([cx-b*.18, cy-hals*.55, cx+b*.18, cy+h*.18],
+                        radius=b*.10, fill=A(GLAS, 95), outline=A(GLAS, 210), width=lw)
+    d.pieslice([cx-b/2+lw, cy+h*.06+lw, cx+b/2-lw, cy+h*.54-lw], start=0, end=180, fill=A(DRANK, 238))
+    d.ellipse([cx-b*.42, cy+h*.245, cx+b*.42, cy+h*.325], fill=A(DRANK_L, 238))
+    for bx, by, br in [(-.11, .42, .055), (.08, .35, .042), (-.03, .26, .032),
+                       (.14, .47, .030), (-.16, .32, .026), (.02, .18, .022)]:
+        d.ellipse([cx+b*bx-b*br, cy+h*by-b*br, cx+b*bx+b*br, cy+h*by+b*br],
+                  fill=A(DRANK_L, 205), outline=A(LICHT, 160), width=1)
+    d.line([(cx-b*.30, cy+h*.18), (cx-b*.345, cy+h*.38)], fill=A(LICHT, 170), width=max(2, int(W*.0072)))
+    d.rounded_rectangle([cx-b*.23, cy-hals*.88, cx+b*.23, cy-hals*.38], radius=b*.06, fill=A(SCHORS))
+    d.rounded_rectangle([cx-b*.23, cy-hals*.88, cx+b*.23, cy-hals*.66], radius=b*.06, fill=A(SCHORS_L))
+    streng(d, bocht((cx+b*.18, cy-hals*.08), (cx+b*.58, cy+h*.04), (cx+b*.42, cy+h*.22)), W*.0085, SCHORS)
+    blad(d, cx+b*.50, cy+h*.18, math.radians(58), h*.22, h*.09, BLAD, BLAD_D, BLAD_LL, punt=.85)
+
+
+def dryade(S, ring=True, metflacon=True, achtergrond=True, krimp=1.0):
+    W = S*SS
+    im = laag(W)
+    cx = W/2
 
     if achtergrond:
-        d.rounded_rectangle([0, 0, W, W], radius=W * .21, fill=BOS)
+        bg = laag(W); db = ImageDraw.Draw(bg)
+        db.rounded_rectangle([0, 0, W, W], radius=W*.215, fill=A(BOS_D))
+        gl = laag(W); dg = ImageDraw.Draw(gl)
+        dg.ellipse([W*.08, -W*.12, W*.92, W*.74], fill=A(BOS_L, 235))
+        gl = zacht(gl, W*.09)
+        masker = Image.new("L", (W, W), 0)
+        ImageDraw.Draw(masker).rounded_rectangle([0, 0, W, W], radius=W*.215, fill=255)
+        gl.putalpha(Image.composite(gl.split()[3], Image.new("L", (W, W), 0), masker))
+        bg.alpha_composite(gl)
+        im.alpha_composite(bg)
+
     if ring:
-        d.ellipse([p * .62, p * .62, W - p * .62, W - p * .62],
-                  outline=GOUD + () if False else (201, 162, 39, 120), width=max(2, int(W * .009)))
+        rg = laag(W)
+        keltische_ring(rg, W, W*.420, W*.021, GOUD)
+        im.alpha_composite(rg)
 
-    # ---- takken/haar links en rechts (schors) ----
+    fig = laag(W)
+    d = ImageDraw.Draw(fig)
+    fw, fh = W*.395, W*.475
+    fy = W*.545
+
     for zij in (-1, 1):
-        for j, (sx, sy, mx, my, ex, ey, bw) in enumerate([
-            (.06, .30, .30, .48, .34, .82, .046),
-            (.03, .26, .21, .40, .26, .90, .034),
-            (.09, .38, .34, .58, .28, .70, .028),
-            (.05, .22, .26, .30, .33, .46, .024),
-        ]):
-            pts = bocht((cx + zij * sx * W, W * sy),
-                        (cx + zij * mx * W, W * my),
-                        (cx + zij * ex * W, W * ey))
-            rank(d, pts, W * bw, SCHORS)
-            leaf(d, cx + zij * ex * W, W * ey, math.radians(70 * zij + 90),
-                 W * .13, W * .055, BLAD_D, nerf=BLAD)
+        for sx, sy, mx, my, ex, ey, bw in [
+            (.10, .28, .30, .46, .335, .84, .040),
+            (.05, .24, .225, .40, .275, .90, .030),
+            (.14, .34, .345, .60, .295, .74, .024),
+            (.075, .21, .275, .30, .345, .50, .020),
+            (.03, .30, .16, .56, .20, .88, .017),
+        ]:
+            pts = bocht((cx + zij*sx*W, W*sy), (cx + zij*mx*W, W*my), (cx + zij*ex*W, W*ey))
+            streng(d, pts, W*bw, SCHORS_D if bw < .025 else SCHORS, SCHORS_L)
+            blad(d, cx + zij*ex*W, W*ey, math.radians(72*zij + 90),
+                 W*.115, W*.050, BLAD_D, BLAD_DD, BLAD_L, punt=.85)
 
-    # ---- bladerkroon ----
-    kroon_y = W * .30
-    for i, (a, dist, ln, wd) in enumerate([
-        (-90, .225, .40, .165), (-116, .225, .37, .150), (-64, .225, .37, .150),
-        (-140, .215, .33, .135), (-40, .215, .33, .135),
-        (-162, .195, .28, .115), (-18, .195, .28, .115),
-    ]):
+    for a, dist, ln, wd in [(-155, .218, .258, .142), (-25, .218, .258, .142),
+                            (-172, .198, .222, .120), (-8, .198, .222, .120)]:
         r = math.radians(a)
-        lx = cx + math.cos(r) * W * dist
-        ly = kroon_y + math.sin(r) * W * dist * .80 + W * .07
-        leaf(d, lx, ly, r, W * ln, W * wd,
-             BLAD if i % 2 == 0 else BLAD_D, nerf=BLAD_L, curve=.72)
+        blad(d, cx + math.cos(r)*W*dist, W*.315 + math.sin(r)*W*dist*.80,
+             r, W*ln, W*wd, BLAD_D, BLAD_DD, BLAD_L, curve=.42, punt=1.05, tanden=.055)
 
-    # ---- gezicht ----
-    fw, fh = W * .425, W * .52
-    fy = W * .545
-    d.ellipse([cx - fw / 2, fy - fh / 2, cx + fw / 2, fy + fh / 2], fill=HUID)
-    # kaaklijn schaduw
-    d.polygon(bocht((cx - fw * .49, fy - fh * .06),
-                    (cx, fy + fh * .66), (cx + fw * .49, fy - fh * .06)) +
-              bocht((cx + fw * .49, fy - fh * .06),
-                    (cx, fy - fh * .30), (cx - fw * .49, fy - fh * .06)), fill=HUID)
+    gezicht(fig, W, cx, fy, fw, fh)
+    d = ImageDraw.Draw(fig)
 
-    # wangschaduw
+    for a, dist, ln, wd in [(-90, .225, .330, .190), (-114, .222, .305, .172), (-66, .222, .305, .172),
+                            (-138, .212, .272, .152), (-42, .212, .272, .152)]:
+        r = math.radians(a)
+        blad(d, cx + math.cos(r)*W*dist, W*.315 + math.sin(r)*W*dist*.80,
+             r, W*ln, W*wd, BLAD, BLAD_D, BLAD_LL, curve=.42, punt=1.05, tanden=.055)
+
     for zij in (-1, 1):
-        leaf(d, cx + zij * fw * .32, fy + fh * .06, math.radians(80 * zij),
-             fh * .30, fw * .14, (128, 158, 100, 255), curve=.3)
-
-    # ---- bladeren op het voorhoofd ----
+        blad(d, cx + zij*fw*.19, fy - fh*.345, math.radians(-32*zij),
+             fw*.34, fw*.145, BLAD_D, BLAD_DD, BLAD_L, punt=.85)
+    blad(d, cx, fy - fh*.415, math.radians(-90), fw*.26, fw*.135, BLAD, BLAD_D, BLAD_LL, punt=.85)
     for zij in (-1, 1):
-        leaf(d, cx + zij * fw * .17, fy - fh * .34, math.radians(-30 * zij),
-             fw * .40, fw * .20, BLAD_D, nerf=BLAD)
-    leaf(d, cx, fy - fh * .43, math.radians(-90), fw * .32, fw * .19, BLAD, nerf=BLAD_L)
+        blad(d, cx + zij*fw*.235, fy - fh*.155, math.radians(-14*zij),
+             fw*.32, fw*.072, BLAD_D, BLAD_DD, BLAD_L, punt=.7)
 
-    # ---- wenkbrauwen als bladen ----
+    ogen(fig, W, cx, fy, fw, fh)
+    d = ImageDraw.Draw(fig)
+
+    ns = laag(W); dn = ImageDraw.Draw(ns)
+    dn.polygon([(cx, fy - fh*.05), (cx + fw*.095, fy + fh*.155),
+                (cx, fy + fh*.205), (cx - fw*.095, fy + fh*.155)], fill=A(HUID_DD, 175))
+    fig.alpha_composite(zacht(ns, W*.006))
+    d = ImageDraw.Draw(fig)
+    d.polygon([(cx, fy + fh*.01), (cx + fw*.045, fy + fh*.16),
+               (cx, fy + fh*.185), (cx - fw*.045, fy + fh*.16)], fill=A(HUID_L, 210))
     for zij in (-1, 1):
-        leaf(d, cx + zij * fw * .24, fy - fh * .14, math.radians(-13 * zij),
-             fw * .34, fw * .085, BLAD_D)
+        d.ellipse([cx + zij*fw*.062 - fw*.022, fy + fh*.155,
+                   cx + zij*fw*.062 + fw*.022, fy + fh*.192], fill=A(HUID_DD, 190))
 
-    # ---- ogen ----
-    ow, oh = fw * .27, fh * .115
-    oy = fy - fh * .02
-    for zij in (-1, 1):
-        ox = cx + zij * fw * .235
-        d.polygon(leafpts(ox, oy, 0, ow, oh, curve=.18), fill=LICHT)
-        d.ellipse([ox - oh * .62, oy - oh * .62, ox + oh * .62, oy + oh * .62], fill=IRIS)
-        d.ellipse([ox - oh * .30, oy - oh * .30, ox + oh * .30, oy + oh * .30], fill=OOG)
-        d.ellipse([ox - oh * .46, oy - oh * .52, ox - oh * .10, oy - oh * .16], fill=LICHT)
-        # bovenlijn
-        d.line(bocht((ox - ow / 2, oy), (ox, oy - oh * 1.05), (ox + ow / 2, oy)),
-               fill=OOG, width=max(2, int(W * .008)), joint="curve")
+    my = fy + fh*.295
+    d.polygon(bocht((cx - fw*.165, my), (cx, my - fh*.050), (cx + fw*.165, my)) +
+              bocht((cx + fw*.165, my), (cx, my + fh*.082), (cx - fw*.165, my)),
+              fill=A((132, 108, 96), 195))
+    d.line(bocht((cx - fw*.165, my), (cx, my + fh*.024), (cx + fw*.165, my)),
+           fill=A(HUID_DD), width=max(2, int(W*.006)), joint="curve")
+    d.line(bocht((cx - fw*.07, my + fh*.055), (cx, my + fh*.078), (cx + fw*.07, my + fh*.055)),
+           fill=A(HUID_LL, 125), width=max(1, int(W*.004)), joint="curve")
 
-    # ---- neus ----
-    d.polygon([(cx, fy - fh * .02), (cx + fw * .085, fy + fh * .155),
-               (cx, fy + fh * .195), (cx - fw * .085, fy + fh * .155)], fill=HUID_D)
-    d.polygon([(cx, fy + fh * .03), (cx + fw * .05, fy + fh * .16),
-               (cx, fy + fh * .185), (cx - fw * .05, fy + fh * .16)], fill=HUID_L)
-
-    # ---- mond ----
-    my = fy + fh * .285
-    d.line(bocht((cx - fw * .15, my), (cx, my + fh * .055), (cx + fw * .15, my)),
-           fill=HUID_D, width=max(2, int(W * .011)), joint="curve")
-
-    # ---- bladbaard ----
     for i, (dx, dy, a, sc) in enumerate([
-        (-.34, .40, 124, 0.95), (.34, .40, 56, 0.95),
-        (-.19, .52, 104, 0.86), (.19, .52, 76, 0.86),
-        (-.44, .24, 140, 0.80), (.44, .24, 40, 0.80),
-        (0.00, .58, 90, 0.80),
+        (-.42, .455, 128, .92), (.42, .455, 52, .92),
+        (-.25, .575, 106, .85), (.25, .575, 74, .85),
+        (-.52, .295, 144, .80), (.52, .295, 36, .80),
+        (0.0, .625, 90, .78),
     ]):
-        leaf(d, cx + fw * dx, fy + fh * dy, math.radians(a),
-             fh * .34 * sc, fw * .17 * sc,
-             BLAD if i % 2 == 0 else BLAD_D, nerf=BLAD_L, curve=.35)
+        blad(d, cx + fw*dx, fy + fh*dy, math.radians(a), fh*.32*sc, fw*.155*sc,
+             BLAD if i % 2 == 0 else BLAD_D, BLAD_DD, BLAD_LL, curve=.40, punt=.85)
 
-    # ---- kleine ranken langs de wangen ----
-    for zij in (-1, 1):
-        pts = bocht((cx + zij * fw * .46, fy - fh * .22),
-                    (cx + zij * fw * .60, fy + fh * .05),
-                    (cx + zij * fw * .40, fy + fh * .34))
-        rank(d, pts, W * .016, SCHORS)
+    if metflacon:
+        flacon(fig, W, cx - W*.300, W*.705, W*.240)
 
+    if krimp != 1.0:
+        n = int(W*krimp)
+        klein = fig.resize((n, n), Image.LANCZOS)
+        fig = laag(W)
+        fig.alpha_composite(klein, ((W-n)//2, (W-n)//2))
+    im.alpha_composite(fig)
     return im.resize((S, S), Image.LANCZOS)
 
 
 def badge(S=96):
-    """Monochroom silhouet met transparantie — Android kleurt dit zelf in."""
-    W = S * SS
-    im = Image.new("RGBA", (W, W), (0, 0, 0, 0))
-    d = ImageDraw.Draw(im)
-    cx = W / 2
-    wit = (255, 255, 255, 255)
-    leeg = (0, 0, 0, 0)
-
-    # basisvorm zodat kroon en gezicht één silhouet worden
-    d.ellipse([cx - W * .225, W * .335, cx + W * .225, W * .80], fill=wit)
-    # bladerkroon — met marge, Android snijdt de badge bij
-    for a, dist, ln, wd in [(-90, .205, .30, .120), (-116, .205, .28, .110), (-64, .205, .28, .110),
-                            (-143, .190, .24, .098), (-37, .190, .24, .098)]:
+    W = S*SS
+    im = laag(W); d = ImageDraw.Draw(im)
+    cx = W/2
+    wit = (255, 255, 255, 255); leeg = (0, 0, 0, 0)
+    d.ellipse([cx - W*.215, W*.345, cx + W*.215, W*.795], fill=wit)
+    for a, dist, ln, wd in [(-90, .205, .30, .120), (-115, .205, .275, .108),
+                            (-65, .205, .275, .108), (-142, .190, .235, .095),
+                            (-38, .190, .235, .095)]:
         r = math.radians(a)
-        leaf(d, cx + math.cos(r) * W * dist, W * .455 + math.sin(r) * W * dist * .8,
-             r, W * ln, W * wd, wit, curve=.72)
-    # gezicht: ovaal met echte kin
-    fw, fh = W * .44, W * .50
-    fy = W * .585
-    d.polygon(bocht((cx - fw * .49, fy - fh * .06), (cx, fy + fh * .66), (cx + fw * .49, fy - fh * .06)) +
-              bocht((cx + fw * .49, fy - fh * .06), (cx, fy - fh * .34), (cx - fw * .49, fy - fh * .06)),
-              fill=wit)
-    # uitgesneden ogen, neus en mond
+        d.polygon(leafpts(cx + math.cos(r)*W*dist, W*.455 + math.sin(r)*W*dist*.80,
+                          r, W*ln, W*wd, .72, .78), fill=wit)
+    fw, fh = W*.42, W*.48
+    fy = W*.585
+    d.polygon(bocht3((cx - fw*.50, fy - fh*.14), (cx - fw*.52, fy + fh*.30),
+                     (cx - fw*.26, fy + fh*.56), (cx, fy + fh*.60)) +
+              bocht3((cx, fy + fh*.60), (cx + fw*.26, fy + fh*.56),
+                     (cx + fw*.52, fy + fh*.30), (cx + fw*.50, fy - fh*.14)) +
+              [(cx + fw*.50, fy - fh*.40), (cx - fw*.50, fy - fh*.40)], fill=wit)
     for zij in (-1, 1):
-        d.polygon(leafpts(cx + zij * fw * .225, fy - fh * .06, 0, fw * .28, fh * .125, .18), fill=leeg)
-    d.line(bocht((cx - fw * .18, fy + fh * .26), (cx, fy + fh * .35), (cx + fw * .18, fy + fh * .26)),
-           fill=leeg, width=max(3, int(W * .020)), joint="curve")
-    d.polygon([(cx, fy + fh * .01), (cx + fw * .06, fy + fh * .16), (cx - fw * .06, fy + fh * .16)], fill=leeg)
+        d.polygon(leafpts(cx + zij*fw*.225, fy - fh*.055, 0, fw*.27, fh*.135, .18, .72), fill=leeg)
+    d.polygon([(cx, fy + fh*.015), (cx + fw*.06, fy + fh*.165), (cx - fw*.06, fy + fh*.165)], fill=leeg)
+    d.line(bocht((cx - fw*.17, fy + fh*.265), (cx, fy + fh*.345), (cx + fw*.17, fy + fh*.265)),
+           fill=leeg, width=max(3, int(W*.021)), joint="curve")
     return im.resize((S, S), Image.LANCZOS)
 
 
 if __name__ == "__main__":
     dryade(512).save("icon-512.png")
     dryade(192).save("icon-192.png")
-    dryade(512, pad=0.20).save("icon-maskable.png")
+    dryade(512, ring=False, metflacon=False, krimp=.66).save("icon-maskable.png")
     badge(96).save("badge-96.png")
-    dryade(384, achtergrond=False, ring=False).save("dryade-vlak.png")
     print("iconen klaar")

@@ -1,5 +1,5 @@
 /* Wildpluk service worker — VERSION altijd gelijk aan APP_VERSION in index.html */
-const VERSION = "0.4.0";
+const VERSION = "0.5.0";
 const SHELL = "wildpluk-shell-v" + VERSION;
 const LIB   = "wildpluk-lib-v" + VERSION;
 const TILES = "wildpluk-tiles";          /* niet versiegebonden */
@@ -127,14 +127,29 @@ async function checkHerinnering() {
 
   await writeMeta(db, {k:"push", aan:true, tijd:push.tijd, laatst:t});
 
+  const PORTJES = [
+    ["Er staat iets te bloeien", "Vijf soorten, twee minuten, en je weet ze morgen nog."],
+    ["Het bos vraagt naar je", "Een paar planten wachten op herhaling. Kop thee erbij?"],
+    ["Even langs de veldschool", "Wie je vandaag oefent, herken je straks in de berm."],
+    ["De dryade tikt op je schouder", "Kleine ronde. Namen, gebruik, en waar je voor moet oppassen."],
+    ["Tijd voor een paar bladeren", "Korte oefening. Je streak blijft staan, en dat scheelt weer."]
+  ];
+  const p = PORTJES[new Date().getDate() % PORTJES.length];
   const body = srs.length === 0
     ? "Nog niet begonnen. Tien vragen en je kent je eerste soorten uit je hoofd."
     : klaar > 0
-      ? klaar + " soorten staan klaar. Twee minuten, en je streak blijft staan."
+      ? klaar + " soorten staan klaar. " + p[1]
       : "Alles herhaald. Zin in een extra ronde?";
 
-  return self.registration.showNotification("Tijd voor de veldschool", {
-    body, icon:"icon-192.png", badge:"badge-96.png", tag:"wildpluk-quiz", data:{scr:"leer"}
+  /* absolute paden: een relatief pad valt op sommige toestellen terug
+     op het browsericoon, en dan zie je een blokje in de statusbalk */
+  const basis = self.registration.scope;
+  return self.registration.showNotification(p[0], {
+    body,
+    icon: new URL("icon-192.png", basis).href,
+    badge: new URL("badge-96.png", basis).href,
+    tag: "wildpluk-quiz",
+    data: { scr: "leer" }
   });
 }
 

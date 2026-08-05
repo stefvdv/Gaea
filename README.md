@@ -1,4 +1,4 @@
-# Wildpluk v0.4.0
+# Wildpluk v0.5.0
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -129,6 +129,37 @@ lege-schermtekens en accenten. Krullijn onderaan elk blad, rank in beide hoeken.
 de maanfase wordt berekend uit de synodische maand vanaf de nieuwe maan van
 6 januari 2000, en het jaarwiel toont welk feest geweest is en hoeveel dagen
 tot het volgende — met wat er dan in het veld gebeurt.
+
+## Waarom de kaart leeg bleef
+`occurrence/search` geeft per waarneming een `taxonKey` terug die vaak van een
+andere rang is dan de soortsleutel waarop je zoekt — een ondersoort, een synoniem,
+of juist het geslacht. De oude code deed `omgekeerd[o.taxonKey]` en gooide alles
+weg wat niet exact matchte, dus meestal alles.
+
+`koppelSoort()` probeert nu op volgorde: `taxonKey`, `speciesKey`,
+`acceptedTaxonKey`, `usageKey`, dan de wetenschappelijke naam (volledig en op de
+eerste twee woorden), dan het geslacht. Wat dan nog niet koppelt blijft staan met
+de GBIF-naam erbij in plaats van te verdwijnen.
+
+Er is nu ook terugkoppeling: als geen enkel verzoek antwoordt zegt de app dat,
+en als GBIF wel records geeft maar niets koppelt zie je dat ook.
+
+## Open databases voor gebruik en gevaren
+- **Dr. Duke's Phytochemical and Ethnobotanical Databases** (USDA ARS) — de
+  serieuze open bron voor plantgebruik. **CC0**, dus vrij te hergebruiken, met
+  ethnobotanische toepassingen per soort, fytochemie, biologische activiteit en
+  LD-toxiciteitsgegevens, met literatuurverwijzing per regel. Downloadbaar als
+  `Duke-Source-CSV.zip` via Ag Data Commons; web-interface op phytochem.nal.usda.gov.
+  Dit is een **build-time import**, geen live API: het CSV-pakket wordt omgezet
+  naar een `GEBRUIK_DB`-tabel in de app.
+- **EMA HMPC-monografieën** — gezaghebbend voor traditioneel gebruik,
+  contra-indicaties en interacties, maar geen API. Handmatig per soort.
+- **Wikidata** — open en machineleesbaar, dekking wisselend.
+- **NVIC** — beste Nederlandse bron voor vergiftigingen, geen open API.
+
+Duke's is Engelstalig en Amerikaans-gecentreerd, en zegt weinig over
+verwarringssoorten in Nederlandse bermen. Het vult de kolom "gebruik" goed,
+niet de kolom "gevaar".
 
 ## Nog te doen
 - Waarneming.nl-koppeling (API-sleutel aanvragen) voor veel dichtere NL-dekking
