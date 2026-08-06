@@ -1,4 +1,4 @@
-# Gaea v0.8.2
+# Gaea v0.9.0
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -125,36 +125,40 @@ Periodic Background Sync (`wildpluk-dagelijks`, min. 6 u). Werkt alleen als de a
 op het startscherm staat. Chrome bepaalt het exacte moment; marge van ongeveer een uur.
 
 ## Geïllustreerde assets
-De zes aangeleverde bladen zijn met `snij.py` uitgesneden: alfamasker, licht
-dichtsmeren zodat losse blaadjes bij hun ornament horen, samenhangende gebieden
-labelen, bijsnijden, verkleinen en kwantiseren met behoud van transparantie.
+Alle sierbeeld komt uit de aangeleverde illustraties. Er zit geen getekend
+lijnwerk meer tussen; dat was precies wat de app een gemengd gevoel gaf.
 
-In gebruik:
-- **Ronde reliëfknoppen** voor kaartlaag, instellingen, GPS, ontdekken, sluiten en
-  de plus op *Pin hier*. Geen achtergrond meer, alleen de penning met een
-  slagschaduw; de actieve knop krijgt een groene gloed.
-- **Vierkante tegels** als navigatie: kaart, pin, mand, blad, boek. Inactief
-  gedempt en grijzer, actief in kleur met gloed.
-- **Scheidingslijnen** onder elke schermkop (slinger met medaillon), boven elke
-  sectiekop in een blad (fijne band) en achter elke groepskop (haarlijn).
-- **Hoekornamenten** in alle vier de hoeken van elk blad, en een klein eikentakje
-  rechtsonder op elke kaart in de lijsten.
-- **Takjes** als leeg-schermteken en als vervaagd accent in waarschuwingsblokken.
-- **Flesjes** rechtsonder op elk voorraadpotje — groen glas voor natte maaksels
-  (tinctuur, oxymel, azijn, siroop, olie, likeur, honing, ferment), amber voor
-  droge (gedroogd, zout, thee, poeder).
-- **Boommedaillon** als zegel in elke schermkop.
-- **Lijst** als `border-image` rond het specimenblad, met het binnenvlak
-  weggesneden zodat het papier van de app zelf zichtbaar blijft.
+`vrij.py` doet de voorbewerking: bijsnijden op de zichtbare inhoud, schalen naar
+de maat waarop iets werkelijk getoond wordt, en het palet terugbrengen. Bij dat
+laatste worden de RGB-waarden onder volledig transparante pixels eerst met de
+gemiddelde zichtbare kleur gevuld — anders trekt die rommel het palet scheef en
+krijg je vuile randen.
 
-`snij.py` staat erbij, dus nieuwe bladen kun je met dezelfde methode uitsnijden.
+Van 42 aangeleverde stukken zijn er 24 in gebruik:
 
-**Alles zit als data-URI in `index.html`.** Er is geen `art/`-map meer. Dat scheelt
-26 losse bestanden bij het deployen, en het maakt de app in één klap volledig
-offline-compleet zonder aparte cachestap in de service worker. Prijs: index.html
-is ongeveer 2 MB, en bij elke update haalt de browser dat opnieuw op. Voor een
-persoonlijke app op wifi is dat prima; wil je het ooit terug naar losse bestanden,
-draai dan `snij.py` opnieuw en vervang de data-URI's door `url(art/naam.png)`.
+| waar | beeld |
+|---|---|
+| kaartlaag, instellingen, ontdekken, sluiten, plus | gouden penningen |
+| back-up en herstel | penning met pijl |
+| GPS-knop en kaartspelden | eikenspeld |
+| navigatie | speld, mand, flacon, open boek, gesloten boek |
+| schermkop | boommedaillon en een vlechtlijn met boom |
+| sectiekop in een blad | fijne eikenlijn, plus vijzel, ketel of sikkel waar dat past |
+| groepskop | vlechtlijn |
+| hoeken van elk blad | eikenhoek, vier keer gespiegeld |
+| kaarten in lijsten | dezelfde hoek, klein en vervaagd |
+| lege schermen | mand of open boek |
+| voorraadpotjes | flacon, amber gefilterd voor droge maaksels |
+| kwalen | gereedschap per groep |
+| maanstand | maan in de gouden eikenring |
+| startscherm | kruidenvrouw in de gotische lijst |
+
+De kaartspeld draagt de soortklasse niet meer in zijn vorm maar in een gekleurde
+gloed eromheen en een steentje in de kop. Zo blijft één illustratie voldoende
+voor eetbaar, medicinaal, giftig en zwam.
+
+Waar geen passend pictogram bestond staat er niets. Een half passend beeld is
+erger dan geen beeld.
 
 ## Vormgeving
 Alles wat een oppervlak is deelt één behandeling: lichte bovenrand, donkere
@@ -172,48 +176,34 @@ donkere panelen.
   linksboven en rechtsboven, plus de rank rechtsboven en linksonder.
 
 ## Startanimatie
-De kruidenvrouw met vijzel en flacon, in een gouden lijst. Het origineel is te
-druk voor een klein scherm, dus de plaat is bewerkt: bijgesneden tot kop, handen,
-vijzel en flacon, mediaanfilter tegen ruis, licht verzacht en daarna heel licht
-verscherpt zodat de vormen blijven, iets minder verzadigd, en een vignet dat de
-randen laat wegvallen. Van 941 naar 760 px, 196 kB.
-
-Bewegen doet hij zo:
-- de plaat komt op en zoomt langzaam uit van 110% naar 100% over 4,6 s
-- een groene gloed pulseert over de flacon in haar hand, 3,1 s
-- een gouden gloed pulseert trager over de vijzel, 4,2 s
-- de kaars linksonder flikkert onregelmatig, 1,7 s
-- zestien sporen stijgen op vanaf willekeurige punten, elk met eigen duur,
+De kruidenvrouw in de gotische lijst. In lagen:
+- de lijst komt op en schaalt van 94% naar 100%
+- de vrouw verschijnt daarna en ademt heel licht door, 6 s per cyclus
+- een groene gloed pulseert over de flacon in haar linkerhand, 3,2 s
+- een gouden gloed pulseert trager over de vijzel, 4,4 s
+- veertien sporen stijgen op vanaf willekeurige punten, elk met eigen duur,
   vertraging en zijwaartse drift
-- de gouden lijst komt na een halve seconde op
-- daarna GAEA, een uitrollende sierlijn en de ondertitel
+- daarna GAEA, een uitrollende vlechtlijn en de ondertitel
 
 Ongeveer 3,4 s. Tikken slaat het over; bij `prefers-reduced-motion` staat alles
 stil en verdwijnt het scherm na 0,9 s.
 
+De vrouw zit als JPEG in de app, samengesteld op een donkere bosachtergrond.
+Transparantie is daar niet nodig en dat scheelt een factor zes: 105 kB in plaats
+van 600 kB.
+
 ## Iconen
-Vanaf v0.8.2 gebouwd uit het aangeleverde portret in plaats van getekend.
-`maak_icoon.py` snijdt de kop van de kruidenvrouw uit (uitsnede 0,31–0,75 breed,
-0,105–0,353 hoog), tempert het detail zodat het op 48 dp nog leest, legt er een
-vignet overheen dat naar het bosgroen van de app trekt, en zet daar een gouden
-dubbele ring met vier knopen omheen en de groene flacon linksonder met een gloed.
+Vanaf v0.9 opgebouwd uit de kruidenvrouw en de gouden eikenring, dus uit
+dezelfde hand als de rest van de app. `maak_icoon.py` zet haar op een donkere
+bosachtergrond met radiale gloed en vignet, geeft haar een zachte slagschaduw,
+en legt de eikenring als omlijsting eromheen.
 
-- `icon-512/192.png` — afgeronde vierkant, ring en flacon, 96 kleuren
-- `icon-maskable.png` — geen ring of flacon, 66% geschaald binnen een groen veld,
-  met een zachte ronde rand zodat je in de ronde uitsnede van Android geen
-  vierkante fotorand ziet liggen
-- `badge-96.png` — nog steeds getekend, want Android maakt van de badge een
-  silhouet en gooit alle kleur weg; een foto werkt daar per definitie niet
-
-Hetzelfde boommedaillon staat nu ook als merkteken in de bovenbalk en in elke
-schermkop.
-
-`badge-96.png` is apart en essentieel: Android maakt van de meldings-badge een
-silhouet en gooit alle kleur weg. Een dekkend vierkant icoon wordt dan een blok.
-De badge is daarom wit-op-transparant met marge, en het silhouet is één geheel
-(kroon en gezicht overlappen), anders valt het uiteen op 24 dp.
-
-Ook in het manifest als `purpose: monochrome`.
+- `icon-512/192.png` — afgeronde vierkant met ring
+- `icon-maskable.png` — geen ring, 80% geschaald, zodat er binnen de ronde
+  uitsnede van Android niets wegvalt
+- `badge-96.png` — nog steeds getekend: een schorskop met geweitakken als kroon
+  en worteltakken als baard. Android maakt van de badge een silhouet en gooit
+  alle kleur weg, dus een illustratie werkt daar per definitie niet
 
 ## Betrouwbaarheid
 Store `keur`, sleutel = soortsleutel of `r:receptsleutel`.
