@@ -1,4 +1,4 @@
-# Gaea v0.9.1
+# Gaea v0.10.0
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -53,8 +53,9 @@ Drie soorten herkomst, en de app zegt het er per soortenblad bij:
 Dat onderscheid staat ook in Instellingen, onder "Waar komt de informatie vandaan".
 
 ## Gids
-175 soorten: 96 kruiden, 39 bomen en struiken, 40 paddenstoelen.
-46 daarvan zijn giftig en staan er juist in om te leren kennen en te pinnen.
+218 soorten: 96 kruiden, 39 bomen en struiken, 40 paddenstoelen en 43 tuin-,
+keuken- en apotheekkruiden. 48 daarvan zijn giftig.
+Ze staan er juist in om te leren kennen en te pinnen.
 Nieuw in v0.6 onder meer: de kust (zeekraal, zulte, strandbiet, zeesla, blaaswier,
 suikerwier), de klassieke lookalike-paren bij zwammen (stobbezwammetje naast
 bundelmosklokje, weidekringzwam naast weidetrechterzwam, parelamaniet naast
@@ -65,18 +66,26 @@ wilg, sleutelbloem, driekleurig viooltje, witte dovenetel, zwarte bes.
 
 ## Waarvoor — kwalen
 24 kwalen in zeven groepen, elk met soorten en recepten. Per soort staat
-`kwalen[]`; 26 soorten hebben daarnaast `emaInfo` met de monografiereferentie,
-het plantendeel en waarvoor het is vastgelegd.
+`kwalen[]`; 53 soorten hebben daarnaast `emaInfo` en gelden als officieel erkend
+traditioneel gebruik. De rest is volksgebruik en staat er als zodanig bij.
 
-Het onderscheid dat de app overal maakt:
-- **EMA** — het Comité voor Kruidengeneesmiddelen heeft een monografie
-  vastgesteld. Dat is erkenning van traditioneel gebruik, geen bewijs van
-  werkzaamheid. Geverifieerd tijdens de bouw voor Urtica, Plantago lanceolata,
-  Tilia, Achillea, Capsella, Filipendula, Matricaria, Sambucus, Althaea en
-  Equisetum, plus de combinatiemonografie *Species pectorales* voor borstthee.
-- **Volksgebruik** — alles zonder die vlag. Interessant, niet gedekt.
+Dat onderscheid blijft, want het is veiligheidsinformatie: erkend betekent lang
+en veilig genoeg gebruikt om geregistreerd te worden, niet dat werkzaamheid is
+aangetoond.
 
-## Botanische plaat
+## Tuin, keuken en apotheek
+Nieuw in v0.10: 43 kruiden die je kweekt of koopt in plaats van plukt, onder een
+eigen tabblad. Salie, rozemarijn, lavendel, echte tijm, basilicum, peterselie,
+bieslook, dille, venkel, koriander, dragon, kervel, bonenkruid, laurier,
+pepermunt, groene munt, citroenverbena, goudsbloem, rode zonnehoed, hysop, lavas,
+absintalsem, knoflook, mierikswortel, zoethout, gember, kurkuma, kaneel, anijs,
+karwij, komijn, zwarte komijn, Roomse kamille, passiebloem, vrouwenmantel,
+guldenroede, berendruif, bleekselderij, citroengras, ginkgo, aloë vera, en twee
+die er staan om te leren mijden: wijnruit en vingerhoedskruid in de tuin.
+
+Ze horen erbij omdat de voorraadkast en de recepten er net zo goed op draaien.
+
+## Botanische plaat## Botanische plaat
 Eén algemene plaat voor alles wat een plant is: penwortel met zijwortels,
 stengel, drie bladparen met steel, middennerf en zijnerven, een gesloten knop,
 een bloemscherm met zes bloempjes van elk zes kroonblaadjes, en bessen aan
@@ -129,65 +138,22 @@ alles groepeert op gebruik.
 voorraadkast" maakt het maaksel aan met de juiste rijpings- en houdbaarheidsdatum.
 
 ## Veldschool
-Leitner, dozen 0–7, intervallen 0/1/2/4/8/16/32/64 dagen. Zeven vraagsoorten:
-NL↔Latijn, verwarringsgevaar, let-op-regel, veldkenmerk, plantdeel, oogstmaand,
-en vanaf drie gefotografeerde soorten herkenning op je eigen foto's.
-Weging: eigen plekken > gifplanten > paddenstoelen > eerder foute antwoorden.
+Leitner, dozen 0 tot 7, intervallen 0/1/2/4/8/16/32/64 dagen.
 
-## Dagelijkse herinnering
-Periodic Background Sync (`wildpluk-dagelijks`, min. 6 u). Werkt alleen als de app
-op het startscherm staat. Chrome bepaalt het exacte moment; marge van ongeveer een uur.
+Elke derde vraag is beeldherkenning. Eerst je eigen foto's, en als die er nog
+niet zijn beeld uit GBIF voor de soorten van deze ronde. `beeldVooruit()` haalt
+vooraf beeld op voor maximaal zes soorten, zodat een vraag niet halverwege op
+het netwerk staat te wachten; `FOTO_KAS` houdt het per sessie vast.
 
-## Geïllustreerde assets
-Alle sierbeeld komt uit de aangeleverde illustraties. Er zit geen getekend
-lijnwerk meer tussen; dat was precies wat de app een gemengd gevoel gaf.
+Onder elke GBIF-foto staat de fotograaf en de licentie. Dat is geen
+bronvermelding maar een voorwaarde van de Creative Commons-licentie waaronder
+die beelden vrijgegeven zijn.
 
-`vrij.py` doet de voorbewerking: bijsnijden op de zichtbare inhoud, schalen naar
-de maat waarop iets werkelijk getoond wordt, en het palet terugbrengen. Bij dat
-laatste worden de RGB-waarden onder volledig transparante pixels eerst met de
-gemiddelde zichtbare kleur gevuld — anders trekt die rommel het palet scheef en
-krijg je vuile randen.
+Elk soortenblad heeft een knop **Herkenning oefenen** die meteen één beeldvraag
+over die soort opent.
 
-Van 42 aangeleverde stukken zijn er 24 in gebruik:
-
-| waar | beeld |
-|---|---|
-| kaartlaag, instellingen, ontdekken, sluiten, plus | gouden penningen |
-| back-up en herstel | penning met pijl |
-| GPS-knop en kaartspelden | eikenspeld |
-| navigatie | speld, mand, flacon, open boek, gesloten boek |
-| schermkop | boommedaillon en een vlechtlijn met boom |
-| sectiekop in een blad | fijne eikenlijn, plus vijzel, ketel of sikkel waar dat past |
-| groepskop | vlechtlijn |
-| hoeken van elk blad | eikenhoek, vier keer gespiegeld |
-| kaarten in lijsten | dezelfde hoek, klein en vervaagd |
-| lege schermen | mand of open boek |
-| voorraadpotjes | flacon, amber gefilterd voor droge maaksels |
-| kwalen | gereedschap per groep |
-| maanstand | maan in de gouden eikenring |
-| startscherm | kruidenvrouw in de gotische lijst |
-
-De kaartspeld draagt de soortklasse niet meer in zijn vorm maar in een gekleurde
-gloed eromheen en een steentje in de kop. Zo blijft één illustratie voldoende
-voor eetbaar, medicinaal, giftig en zwam.
-
-Waar geen passend pictogram bestond staat er niets. Een half passend beeld is
-erger dan geen beeld.
-
-## Vormgeving
-Alles wat een oppervlak is deelt één behandeling: lichte bovenrand, donkere
-onderrand, zachte slagschaduw. Dat zit in de tokens `--relief`, `--relief-diep`
-en `--relief-ink`, plus een fijne schubtextuur (`--schub`) als data-URI over de
-donkere panelen.
-
-- Kaarten (vondsten, maaksels, kwalen, instellingen) krijgen een verlopend paneel,
-  een gouden haarlijn langs de bovenrand en een eikenblad in de hoek.
-- Knoppen zijn geperst: verloop, binnenlicht, gouden rand op de primaire.
-- De navigatiebalk heeft een gouden haarlijn en een streepje boven het actieve item.
-- Elke schermkop draagt het dryade-zegel, met daaronder een knoopregel:
-  gouden lijn, symbool, gouden lijn.
-- Elk blad heeft een dubbele omlijsting in het papier en keltische hoekknopen
-  linksboven en rechtsboven, plus de rank rechtsboven en linksonder.
+Afleiders komen altijd uit dezelfde wereld: bij een zwamvraag alleen zwammen,
+bij een plantvraag alleen planten.
 
 ## Startanimatie
 De kruidenvrouw in de gotische lijst. In lagen:
@@ -218,22 +184,6 @@ en legt de eikenring als omlijsting eromheen.
 - `badge-96.png` — nog steeds getekend: een schorskop met geweitakken als kroon
   en worteltakken als baard. Android maakt van de badge een silhouet en gooit
   alle kleur weg, dus een illustratie werkt daar per definitie niet
-
-## Betrouwbaarheid
-Store `keur`, sleutel = soortsleutel of `r:receptsleutel`.
-Vier standen: open, nagekeken, twijfel, klopt niet. Per stand een bron en notitie.
-
-Tien invoeren zijn tijdens de bouw vergeleken met externe bronnen en staan al
-ingevuld (NVIC, NMV, Het Acute Boekje, Wildpluk wiki): daslook, lelietje-van-dalen,
-herfsttijloos, gevlekte aronskelk, groene knolamaniet, weidechampignon,
-bundelmosklokje, morielje, plus witte knolamaniet en hanenkam op *twijfel*.
-De rest staat op open — dat is de eerlijke stand van zaken.
-
-Gids heeft een tabblad **Te controleren**. Instellingen exporteert de hele
-controlelijst als markdown, handig om mee naar een flora of een kenner te nemen.
-
-Giftige soorten krijgen een noodblok: huisarts of 112, zeg wat en hoeveel,
-bewaar een restant, en wacht niet op klachten.
 
 ## Kaartgedrag
 - Twee vingers knijpen om te zoomen (`touchZoom`, `tap:false`, `zoomSnap:.25`).
