@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#14201A">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Gaea</title>
+<title>Gaea's Natural Health</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -864,7 +864,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.11.0";
+const APP_VERSION = "0.11.1";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -4557,8 +4557,8 @@ function makeQuestion(k){
 /* De generatoren krijgen een naam mee, zodat een niveau er een selectie
    uit kan maken. Zonder deze koppeling filtert het niveau niets. */
 [[qNL,"nl"],[qLatijn,"latijn"],[qDeel,"deel"],[qMaand,"maand"],[qLet,"let"],
- [qHerken,"herken"],[qVerwar,"verwar"],[qWaarvoor,"waarvoor"]]
-  .forEach(([g,n])=>{ if(typeof g === "function") GEN_NAAM.set(g,n); });
+ [qHerken,"herken"],[qDubbel,"verwar"],[qWaarvoor,"waarvoor"]]
+  .forEach(([g,nm])=>{ if(typeof g === "function") GEN_NAAM.set(g,nm); });
 
 const QZ={list:[],i:0,goed:0,cur:null,sel:-1,done:false};
 async function startQuiz(){

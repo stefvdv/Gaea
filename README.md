@@ -1,4 +1,4 @@
-# Gaea v0.11.0
+# Gaea's Natural Health — v0.11.1
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -24,6 +24,26 @@ Lokaal: `npx serve .` — geolocatie en service worker vragen https of localhost
 ## Bestanden
     index.html            app: stijl, soorten, recepten, logica én al het sierbeeld
     sw.js                 service worker; VERSION == APP_VERSION
+    manifest.webmanifest  naam, iconen, kleuren
+    proef.js              droogloop in een neppe DOM, zie hieronder
+
+## Naam
+`manifest.webmanifest` bepaalt wat Android onder het icoon zet:
+`name` is "Gaea's Natural Health", `short_name` is "Gaea". Android leest die
+naam alleen bij het installeren, dus na een naamswijziging moet je de app van je
+startscherm halen en opnieuw toevoegen. In de app zelf staat kortweg "Gaea",
+want de volledige naam past niet in een balk van 390 px.
+
+## proef.js — droogloop
+`node proef.js` draait de volledige app-code in een nagebouwde browser: neppe
+DOM, localStorage, IndexedDB, Leaflet en fetch. Daarna roept het de vijf schermen
+aan, bouwt het een vraag voor alle 219 soorten, tekent alle botanische platen en
+loopt de kwaalpictogrammen af.
+
+Dat vangt precies wat `node --check` niet ziet: een verwijzing naar een functie
+die niet bestaat. In v0.11.0 verwees de niveaukoppeling naar `qVerwar`, terwijl
+de generator `qDubbel` heet — syntactisch correct, en toch bleef de app op het
+opstartscherm hangen. Draai dit voor elke release.
     sw.js                 service worker; VERSION == APP_VERSION
     _redirects            GBIF-proxy voor Netlify
     manifest.webmanifest  PWA-manifest
