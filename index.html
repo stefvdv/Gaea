@@ -879,7 +879,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.12.1";
+const APP_VERSION = "0.12.2";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -3392,7 +3392,12 @@ const scrimEl = document.getElementById("scrim");
 const bodyEl  = document.getElementById("sheetBody");
 const quizEl  = document.getElementById("quiz");
 
+/* Wanneer het blad opengaat. De achtergronddoek verschijnt onder je vinger,
+   dus de klik die volgt op dezelfde aanraking landt er meteen op en zou het
+   blad direct weer dichtdoen. Vandaar een korte rustperiode. */
+let bladSinds = 0;
 function showSheet(html){
+  bladSinds = Date.now();
   bodyEl.innerHTML = html;
   sheetEl.classList.add("on"); scrimEl.classList.add("on");
   sheetEl.scrollTop = 0; hydratePhotos(bodyEl);
@@ -3416,7 +3421,7 @@ function closeSheet(){
   }
   if(S.scr==="map" && S.map) drawMarkers();
 }
-scrimEl.onclick = closeSheet;
+scrimEl.onclick = ()=>{ if(Date.now() - bladSinds > 400) closeSheet(); };
 
 function bandHtml(mnd, ink){
   const m = nowM();
@@ -3902,7 +3907,10 @@ function editPin(id,isNew){
   /* Bij een nieuwe vondst wil je meteen typen. Het blad schuift open met een
      animatie; focussen tijdens die beweging wordt op Android genegeerd,
      vandaar de korte vertraging. */
-  if(isNew && !pin.spec) setTimeout(()=>{ try{ q.focus({preventScroll:true}); }catch(e){ q.focus(); } }, 320);
+  if(isNew && !pin.spec) setTimeout(()=>{
+    if(!sheetEl.classList.contains("on")) return;
+    try{ q.focus({preventScroll:true}); }catch(e){ q.focus(); }
+  }, 380);
   segWire("edHoev"); segWire("edToe"); segWire("edZeker"); segWire("edVerv",true);
   bodyEl.querySelector('[data-act="clear"]').onclick = ()=>{
     sel=null; custom=""; q.value="";

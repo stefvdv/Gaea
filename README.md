@@ -1,4 +1,4 @@
-# Gaea's Natural Health — v0.12.1
+# Gaea's Natural Health — v0.12.2
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -322,6 +322,17 @@ schuine of trage sleep binnen een lijst nooit per ongeluk telt: minstens 72 px
 horizontaal, binnen 600 ms, horizontaal minstens 2,2 keer zo ver als verticaal,
 en niet meer dan 90 px verticaal. Bladen, quiz, loep, invoervelden, segmentknoppen
 en de soortenkiezer zijn uitgezonderd.
+
+## Bladen openen
+`showSheet()` noteert wanneer het blad opengaat, en de achtergronddoek negeert
+klikken in de eerste 400 ms. Zonder die rustperiode sluit een blad dat vanaf de
+kaart wordt geopend zichzelf meteen weer: de doek verschijnt onder je vinger en
+de klik die volgt op diezelfde aanraking landt er bovenop.
+
+Dat kostte een versie om te vinden, want het blad ging wél open. Het bleef in
+de DOM staan, alleen zonder de klasse `on`. De zoekbalk kreeg dus netjes focus
+en het toetsenbord kwam op — alleen was er niets te zien. Dat is dezelfde
+touchend-gevolgd-door-click-val als bij de spookpin, één laag hoger.
 
 ## Soort kiezen
 De zoekbalk toont niets zolang je niets hebt getypt. Een willekeurige greep uit
