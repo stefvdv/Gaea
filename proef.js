@@ -125,7 +125,16 @@ try{
       }],
     ["gebruiksTekening", ()=>{ SPECIES.forEach(s=>gebruiksTekening(s)); return "ok"; }],
     ["specRow", ()=>{ SPECIES.forEach(s=>specRow(s)); return "ok"; }],
-    ["kwaalIcoon", ()=>KWALEN.map(k=>kwaalIcoon(k)).join(",").length]
+    ["kwaalIcoon", ()=>KWALEN.map(k=>kwaalIcoon(k)).join(",").length],
+    ["dubbelSleutel", ()=>{
+        let raak=0, mis=[], totaal=0;
+        SPECIES.forEach(s=> (s.dubbel||[]).forEach(d=>{
+          totaal++; const k=dubbelSleutel(d);
+          if(k) raak++; else mis.push(d.split("(")[0].trim());
+        }));
+        return raak+"/"+totaal+" gekoppeld; niet gevonden: "+[...new Set(mis)].slice(0,14).join(" | ");
+      }],
+    ["bandHtml", ()=>bandHtml([3,4,5],true).length]
   ];
   for(const [naam,fn] of proeven){
     try{ const r = fn(); console.log("  ok  "+naam+(r!==undefined?"  -> "+r:"")); }

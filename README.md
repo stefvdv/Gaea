@@ -1,4 +1,4 @@
-# Gaea's Natural Health — v0.12.2
+# Gaea's Natural Health — v0.13.0
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -105,7 +105,31 @@ die er staan om te leren mijden: wijnruit en vingerhoedskruid in de tuin.
 
 Ze horen erbij omdat de voorraadkast en de recepten er net zo goed op draaien.
 
-## Botanische plaat## Botanische plaat
+## Soortenblad
+Van boven naar beneden: kop met tags en maandbalk, waarschuwingen, de botanische
+plaat, veldkenmerken, medicinaal gebruik, toelichting, beeld uit GBIF, recepten,
+en je eigen plekken.
+
+**Maandbalk** — twaalf blokjes met de beginletter erboven, J F M A M J J A S O N D.
+Zonder die letters moest je tellen. De blokjes zijn ook groter, en de letter van
+een maand waarin je kunt oogsten is donkerder.
+
+**Verwarbaar met** — de verwarringen staan als vrije tekst, bijvoorbeeld
+"Kruidvlier (giftig, kruidachtig, rechtopstaande bestros)". `dubbelSleutel()`
+pakt het stuk voor de haakjes en zoekt de soort in de gids; lukt dat, dan wordt
+het een knop naar dat blad. Van de 67 verwarringen koppelen er 47. De rest zijn
+soorten die niet in de gids staan of beschrijvingen zonder soortnaam, en die
+blijven gewone tekst — beter dan een knop die niets doet.
+
+**Jouw plekken** — aanklikbaar. Het blad gaat dicht, de kaart komt op en vliegt
+naar die vondst op zoom 17.
+
+**Beeld uit GBIF** — aantikken opent de loep schermvullend, met pinch-zoom tot 6×
+en dubbeltik naar 2,6×. De hardwareterugknop sluit eerst de loep, dan pas het
+blad. De strip komt asynchroon binnen, dus de loep wordt daar apart aangehaakt;
+de binding die `showSheet()` legt is dan al geweest.
+
+## Botanische plaat
 Eén algemene plaat voor alles wat een plant is: penwortel met zijwortels,
 stengel, drie bladparen met steel, middennerf en zijnerven, een gesloten knop,
 een bloemscherm met zes bloempjes van elk zes kroonblaadjes, en bessen aan

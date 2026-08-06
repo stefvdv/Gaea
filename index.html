@@ -148,10 +148,16 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .d-eet{background:var(--mos)} .d-med{background:var(--heide)} .d-gif{background:var(--meekrap)}
 .d-zwam{background:var(--paddo)} .d-onb{background:var(--kalk-2)}
 
-.band{display:flex;gap:2px;margin-top:5px}
-.band i{width:9px;height:5px;border-radius:1px;background:rgba(228,231,214,.12)}
+.band{display:flex;gap:3px;margin-top:6px;align-items:flex-end}
+.band span{display:flex;flex-direction:column;align-items:center;gap:2px}
+.band b{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:0;
+  line-height:1;color:rgba(228,231,214,.42)}
+.band i{width:13px;height:8px;border-radius:2px;background:rgba(228,231,214,.12)}
 .band i.on{background:var(--mos)}
+.band span:has(i.on) b{color:rgba(228,231,214,.8)}
 .band i.now{outline:1.5px solid var(--goud);outline-offset:1px}
+.band.ink b{color:rgba(44,42,31,.4)}
+.band.ink span:has(i.on) b{color:var(--inkt)}
 .band.ink i{background:rgba(44,42,31,.13)}
 .band.ink i.on{background:var(--mos-d)}
 .band.ink i.now{outline-color:var(--goud)}
@@ -705,6 +711,12 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
    onder de bladen, en vangt geen tikken op — anders zou hij de kaart
    blokkeren precies waar je wilt pinnen.
    ========================================================= */
+.kvlink{width:100%;text-align:left;background:none;border:0;font:inherit;cursor:pointer}
+.kvlink:active{background:rgba(44,42,31,.05)}
+.dblink{display:inline;padding:0;background:none;border:0;font:inherit;color:inherit;
+  text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;
+  text-decoration-thickness:1.5px;cursor:pointer}
+.dblink:active{opacity:.6}
 .chips2{display:flex;flex-wrap:wrap;gap:7px;margin:0 18px 10px}
 .chip2{padding:6px 11px;border-radius:11px;font-size:13px;font-weight:600;
   background:rgba(94,122,68,.16);color:var(--inkt);border:1px solid rgba(94,122,68,.4)}
@@ -879,7 +891,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.12.2";
+const APP_VERSION = "0.13.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -3423,11 +3435,33 @@ function closeSheet(){
 }
 scrimEl.onclick = ()=>{ if(Date.now() - bladSinds > 400) closeSheet(); };
 
+/* De maandbalk. Twaalf blokjes zeggen weinig zonder te tellen, dus staat de
+   beginletter van elke maand erboven. J F M A M J J A S O N D. */
+const MND_LTR = ["J","F","M","A","M","J","J","A","S","O","N","D"];
 function bandHtml(mnd, ink){
   const m = nowM();
   return '<div class="band'+(ink?" ink":"")+'">'+Array.from({length:12},(_,i)=>
-    '<i class="'+((mnd||[]).includes(i+1)?"on ":"")+(i+1===m?"now":"")+'"></i>').join("")+'</div>';
+    '<span><b>'+MND_LTR[i]+'</b><i class="'+((mnd||[]).includes(i+1)?"on ":"")+
+    (i+1===m?"now":"")+'"></i></span>').join("")+'</div>';
 }
+/* De verwarringen staan als vrije tekst: "Kruidvlier (giftig, kruidachtig...)".
+   Zit de genoemde soort in de gids, dan wordt het een knop naar dat blad.
+   Zo niet, dan blijft het gewoon tekst — beter dan een knop die niets doet. */
+function dubbelSleutel(tekst){
+  const kop = String(tekst).split("(")[0].trim().toLowerCase();
+  if(!kop) return null;
+  let hit = SPECIES.find(x=> x.nl.toLowerCase() === kop);
+  if(hit) return hit.k;
+  hit = SPECIES.find(x=> kop.includes(x.nl.toLowerCase()) || x.nl.toLowerCase().includes(kop));
+  return hit ? hit.k : null;
+}
+function dubbelHtml(lijst){
+  return (lijst||[]).map(t=>{
+    const k = dubbelSleutel(t);
+    return k ? '<button class="dblink" data-dbl="'+k+'">'+esc(t)+'</button>' : esc(t);
+  }).join(" · ");
+}
+
 function tagsHtml(tags, grp){
   const map={eetbaar:["t-eet","Eetbaar"],medicinaal:["t-med","Medicinaal"],giftig:["t-gif","Giftig"]};
   let h = (tags||[]).map(t=>map[t]?'<span class="tag '+map[t][0]+'">'+map[t][1]+'</span>':"").join("");
@@ -3692,7 +3726,7 @@ function gebruiksTekening(sp){
   } else {
     svgs = plaatPlant(d);
     volgorde = ["blad","bloem","vrucht","wortel","stengel","bast"];
-    bij = "Algemene plantenplaat · ingekleurd wat je van " + sp.nl.toLowerCase() + " gebruikt";
+    bij = "";
   }
   const lg = volgorde.map(x=>{
     const aan = d.has(x), c = DEELKLEUR[x];
@@ -3977,7 +4011,7 @@ async function specSheet(k, terugPin){
   if(s.grp==="zwam")
     h += '<div class="warn oker"><b>Paddenstoelen</b>Bij zwammen is één verkeerd kenmerk genoeg voor een fatale afloop. Laat elke eerste vondst van een soort controleren door iemand die hem al jaren kent, of door een paddenstoelenwerkgroep.</div>';
   if(s.dubbel && s.dubbel.length)
-    h += '<div class="warn'+(dood?' dood':'')+'">'+(dood?ZEGEL:'')+'<b>Verwarbaar met</b>'+s.dubbel.map(esc).join(" · ")+'</div>';
+    h += '<div class="warn'+(dood?' dood':'')+'">'+(dood?ZEGEL:'')+'<b>Verwarbaar met</b>'+dubbelHtml(s.dubbel)+'</div>';
   if(s.let) h += '<div class="warn'+(dood?' dood':' oker')+'"><b>Let op</b>'+esc(s.let)+'</div>';
 
   if(dood)
@@ -3986,14 +4020,13 @@ async function specSheet(k, terugPin){
       'en bewaar een restant of een foto. De arts kan het Nationaal Vergiftigingen Informatie Centrum raadplegen. '+
       'Wacht niet op klachten: bij amatoxinen komen die pas na uren, als de schade al begonnen is.</div>';
 
-  h += '<div class="sec">'+sech("Wat je gebruikt","",'hand')+gebruiksTekening(s)+
-    '<div class="kv" style="margin-top:9px"><span>Delen</span><span>'+esc(s.delen)+'</span></div></div>';
+  h += '<div class="sec">'+sech("Wat je gebruikt","",'hand')+gebruiksTekening(s)+'</div>';
 
   if(s.herken) h += '<div class="sec">'+sech("Veldkenmerken","",'oog')+'<div class="prose">'+esc(s.herken)+'</div></div>';
 
   if(s.kwalen && s.kwalen.length){
     const ema = s.emaInfo ? s.emaInfo.waarvoor : [];
-    h += '<div class="sec">'+sech("Waarvoor het gebruikt wordt","",'vijzel')+
+    h += '<div class="sec">'+sech("Medicinaal gebruik","",'vijzel')+
       '<div class="bron">'+s.kwalen.map(k=>{
         const kw = KWAAL_BY_K[k]; if(!kw) return "";
         return '<button data-kw="'+k+'">'+esc(kw.nm)+(ema.includes(k)?' <span class="emabadge ink">EMA</span>':'')+'</button>';
@@ -4005,10 +4038,6 @@ async function specSheet(k, terugPin){
   h += '<div class="sec">'+sech("Beeld uit GBIF","",'ster')+'<div class="strip" id="gbifBeeld">'+
        '<div style="font-size:13px;color:var(--inkt-2);padding:6px 0">Ophalen…</div></div></div>';
 
-  h += '<div class="sec">'+sech("Gegevens","",'boek')+kv("Delen", s.delen)+
-    kv("Maanden", s.mnd.length?s.mnd.map(m=>MND[m-1]).join(", "):"—")+
-    kv("Eigen plekken", mine.length?mine.length+" plek"+(mine.length===1?"":"ken"):"nog geen")+'</div>';
-
   const rec = RECEPTEN.filter(r=> r.soorten.includes(k));
   if(rec.length){
     h += '<div class="sec">'+sech("Recepten met deze soort","",'ketel')+'<div class="bron">'+
@@ -4016,7 +4045,8 @@ async function specSheet(k, terugPin){
   }
   if(mine.length){
     h += '<div class="sec">'+sech("Jouw plekken","",'kaart')+
-      mine.map(p=>'<div class="kv"><span>'+esc(shortd(p.gemaakt))+'</span><span>'+esc(p.plek||"—")+'</span></div>').join("")+'</div>';
+      mine.map(p=>'<button class="kv kvlink" data-plek="'+esc(p.id)+'">'+
+        '<span>'+esc(shortd(p.gemaakt))+'</span><span>'+esc(p.plek||"—")+' ›</span></button>').join("")+'</div>';
   }
 
   h += '<div class="row"><button class="btn sec2" data-act="ontdek">Toon op kaart via GBIF</button>'+
@@ -4026,6 +4056,14 @@ async function specSheet(k, terugPin){
 
   bodyEl.querySelectorAll("[data-rk]").forEach(b=> b.onclick=()=> receptSheet(b.dataset.rk));
   bodyEl.querySelectorAll("[data-kw]").forEach(b=> b.onclick=()=> kwaalSheet(b.dataset.kw));
+  bodyEl.querySelectorAll("[data-dbl]").forEach(b=> b.onclick=()=> specSheet(b.dataset.dbl, terugPin));
+  /* Vanaf je eigen plek: blad dicht, kaart erheen. */
+  bodyEl.querySelectorAll("[data-plek]").forEach(b=> b.onclick=()=>{
+    const pin = S.pins.find(x=>x.id===b.dataset.plek);
+    if(!pin) return;
+    closeSheet(); go("map");
+    setTimeout(()=>{ S.map.flyTo([pin.lat,pin.lng], Math.max(S.map.getZoom(),17), {duration:.9}); }, 60);
+  });
   const oefen = document.getElementById("oefenSoort");
   if(oefen) oefen.onclick = async ()=>{
     oefen.textContent = "Beeld ophalen…"; oefen.disabled = true;
@@ -4056,6 +4094,15 @@ async function specSheet(k, terugPin){
   } else {
     el.innerHTML = beelden.map(b=>'<div class="ph"><img src="'+esc(b.url)+'" alt="" loading="lazy">'+
       '<div class="lic">'+esc(b.maker)+(b.lic?' · '+esc(b.lic):'')+'</div></div>').join("");
+    /* De strip komt pas binnen nadat het blad al getekend is, dus de loep
+       moet hier apart worden aangehaakt. */
+    el.querySelectorAll(".ph img").forEach((img,i)=>{
+      img.addEventListener("click", e=>{
+        e.stopPropagation();
+        const b = beelden[i] || {};
+        openLoep(img.src, [b.maker, b.lic].filter(Boolean).join(" · "));
+      });
+    });
   }
 }
 
@@ -5245,7 +5292,8 @@ document.getElementById("verLbl").textContent="v"+APP_VERSION;
 document.getElementById("verLbl2").textContent="v"+APP_VERSION;
 
 window.addEventListener("popstate",()=>{
-  if(quizEl.classList.contains("on")) quizEl.classList.remove("on");
+  if(loepEl.classList.contains("on")) sluitLoep();
+  else if(quizEl.classList.contains("on")) quizEl.classList.remove("on");
   else if(S.spook) wisSpook();
   else if(sheetEl.classList.contains("on")) closeSheet();
   else if(S.scr!=="map") go("map");
