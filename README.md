@@ -1,4 +1,4 @@
-# Gaea's Natural Health — v0.11.1
+# Gaea's Natural Health — v0.12.0
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -150,13 +150,29 @@ geen vindplaats. "Eigen vondst hier zetten" maakt een pin met status
 "nog te bevestigen".
 
 ## Voorraadkast en recepten
-16 soorten maaksel met eigen rijp- en houdbaarheidstermijn, batchcode `GA-JJMM-NN`.
+Een *maaksel* heet vanaf v0.12 een **brouwsel** — in de tekst. De veldnaam
+`maaksel:`, de array `MAAKSELS`, `S.maaksels` en de IndexedDB-store `maaksels`
+zijn onveranderd gebleven, anders was je hele voorraadkast verdwenen.
 
-62 recepten: 33 keuken en 29 voor het lijf. Nieuw in v0.11 onder meer
-krentenboompjessaus, iepenzaadsalade, robiniabeignets, eikelmeel met de
-koudwatermethode, gefermenteerde bramenbladthee, gefermenteerde bospaddenstoelen,
-zeewierbouillon, jeneverbes-kruidenzout, salietinctuur, tijmhoestsiroop met anijs,
-goudsbloemzalf, gember-oxymel, lavendel-slaapkussen en verse aloëgel.
+16 soorten brouwsel met eigen rijp- en houdbaarheidstermijn, batchcode
+`GA-JJMM-NN`.
+
+### Eigen recepten
+Je kunt zelf recepten schrijven: naam, keuken of lijf, tijd, opbrengst,
+ingrediënten (één per regel, `hoeveelheid - naam`), werkwijze, een let-op en
+zoveel soorten als je wilt. Kies je een soort brouwsel, dan kun je het recept
+met één tik in de voorraadkast zetten, net als de ingebouwde recepten.
+
+Ze staan in localStorage onder `admiral_app:eigenrecepten`, gaan mee in de
+back-up, staan bovenaan in de lijst met een gouden merkje **eigen**, en hebben
+een eigen tabblad. `alleRecepten()` plakt ze voor `RECEPTEN`; `receptZoek()`
+kijkt in beide.
+
+78 recepten: 44 keuken en 34 voor het lijf. Nieuw in v0.12 onder meer
+hondsdrafazijn, geroosterde beukennootjes, meidoornbessenketchup, ingelegde
+speenkruidknoppen, lisdoddestuifmeelkoekjes, vlierbloesemlimonade, veldzuringsoep,
+hopscheuten als wilde asperge, berkenbastaftreksel, kaasjeskruid als
+koudwateraftreksel, eikenschorsspoeling en vlierbloesembeignets.
 
 ## Veldschool
 Leitner, dozen 0 tot 7, intervallen 0/1/2/4/8/16/32/64 dagen. Drie niveaus:
@@ -279,9 +295,24 @@ de cache `wildpluk-beeld` (LRU op 900), en daarna werkt het offline. Nogmaals
 tikken stopt de kuur. Reken op enkele tientallen MB — doe het op wifi.
 
 ## Kaartknoppen
-Alle knoppen staan op één rij onderaan de kaart, gecentreerd boven de
-navigatiebalk. Rechtsonder was hinderlijk bij het navigeren. De knop "Pin hier"
-is weg: een vondst begint bij de spookpin.
+Drie knoppen op één rij onderaan, gecentreerd boven de navigatiebalk:
+ontdekken, thuis, GPS.
+
+**Thuis** — één tik brengt je naar je vaste plek, lang indrukken (650 ms) zet
+die vast op je huidige GPS-positie, of op het midden van de kaart als GPS uit
+staat. Opgeslagen onder `admiral_app:thuis`. De knop licht op zodra er een
+thuis bekend is.
+
+## Swipe
+Horizontaal vegen wisselt van scherm, in de volgorde kaart, vondsten, voorraad,
+gids, leren.
+
+Op de kaart staat het uit. Daar betekent slepen pannen, en een verkeerd begrepen
+veeg gooit je van je vindplaats af. Verder gelden vier eisen tegelijk, zodat een
+schuine of trage sleep binnen een lijst nooit per ongeluk telt: minstens 72 px
+horizontaal, binnen 600 ms, horizontaal minstens 2,2 keer zo ver als verticaal,
+en niet meer dan 90 px verticaal. Bladen, quiz, loep, invoervelden, segmentknoppen
+en de soortenkiezer zijn uitgezonderd.
 
 ## Randwerk
 Een sierlijst langs de vier schermranden: eikenhoeken in de hoeken, gouden
@@ -291,16 +322,21 @@ waar je wilt pinnen. Op het kaartscherm staat hij een stuk terughoudender, daar
 telt elke pixel.
 
 ## Spookpin
-De spookpin slaat niets op. Hij is er om te zien of je de juiste plek raakt.
-- Ergens anders tikken verplaatst hem; de vorige verdwijnt.
-- Terug-knop laat hem vallen, en van scherm wisselen ook.
-- Nog eens tikken op dezelfde plek maakt er een vondst van, en pas **Bewaren**
-  slaat die op.
+Drie regels, en verder niets:
 
-Dat laatste vroeg een correctie. De speld staat met zijn punt op de plek, dus
-zijn kop zit bóven je vinger. Tik je nog eens op dezelfde plek, dan raak je het
-beeld niet — maar je bedoelt hem wél. Een tweede tik binnen 44 px van de staande
-spookpin telt daarom als bevestiging, of je het beeld nu raakt of niet.
+1. Een tik op de kaart zet een tijdelijke speld neer.
+2. Een tik **op** die speld opent het formulier voor een nieuwe vondst. Pas
+   **Bewaren** slaat hem op.
+3. Een tik ergens anders haalt de oude speld weg en zet een nieuwe op die plek.
+   Er staat er dus altijd hoogstens één.
+
+De speld overleeft niets: van scherm wisselen, de terugknop, de app naar de
+achtergrond of afsluiten — hij is weg. Hij komt nooit in `S.pins` of IndexedDB.
+
+Wat er in v0.11 misging: de tikafhandeling op de speld riep `newPin()` aan in
+plaats van `nieuweVondst()`. `newPin` schrijft direct naar IndexedDB. Elke tik
+op een speld maakte dus meteen een naamloze vondst aan, zonder formulier. Het
+uitlegwolkje is weg; het gedrag spreekt nu voor zich.
 
 ## Veldschool
 Leitner, dozen 0–7, intervallen 0/1/2/4/8/16/32/64 dagen. Zeven vraagsoorten:

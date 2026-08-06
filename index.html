@@ -697,6 +697,12 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
    onder de bladen, en vangt geen tikken op — anders zou hij de kaart
    blokkeren precies waar je wilt pinnen.
    ========================================================= */
+.chips2{display:flex;flex-wrap:wrap;gap:7px;margin:0 18px 10px}
+.chip2{padding:6px 11px;border-radius:11px;font-size:13px;font-weight:600;
+  background:rgba(94,122,68,.16);color:var(--inkt);border:1px solid rgba(94,122,68,.4)}
+.eigenmerk{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 6px;border-radius:6px;vertical-align:middle;
+  background:rgba(201,162,39,.18);color:var(--goud);border:1px solid rgba(201,162,39,.45)}
 #randwerk{position:fixed;inset:0;z-index:360;pointer-events:none}
 #randwerk span{position:absolute;background-repeat:no-repeat;background-size:contain;
   filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
@@ -740,6 +746,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 
 <div class="fabs" id="fabs">
   <button class="fab ghost beeld" id="btnOntdek" aria-label="Ontdek-laag"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M16.2 16.2 21 21" stroke-linecap="round"/><path d="M11 8v6M8 11h6" stroke-linecap="round"/></svg></button>
+  <button class="fab ghost beeld" id="btnThuis" aria-label="Naar huis"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6.5 9.6V19h11V9.6"/><path d="M10 19v-5h4v5"/></svg></button>
   <button class="fab ghost beeld" id="btnGps" aria-label="Volg mijn positie"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></button>
 </div>
 
@@ -772,8 +779,9 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
     <button data-v="nu">Nu te maken</button>
     <button data-v="keuken">Keuken</button>
     <button data-v="lijf">Voor het lijf</button>
+    <button data-v="eigen">Eigen</button>
   </div>
-  <div class="searchbar"><input id="qKast" placeholder="Zoek maaksel, soort of gebruik"></div>
+  <div class="searchbar"><input id="qKast" placeholder="Zoek brouwsel, soort of gebruik"></div>
   <div id="kastBody"></div>
 </section>
 
@@ -798,7 +806,6 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <section class="screen" id="scr-leer">
   <div class="kop" id="kop-leer"><div class="rij"><h1 style="margin:0">Veldschool</h1></div></div>
   <p class="sub">Elke dag een paar vragen. Namen, gebruik, en vooral: waarmee je iets kunt verwarren.</p>
-  <div class="knoopregel" data-orn="boek"></div>
   <div id="leerBody"></div>
 </section>
 
@@ -812,7 +819,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
   <button class="srow" id="setNotifTest"><div class="t"><b>Test de melding</b><span>Stuurt er nu direct één</span></div><span class="v">↗</span></button>
   <p class="sub" id="notifNote" style="margin-top:-2px;line-height:1.55"></p>
   <p class="grouphd">Gegevens</p>
-  <button class="srow" id="setExport"><span class="munt"></span><div class="t"><b>Exporteer back-up</b><span>JSON met vondsten en maaksels</span></div><span class="v">.json</span></button>
+  <button class="srow" id="setExport"><span class="munt"></span><div class="t"><b>Exporteer back-up</b><span>JSON met vondsten en brouwsels</span></div><span class="v">.json</span></button>
   <button class="srow" id="setExportPh"><span class="munt"></span><div class="t"><b>Exporteer met foto's</b><span>Groter bestand, volledig herstelbaar</span></div><span class="v">.json</span></button>
   <button class="srow" id="setImport"><span class="munt"></span><div class="t"><b>Herstel uit back-up</b><span>Voegt samen, overschrijft op id</span></div><span class="v">↑</span></button>
   <button class="srow" id="setCache"><div class="t"><b>Opslag</b><span id="cacheInfo">—</span></div><span class="v">i</span></button>
@@ -840,7 +847,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
   <span class="lijn top"></span><span class="lijn bod"></span>
   <span class="zij l"></span><span class="zij r"></span>
 </div>
-<div class="spookhint" id="spookhint"></div>
+
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet"><div class="grab"></div><div id="sheetBody"></div></div>
 <div class="toast" id="toast"></div>
@@ -864,7 +871,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.11.1";
+const APP_VERSION = "0.12.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -2410,6 +2417,130 @@ const RECEPTEN_TUIN = [
 
 RECEPTEN.push(...RECEPTEN_EXTRA, ...RECEPTEN_TUIN);
 
+const RECEPTEN_DRIE = [
+{k:"hondsdrafazijn",nl:"Hondsdrafazijn",type:"keuken",soorten:["hondsdraf","daslook","zevenblad"],mnd:[3,4,5],tijd:"3 weken",opbrengst:"500 ml",maaksel:"azijn",
+ ing:[["60 g","hondsdraf, bloeiend"],["500 ml","witte wijnazijn"],["1","sjalot"]],
+ stap:["Pluk de hele bloeiende toppen; hondsdraf is aan de vierkante stengel en de niergevormde blaadjes te herkennen.",
+   "Spoel niet, schud alleen uit — water verdunt de azijn en trekt schimmel aan.",
+   "Alles in een schone fles, azijn erover tot alles onderstaat.",
+   "Drie weken donker wegzetten, om de dag schudden.",
+   "Zeven. Blijft een jaar goed."],
+ let:"Niet in grote hoeveelheden tijdens zwangerschap. Hondsdraf is voor paarden giftig; laat het niet in de wei liggen."},
+{k:"beukennootjesolie",nl:"Geroosterde beukennootjes",type:"keuken",soorten:["beuk"],mnd:[9,10],tijd:"40 min",opbrengst:"1 potje",
+ ing:[["300 g","beukennootjes in de bolster"],["1 tl","zout"],["1 el","olie"]],
+ stap:["Verzamel na de eerste herfststorm; wat op de grond ligt is rijp.",
+   "Pel de driekantige nootjes uit de stekelige bolster.",
+   "Rooster 15 minuten op 160 °C tot de bruine vliesjes loslaten.",
+   "Wrijf ze in een doek tot de vliesjes eraf zijn.",
+   "Nog 10 minuten roosteren met zout en olie."],
+ let:"Rauw bevatten ze fagine, dat misselijkheid geeft. Roosteren breekt dat af. Ook geroosterd hooguit een handvol per keer."},
+{k:"hazelaarpesto",nl:"Hazelnoot-brandnetelpesto",type:"keuken",soorten:["hazelaar","brandnetel","zevenblad"],mnd:[8,9,10],tijd:"20 min",opbrengst:"2 potjes",maaksel:"olie",
+ ing:[["100 g","hazelnoten"],["150 g","brandneteltoppen"],["50 g","oude kaas"],["150 ml","olijfolie"],["1","teentje knoflook"],["1 tl","zout"]],
+ stap:["Rooster de hazelnoten droog tot de vliesjes loslaten en wrijf ze schoon.",
+   "Blancheer de netels 30 seconden en knijp ze goed droog.",
+   "Alles grof malen, olie er in een straal bij.",
+   "Op smaak met zout. Afvullen met een laagje olie erop."],
+ let:"Hazelnoten gaan snel ranzig; koel bewaren en binnen twee maanden opmaken."},
+{k:"meidoornbessenketchup",nl:"Meidoornbessenketchup",type:"keuken",soorten:["meidoorn"],mnd:[9,10],tijd:"1 uur",opbrengst:"2 flesjes",maaksel:"ingelegd",
+ ing:[["1 kg","meidoornbessen"],["400 ml","appelazijn"],["200 g","suiker"],["1 tl","zout"],["1","kaneelstokje"]],
+ stap:["Rits de bessen van de trossen; groene laat je hangen.",
+   "Kook met azijn tot ze uiteenvallen, 30 minuten.",
+   "Wrijf door een zeef; de harde pit blijft achter.",
+   "Kook op met suiker, zout en kaneel tot het bindt.",
+   "Heet afvullen."],
+ let:"Meidoorn beïnvloedt de hartwerking. Als kruiderij geen probleem, maar niet dagelijks in grote hoeveelheden en niet naast hartmedicijnen."},
+{k:"tandzaadthee",nl:"Aftreksel van heelblaadjes",type:"lijf",soorten:["duizendblad","brunel","agrimonie"],mnd:[6,7,8],tijd:"15 min",opbrengst:"1 kop",
+ ing:[["1 tl","duizendblad"],["1 tl","brunel"],["250 ml","kokend water"]],
+ stap:["Oogst op een droge dag rond de middag, als de olie op sterkte is.",
+   "Droog luchtig en in het donker.",
+   "Overgiet met kokend water, tien minuten afgedekt trekken.",
+   "Zeven. Bitter en samentrekkend."],
+ let:"Duizendblad kan de huid lichtgevoelig maken. Bij een allergie voor composieten voorzichtig."},
+{k:"speenkruidknoppen",nl:"Ingelegde speenkruidknoppen",type:"keuken",soorten:["speenkruid"],mnd:[2,3],tijd:"3 weken",opbrengst:"1 potje",maaksel:"ingelegd",
+ ing:[["100 g","gesloten speenkruidknoppen"],["20 g","zout"],["150 ml","witte wijnazijn"],["1 tl","suiker"]],
+ stap:["Uitsluitend vóór de bloei plukken. Zodra de eerste gele bloem opengaat, is het seizoen voorbij.",
+   "Meng met zout, 24 uur laten staan.",
+   "Afspoelen en droogdeppen.",
+   "Kook azijn met suiker, laat afkoelen en giet erover.",
+   "Drie weken laten staan."],
+ let:"Na de bloei bouwt speenkruid protoanemonine op, dat blaren op mond en darm geeft. Dit is een recept met een harde einddatum."},
+{k:"lisdoddepollen",nl:"Lisdoddestuifmeelkoekjes",type:"keuken",soorten:["lisdodde"],mnd:[5,6],tijd:"30 min",opbrengst:"12 koekjes",
+ ing:[["60 g","lisdoddestuifmeel"],["100 g","bloem"],["1","ei"],["60 g","boter"],["40 g","suiker"]],
+ stap:["Schud de gele mannelijke aren boven een zak; het stuifmeel valt er als zwavelpoeder uit.",
+   "Zeef het om insecten te verwijderen.",
+   "Meng met bloem, boter, suiker en ei tot een deeg.",
+   "Bolletjes plat drukken, 12 minuten op 180 °C."],
+ let:"Alleen uit water waarvan je de herkomst kent; lisdodde neemt zware metalen op. Niet oogsten in beschermd rietland."},
+{k:"vlierbloesemkefir",nl:"Vlierbloesemlimonade",type:"keuken",soorten:["vlier"],mnd:[5,6],tijd:"4 dagen",opbrengst:"2 l",maaksel:"ferment",
+ ing:[["8","vlierbloemschermen"],["2 l","water"],["150 g","suiker"],["1","citroen, in schijven"],["1 el","appelazijn"]],
+ stap:["Pluk op een droge zonnige ochtend en was niet: de gist zit op de bloesem.",
+   "Los de suiker op in lauw water.",
+   "Bloesem, citroen en azijn erbij, afdekken met een doek.",
+   "Vier dagen op kamertemperatuur, dagelijks roeren tot het bruist.",
+   "Zeven en in beugelflessen. Dagelijks even ontluchten."],
+ let:"Dit gist door. Laat de flessen niet dicht in de zon staan en ontlucht ze elke dag, anders knappen ze."},
+{k:"zuringsoep",nl:"Veldzuringsoep",type:"keuken",soorten:["veldzuring","schapenzuring"],mnd:[4,5,6],tijd:"30 min",opbrengst:"4 personen",
+ ing:[["250 g","veldzuring"],["2","aardappels"],["1","ui"],["1 l","bouillon"],["100 ml","room"],["30 g","boter"]],
+ stap:["Pluk jong blad; oud blad is taai en nog zuurder.",
+   "Fruit ui in boter, aardappel en bouillon erbij, 20 minuten koken.",
+   "Zuring op het laatst erdoor; hij verkleurt binnen een minuut naar olijfgroen.",
+   "Pureren en room erdoor."],
+ let:"Veel oxaalzuur. Niet bij nierstenen, jicht of reuma, en niet in grote hoeveelheden of dagelijks."},
+{k:"boerenwormkruidmotwerend",nl:"Mottenzakje",type:"lijf",soorten:["boerenwormkruid","lavendel","alsem"],mnd:[7,8,9],tijd:"1 dag",opbrengst:"3 zakjes",
+ ing:[["30 g","boerenwormkruid"],["30 g","lavendel"],["20 g","alsem"],["3","katoenen zakjes"]],
+ stap:["Oogst in volle bloei op een droge dag.",
+   "Droog volledig in het donker.",
+   "Kruimel grof en meng.",
+   "Vul de zakjes losjes en hang ze in de kast."],
+ let:"Uitwendig, in een gesloten zakje. Boerenwormkruid en alsem bevatten thujon en horen niet in thee. Buiten bereik van kinderen."},
+{k:"heggenrankwaarschuwing",nl:"Wilde asperge van hop",type:"keuken",soorten:["hop"],mnd:[3,4],tijd:"15 min",opbrengst:"2 personen",
+ ing:[["300 g","jonge hopscheuten"],["30 g","boter"],["1","citroen"],["","zout, peper"]],
+ stap:["Zoek in maart de bleke scheuten aan de voet van oude hopranken; ze breken als asperge.",
+   "Snijd af waar het nog knapt, laat het houtige staan.",
+   "Kook drie minuten in ruim zout water.",
+   "Kort bakken in boter, citroen en peper erover."],
+ let:"Verwar hopscheuten niet met heggenrank, die op dezelfde plekken klimt en waarvan de wortel en bes zeer giftig zijn. Hop heeft ruwe stengels die rechtsom draaien en gelobd blad."},
+{k:"berkenbastthee",nl:"Berkenbastaftreksel",type:"lijf",soorten:["berk"],mnd:[3,4,5],tijd:"30 min",opbrengst:"1 l",
+ ing:[["20 g","binnenbast van een gevelde berk"],["1,2 l","water"]],
+ stap:["Neem uitsluitend bast van een boom die al geveld is; schillen doodt een levende berk.",
+   "Schraap de bruine buitenlaag weg, houd de lichte binnenbast over.",
+   "Snijd in reepjes en zet op met koud water.",
+   "Half uur zachtjes trekken, net onder het kookpunt.",
+   "Zeven. Licht bitter, ruikt naar wintergroen."],
+ let:"Bevat salicylaten. Niet bij aspirineallergie en niet aan kinderen met koorts."},
+{k:"kaasjeskruidslijmthee",nl:"Kaasjeskruidkoudwateraftreksel",type:"lijf",soorten:["kaasjeskruid","heemst"],mnd:[6,7,8,9],tijd:"8 uur",opbrengst:"500 ml",
+ ing:[["2 el","gedroogd kaasjeskruidblad"],["500 ml","koud water"]],
+ stap:["Doe het kruid in koud water — dat is het hele punt.",
+   "Acht uur laten staan, af en toe roeren.",
+   "Zeven. Het aftreksel is dik en glad.",
+   "Lauw drinken of ermee gorgelen."],
+ let:"Koud zetten, niet heet: de slijmstoffen die de keel verzachten breken bij hitte af. Neem medicijnen niet tegelijk in; slijmstoffen vertragen de opname."},
+{k:"eikenschorstinctuur",nl:"Eikenschorsspoeling",type:"lijf",soorten:["eik"],mnd:[3,4],tijd:"30 min",opbrengst:"500 ml",
+ ing:[["20 g","jonge eikenschors"],["500 ml","water"]],
+ stap:["Neem schors van dunne takken van een gevelde of gesnoeide eik.",
+   "Snijd klein en zet op met koud water.",
+   "Twintig minuten zachtjes koken.",
+   "Zeven en laten afkoelen. Voor spoelbaden en kompressen."],
+ let:"Uitwendig. Sterk samentrekkend door de looistoffen; niet op grote open wonden en niet langer dan twee weken achtereen."},
+{k:"vogelmuursalade",nl:"Vogelmuur met ei",type:"keuken",soorten:["vogelmuur","veldsla","paardenbloem"],mnd:[1,2,3,4,9,10,11,12],tijd:"10 min",opbrengst:"2 personen",
+ ing:[["150 g","vogelmuur"],["2","eieren"],["1 el","hazelnootolie"],["1 el","azijn"],["","zout, peper"]],
+ stap:["Vogelmuur groeit het hele jaar door; herken hem aan de enkele haarlijn die langs de stengel loopt en per knoop van kant wisselt.",
+   "Was en slinger droog.",
+   "Kook de eieren zacht.",
+   "Meng met olie en azijn, ei erover, peper."],
+ let:"De haarlijn is het kenmerk. Zonder die lijn: niet plukken."},
+{k:"vlierbloesemklapper",nl:"Vlierbloesembeignets",type:"keuken",soorten:["vlier","robinia"],mnd:[5,6],tijd:"20 min",opbrengst:"12 stuks",
+ ing:[["12","vlierbloemschermen met steel"],["100 g","bloem"],["150 ml","bier"],["1","ei"],["1 snuf","zout"],["","frituurolie"],["","poedersuiker"]],
+ stap:["Pluk hele schermen met een stukje steel eraan om vast te houden.",
+   "Klop bloem, bier, ei en zout tot een dun beslag.",
+   "Houd elk scherm aan de steel, doop het in het beslag en laat uitlekken.",
+   "Frituur 40 seconden op 175 °C tot lichtgoud.",
+   "Steel eraf knippen, poedersuiker erover, direct eten."],
+ let:"Alleen de bloemen, geen groene steeltjes. Bloesem van robinia gaat op dezelfde manier, maar dan uitsluitend de bloemtrossen: zaad, bast en blad zijn giftig."}
+];
+RECEPTEN.push(...RECEPTEN_DRIE);
+
+
 /* =======================================================================
    CONSTANTEN
    ======================================================================= */
@@ -2499,7 +2630,8 @@ const S = {
   leer:lsGet("leer",{streak:0,laatst:null,totaal:0,doel:10,niveau:"gemiddeld"}),
   push:{aan:false,tijd:"09:00",laatst:null},
   specView:"nu", kastView:"alles", kastMode:"kast", recView:"alles",
-  spook:null, ontdekVol:null, concept:null,
+  spook:null, ontdekVol:null, concept:null, thuis:lsGet("thuis",null),
+  eigen:lsGet("eigenrecepten",[]),
   gevuld:new Set(), vulBezig:false, vulTimer:null, vulGemeld:false,
   taxa:lsGet("taxa",{})   /* soortsleutel -> gbif taxonKey */
 };
@@ -2757,6 +2889,59 @@ async function soortBeeld(k){
 }
 
 /* =======================================================================
+   SWIPE
+   Horizontaal vegen wisselt van scherm, net als in Admirals & Commanders.
+   Op de kaart is dat uitgeschakeld: daar betekent slepen pannen, en een
+   verkeerd begrepen veeg gooit je van je vindplaats af.
+   Verder gelden er strenge eisen, zodat een schuine of trage sleep binnen
+   een lijst nooit per ongeluk als schermwissel telt.
+   ======================================================================= */
+const SCHERMEN = ["map","list","kast","spec","leer"];
+
+function swipeOpzetten(){
+  let x0=0, y0=0, t0=0, bezig=false;
+
+  const magNiet = (doel)=>{
+    if(!doel || !doel.closest) return false;
+    /* Bladen, quiz, loep en de kaart hebben hun eigen sleepgedrag. */
+    return !!doel.closest(".sheet, .quiz, .loep, .leaflet-container, "+
+      ".pick, .opts, input, textarea, select, .seg, .tabs, .chips");
+  };
+
+  document.addEventListener("touchstart", e=>{
+    bezig = false;
+    if(e.touches.length !== 1) return;
+    if(sheetEl.classList.contains("on") || quizEl.classList.contains("on")) return;
+    if(S.scr === "map") return;
+    if(magNiet(e.target)) return;
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+    t0 = Date.now(); bezig = true;
+  }, {passive:true});
+
+  document.addEventListener("touchend", e=>{
+    if(!bezig) return;
+    bezig = false;
+    const t = e.changedTouches && e.changedTouches[0];
+    if(!t) return;
+    const dx = t.clientX - x0, dy = t.clientY - y0, dt = Date.now() - t0;
+
+    /* De vier eisen: ver genoeg, vlot genoeg, duidelijk horizontaal,
+       en niet zo ver verticaal dat het een scroll was. */
+    if(Math.abs(dx) < 72) return;
+    if(dt > 600) return;
+    if(Math.abs(dx) < Math.abs(dy) * 2.2) return;
+    if(Math.abs(dy) > 90) return;
+
+    const i = SCHERMEN.indexOf(S.scr);
+    if(i < 0) return;
+    const j = dx < 0 ? i+1 : i-1;
+    if(j < 0 || j >= SCHERMEN.length) return;
+    go(SCHERMEN[j]);
+  }, {passive:true});
+}
+swipeOpzetten();
+
+/* =======================================================================
    KAART
    ======================================================================= */
 function markerIcon(pin, sel){
@@ -2813,7 +2998,15 @@ function drawMarkers(){
   renderChips();
 }
 /* ---------- spookpin: één tik zet een voorbeeld, nog een tik maakt hem echt ---------- */
-const spookHint = document.getElementById("spookhint");
+const spookHint = null;
+/* De tijdelijke speld overleeft niets: geen schermwissel, geen achtergrond,
+   geen herstart. */
+document.addEventListener("visibilitychange", ()=>{
+  if(document.hidden && typeof wisSpook === "function") wisSpook();
+});
+window.addEventListener("pagehide", ()=>{
+  if(typeof wisSpook === "function") wisSpook();
+});
 function spookIcon(){
   return L.divIcon({className:"", iconSize:[34,48], iconAnchor:[17,46],
     html:'<div class="spook"></div>'});
@@ -2831,10 +3024,10 @@ function initTik(){
     if(doel && doel.closest && doel.closest(".leaflet-control, .leaflet-popup")) return;
     laatsteTik = Date.now();
 
-    /* recht op de spookpin: pas een vondst beginnen als hij er al even staat */
+    /* recht op de speld: het formulier voor een nieuwe vondst */
     if(doel && doel.closest && doel.closest(".spook")){
       const p = S.spook;
-      if(p && Date.now() - (p.t || 0) > 400){ wisSpook(); nieuweVondst(p.lat, p.lng); }
+      if(p){ wisSpook(); nieuweVondst(p.lat, p.lng); }
       return;
     }
     /* op een bestaande pin: laat Leaflet zijn werk doen */
@@ -2848,18 +3041,7 @@ function initTik(){
        Tik je nog eens op dezelfde plek, dan raak je het beeld niet maar bedoel je
        hem wél. Daarom: tweede tik binnen 44 px van de staande spookpin telt als
        bevestiging. */
-    if(S.spook){
-      const sp = S.map.latLngToContainerPoint(L.latLng(S.spook.lat, S.spook.lng));
-      /* Eén tik zet de speld, een tweede maakt er een vondst van. De marge van
-         400 ms voorkomt dat touchend en click samen als twee tikken tellen. */
-      const rijp = Date.now() - (S.spook.t || 0) > 400;
-      if(punt.distanceTo(sp) <= 48 && rijp){
-        const p = S.spook; wisSpook();
-        nieuweVondst(p.lat, p.lng);
-        return;
-      }
-      if(punt.distanceTo(sp) <= 48) return;
-    }
+    /* Overal elders: oude speld weg, nieuwe op de aangetikte plek. */
     zetSpook(ll.lat, ll.lng);
   }
 
@@ -2887,25 +3069,27 @@ function initTik(){
 
 function wisSpook(){
   if(!S.spook) return;
-  S.map.removeLayer(S.spook.marker);
+  try{ S.map.removeLayer(S.spook.marker); }catch(e){}
   S.spook = null;
-  spookHint.classList.remove("on");
+  if(typeof spookHint !== "undefined" && spookHint) spookHint.classList.remove("on");
 }
+/* De spookpin, drie regels en verder niets:
+   - een tik op de kaart zet een tijdelijke speld neer;
+   - een tik óp die speld opent het formulier voor een nieuwe vondst;
+   - een tik ergens anders haalt de oude weg en zet een nieuwe op die plek.
+   Hij wordt nooit opgeslagen. Van scherm wisselen, de app sluiten of de
+   terugknop laat hem vallen. */
 function zetSpook(lat, lng){
-  wisSpook();          /* een nieuwe spookpin laat de vorige altijd vallen */
+  wisSpook();
   if(S.map.getZoom() < 3) return;
   const m = L.marker([lat,lng],{icon:spookIcon(), zIndexOffset:900}).addTo(S.map);
   m.on("click", (ev)=>{
     if(ev && ev.originalEvent) L.DomEvent.stopPropagation(ev.originalEvent);
     const p = S.spook;
     wisSpook();
-    if(p) newPin(p.lat, p.lng, null);
+    if(p) nieuweVondst(p.lat, p.lng, null);
   });
-  S.spook = {marker:m, lat, lng, t:Date.now()};
-  spookHint.innerHTML = 'Nog een keer tikken maakt er een vondst van<br>'+
-    '<span style="font-weight:500;opacity:.7;font-size:11.5px">'+
-    'ergens anders tikken verplaatst hem · terug laat hem vallen</span>';
-  spookHint.classList.add("on");
+  S.spook = {marker:m, lat, lng};
 }
 
 function renderChips(){
@@ -3925,8 +4109,8 @@ function ontdekSheet(o){
    BLAD: RECEPT
    ======================================================================= */
 function receptSheet(k){
-  const r = RECEPTEN.find(x=>x.k===k); if(!r) return;
-  const soorten = r.soorten.map(x=>SPEC_BY_K[x]).filter(Boolean);
+  const r = receptZoek(k); if(!r) return;
+  const soorten = (r.soorten||[]).map(x=>SPEC_BY_K[x]).filter(Boolean);
   let h = '<div class="label">'+VINE+HOEKRANK+HOEKEN+'<div class="acc"><span>'+(r.type==="keuken"?"Keuken":"Voor het lijf")+'</span><span>'+esc(r.tijd)+'</span></div>'+
     '<h2>'+esc(r.nl)+'</h2><div class="la">'+esc(soorten.map(s=>s.nl).join(", "))+'</div>'+
     '<div class="tagrow"><span class="tag t-eet">'+esc(r.opbrengst)+'</span>'+
@@ -3936,12 +4120,15 @@ function receptSheet(k){
   h += '<div class="sec">'+sech("Werkwijze","",'ketel')+r.stap.map((t,i)=>'<div class="stap"><div class="n">'+(i+1)+'</div><div class="t">'+esc(t)+'</div></div>').join("")+'</div>';
   h += '<div class="sec">'+sech("Soorten","",'varen')+'<div class="bron">'+soorten.map(s=>'<button data-sk2="'+s.k+'">'+esc(s.nl)+'</button>').join("")+'</div></div>';
   if(r.maaksel) h += '<div class="row"><button class="btn" id="rcMaak">Zet in de voorraadkast</button></div>';
+  if(r.eigen)   h += '<div class="row"><button class="btn sec2" id="rcEdit">Dit recept bewerken</button></div>';
   h += '<div class="row"><button class="btn sec2" id="rcClose">Sluiten</button></div>'+FLOURISH;
   showSheet(h);
   bodyEl.querySelectorAll("[data-sk2]").forEach(b=> b.onclick=()=> specSheet(b.dataset.sk2));
   document.getElementById("rcClose").onclick = closeSheet;
   const mk = document.getElementById("rcMaak");
-  if(mk) mk.onclick = ()=> maakEdit(null,{naam:r.nl, type:r.maaksel, soorten:r.soorten.slice(), recept:r.k});
+  if(mk) mk.onclick = ()=> maakEdit(null,{naam:r.nl, type:r.maaksel, soorten:(r.soorten||[]).slice(), recept:r.k});
+  const ed = document.getElementById("rcEdit");
+  if(ed) ed.onclick = ()=> receptEdit(S.eigen.find(x=>x.k===r.k));
 }
 
 /* =======================================================================
@@ -4103,30 +4290,138 @@ function jarRow(m){
     '<div class="fill"><i style="width:'+pct+'%"></i></div></button>';
 }
 function receptRow(r){
-  const s = r.soorten.map(x=>SPEC_BY_K[x]).filter(Boolean);
+  const s = (r.soorten||[]).map(x=>SPEC_BY_K[x]).filter(Boolean);
   return '<button class="rec" data-rk2="'+r.k+'"><div class="th"><span class="dot d-'+(r.type==="lijf"?"med":"eet")+'" style="width:13px;height:13px"></span></div>'+
-    '<div class="body"><div class="nm">'+esc(r.nl)+'</div><div class="la">'+esc(s.map(x=>x.nl).join(", "))+'</div>'+
-    '<div class="meta">'+esc(r.tijd)+' · '+esc(r.opbrengst)+'</div>'+bandHtml(r.mnd)+'</div></button>';
+    '<div class="body"><div class="nm">'+esc(r.nl)+(r.eigen?' <span class="eigenmerk">eigen</span>':'')+'</div>'+
+    '<div class="la">'+esc(s.map(x=>x.nl).join(", "))+'</div>'+
+    '<div class="meta">'+esc(r.tijd||"")+(r.opbrengst?' · '+esc(r.opbrengst):'')+'</div>'+bandHtml(r.mnd||[])+'</div></button>';
 }
+/* =======================================================================
+   EIGEN RECEPTEN
+   Wat je zelf opschrijft staat in localStorage onder `admiral_app:eigenrecepten`
+   en gaat mee in de back-up. In de lijst staan ze bovenaan met een merkje,
+   zodat je ze uit elkaar houdt van wat er standaard in zit.
+   ======================================================================= */
+function eigenRecepten(){
+  return (S.eigen||[]).map(r=>Object.assign({}, r, {eigen:true}));
+}
+function alleRecepten(){ return eigenRecepten().concat(RECEPTEN); }
+function receptZoek(k){ return alleRecepten().find(r=>r.k===k); }
+
+function eigenBewaar(){ lsSet("eigenrecepten", S.eigen); }
+
+function receptEdit(bestaand){
+  const r = bestaand || {k:"eigen-"+Date.now().toString(36), nl:"", type:"keuken",
+    soorten:[], mnd:[], tijd:"", opbrengst:"", maaksel:"", ing:[], stap:[], let:""};
+  const regels = a => (a||[]).join("\n");
+
+  let h = '<div class="label">'+VINE+'<div class="acc"><span>'+
+    (bestaand?"Recept bewerken":"Nieuw recept")+'</span><span>EIGEN</span></div>'+
+    '<h2>'+esc(r.nl||"Naamloos")+'</h2></div>'+
+    '<div class="f"><label>Naam</label><input id="reNaam" value="'+esc(r.nl)+'" placeholder="bv. Vlierbloesemazijn"></div>'+
+    '<div class="f"><label>Waarvoor</label><div class="seg" id="reType">'+
+      [["keuken","Keuken"],["lijf","Voor het lijf"]].map(([v,l])=>
+        '<button data-v="'+v+'"'+(r.type===v?' class="on"':'')+'>'+l+'</button>').join("")+'</div></div>'+
+    '<div class="f" style="margin-top:12px"><label>Tijd</label><input id="reTijd" value="'+esc(r.tijd)+'" placeholder="bv. 3 weken"></div>'+
+    '<div class="f"><label>Opbrengst</label><input id="reOpb" value="'+esc(r.opbrengst)+'" placeholder="bv. 2 potjes"></div>'+
+    '<div class="f"><label>Soort brouwsel</label><div class="seg" id="reMaak">'+
+      '<button data-v=""'+(!r.maaksel?' class="on"':'')+'>geen</button>'+
+      MAAKSELS.map(m=>'<button data-v="'+m.k+'"'+(r.maaksel===m.k?' class="on"':'')+'>'+esc(m.nm)+'</button>').join("")+
+      '</div><span class="hint">Kies je er een, dan kun je dit recept met één tik in de voorraadkast zetten.</span></div>'+
+    '<div class="f" style="margin-top:12px"><label>Ingrediënten</label>'+
+      '<textarea id="reIng" rows="6" placeholder="Eén per regel, hoeveelheid en naam gescheiden door een streepje:&#10;500 g - vlierbloesem&#10;1 l - appelazijn">'+
+      esc((r.ing||[]).map(p=>Array.isArray(p)?p[0]+" - "+p[1]:String(p)).join("\n"))+'</textarea></div>'+
+    '<div class="f"><label>Werkwijze</label>'+
+      '<textarea id="reStap" rows="8" placeholder="Eén stap per regel.">'+esc(regels(r.stap))+'</textarea></div>'+
+    '<div class="f"><label>Let op</label>'+
+      '<textarea id="reLet" rows="3" placeholder="Wat er mis kan gaan, of waar je voorzichtig mee moet zijn.">'+esc(r.let||"")+'</textarea></div>'+
+    '<div class="sec">'+sech("Soorten","",'varen')+
+      '<div class="f"><input id="reQ" placeholder="Typ een naam, de lijst filtert mee"></div>'+
+      '<div class="chips2" id="reGekozen"></div><div class="pick" id="rePick"></div></div>'+
+    '<div class="row"><button class="btn" id="reSave">Bewaren</button>'+
+    '<button class="btn sec2" id="reCancel">Terug</button></div>'+
+    (bestaand?'<div class="row"><button class="btn danger" id="reDel">Verwijderen</button></div>':'');
+  showSheet(h);
+
+  let gekozen = (r.soorten||[]).slice();
+  const q = document.getElementById("reQ");
+  const pick = document.getElementById("rePick");
+  const chips = document.getElementById("reGekozen");
+  const drawChosen = ()=>{
+    chips.innerHTML = gekozen.map(k=>{ const x=SPEC_BY_K[k]; if(!x) return "";
+      return '<button class="chip2" data-uit="'+k+'">'+esc(x.nl)+' ×</button>'; }).join("")
+      || '<span class="hint">Nog geen soort gekozen.</span>';
+    chips.querySelectorAll("[data-uit]").forEach(b=> b.onclick=()=>{
+      gekozen = gekozen.filter(k=>k!==b.dataset.uit); drawChosen(); });
+  };
+  const drawPick = ()=>{
+    const t = q.value.trim().toLowerCase();
+    const hits = SPECIES.filter(x=> !t || x.nl.toLowerCase().includes(t)
+      || x.la.toLowerCase().includes(t)).slice(0, 50);
+    pick.innerHTML = hits.map(x=>'<button data-k="'+x.k+'"><span class="dot d-'+klass(x)+'"></span>'+
+      '<span><span class="nm">'+esc(x.nl)+'</span><br><span class="la">'+esc(x.la)+'</span></span></button>').join("");
+    pick.querySelectorAll("[data-k]").forEach(b=> b.onclick=()=>{
+      if(!gekozen.includes(b.dataset.k)) gekozen.push(b.dataset.k);
+      q.value=""; drawChosen(); drawPick(); });
+  };
+  q.addEventListener("input", drawPick); drawChosen(); drawPick();
+  segWire("reType"); segWire("reMaak");
+
+  document.getElementById("reCancel").onclick = ()=> closeSheet();
+  const del = document.getElementById("reDel");
+  if(del) del.onclick = ()=>{
+    if(!confirm("Dit recept verwijderen?")) return;
+    S.eigen = (S.eigen||[]).filter(x=>x.k!==r.k); eigenBewaar();
+    closeSheet(); renderKast(); toast("Verwijderd");
+  };
+  document.getElementById("reSave").onclick = ()=>{
+    const naam = document.getElementById("reNaam").value.trim();
+    if(!naam){ toast("Geef het recept een naam"); return; }
+    const ing = document.getElementById("reIng").value.split("\n")
+      .map(l=>l.trim()).filter(Boolean).map(l=>{
+        const i = l.indexOf(" - ");
+        return i > 0 ? [l.slice(0,i).trim(), l.slice(i+3).trim()] : ["", l];
+      });
+    const nieuw = {
+      k: r.k, nl: naam, type: segVal("reType") || "keuken",
+      soorten: gekozen, mnd: r.mnd || [],
+      tijd: document.getElementById("reTijd").value.trim(),
+      opbrengst: document.getElementById("reOpb").value.trim(),
+      maaksel: segVal("reMaak") || "",
+      ing: ing,
+      stap: document.getElementById("reStap").value.split("\n").map(l=>l.trim()).filter(Boolean),
+      let: document.getElementById("reLet").value.trim()
+    };
+    S.eigen = (S.eigen||[]).filter(x=>x.k!==r.k);
+    S.eigen.unshift(nieuw); eigenBewaar();
+    closeSheet(); renderKast(); toast(bestaand?"Bijgewerkt":"Recept bewaard");
+  };
+}
+
 function renderKast(){
   const mode = S.kastMode;
   document.getElementById("kastH1").textContent = mode==="kast" ? "Voorraadkast" : "Recepten";
   document.getElementById("kastFilters").style.display = mode==="kast" ? "block" : "none";
   document.getElementById("recToggle").style.display   = mode==="kast" ? "none" : "flex";
-  document.getElementById("qKast").placeholder = mode==="kast" ? "Zoek maaksel, soort of gebruik" : "Zoek recept of soort";
+  document.getElementById("qKast").placeholder = mode==="kast" ? "Zoek brouwsel, soort of gebruik" : "Zoek recept of soort";
   const q=(document.getElementById("qKast").value||"").toLowerCase();
   const body=document.getElementById("kastBody");
 
   if(mode==="recept"){
     const m=nowM();
-    let rows=RECEPTEN;
-    if(S.recView==="nu") rows=RECEPTEN.filter(r=>r.mnd.includes(m));
-    if(S.recView==="keuken") rows=RECEPTEN.filter(r=>r.type==="keuken");
-    if(S.recView==="lijf") rows=RECEPTEN.filter(r=>r.type==="lijf");
-    if(q) rows=rows.filter(r=>(r.nl+" "+r.soorten.map(x=>SPEC_BY_K[x]?SPEC_BY_K[x].nl:"").join(" ")).toLowerCase().includes(q));
-    document.getElementById("kastSub").textContent = rows.length+" van "+RECEPTEN.length+" recepten";
-    body.innerHTML = rows.length ? rows.map(receptRow).join("")
-      : '<div class="empty"><b>Niets in deze maand</b>Kies een ander filter, of kijk vooruit in de gids.</div>';
+    const alles = alleRecepten();
+    let rows = alles;
+    if(S.recView==="nu")     rows=alles.filter(r=>(r.mnd||[]).includes(m));
+    if(S.recView==="keuken") rows=alles.filter(r=>r.type==="keuken");
+    if(S.recView==="lijf")   rows=alles.filter(r=>r.type==="lijf");
+    if(S.recView==="eigen")  rows=alles.filter(r=>r.eigen);
+    if(q) rows=rows.filter(r=>(r.nl+" "+(r.soorten||[]).map(x=>SPEC_BY_K[x]?SPEC_BY_K[x].nl:"").join(" ")).toLowerCase().includes(q));
+    document.getElementById("kastSub").textContent =
+      rows.length+" van "+alles.length+" recepten"+((S.eigen||[]).length?" · "+S.eigen.length+" eigen":"");
+    body.innerHTML = '<button class="btn" id="reNieuw" style="margin:0 12px 14px">Eigen recept toevoegen</button>'+
+      (rows.length ? rows.map(receptRow).join("")
+      : '<div class="empty"><b>Niets gevonden</b>Kies een ander filter, of schrijf zelf een recept.</div>');
+    document.getElementById("reNieuw").onclick = ()=> receptEdit(null);
     body.querySelectorAll("[data-rk2]").forEach(b=> b.onclick=()=>receptSheet(b.dataset.rk2));
     return;
   }
@@ -4136,7 +4431,7 @@ function renderKast(){
   if(S.kastView==="klaar") rows=rows.filter(m=>maakStatus(m).k==="klaar");
   if(S.kastView==="rijp")  rows=rows.filter(m=>maakStatus(m).k==="rijp");
   document.getElementById("kastSub").textContent = S.maaksels.length
-    ? S.maaksels.length+(S.maaksels.length===1?" maaksel · ":" maaksels · ")+S.maaksels.filter(m=>maakStatus(m).k==="klaar").length+" klaar · "+
+    ? S.maaksels.length+(S.maaksels.length===1?" brouwsel · ":" brouwsels · ")+S.maaksels.filter(m=>maakStatus(m).k==="klaar").length+" klaar · "+
       S.maaksels.filter(m=>maakStatus(m).k==="rijp").length+" rijpend"
     : "Nog niets gemaakt";
 
@@ -4151,9 +4446,9 @@ function renderKast(){
     body.innerHTML='<div class="empty"><b>'+(S.maaksels.length?"Niets gevonden":"Lege kast")+'</b>'+
       (S.maaksels.length?"Pas je zoekterm of filter aan."
         :"Zet hier wat je van je oogst maakt. Begin bij de recepten hiernaast, of voeg zelf iets toe.")+'</div>'+
-      '<button class="startbtn" data-new="1" style="margin-top:18px">Eerste maaksel toevoegen</button>';
+      '<button class="startbtn" data-new="1" style="margin-top:18px">Eerste brouwsel toevoegen</button>';
   } else {
-    body.innerHTML = rows.map(jarRow).join("")+'<button class="startbtn" data-new="1" style="margin-top:16px">Maaksel toevoegen</button>';
+    body.innerHTML = rows.map(jarRow).join("")+'<button class="startbtn" data-new="1" style="margin-top:16px">Brouwsel toevoegen</button>';
   }
   body.querySelectorAll("[data-mid]").forEach(b=> b.onclick=()=>maakSheet(b.dataset.mid));
   body.querySelectorAll("[data-new]").forEach(b=> b.onclick=()=>maakEdit(null));
@@ -4218,7 +4513,7 @@ function maakSheet(id){
         m.houdbaar?"Houdbaar tot "+dstr(m.houdbaar):""].filter(Boolean).join("\n");
       try{ await navigator.clipboard.writeText(txt); toast("Etikettekst gekopieerd"); }catch(e){ toast("Kopiëren lukte niet"); }
     } else if(a==="del"){
-      if(!confirm("Dit maaksel verwijderen?")) return;
+      if(!confirm("Dit brouwsel verwijderen?")) return;
       await dbDel("maaksels",m.id); S.maaksels=S.maaksels.filter(x=>x.id!==m.id);
       closeSheet(); renderKast(); toast("Verwijderd");
     }
@@ -4233,10 +4528,10 @@ function maakEdit(id, prefill){
   if(!m) return;
   let soorten=(m.soorten||[]).slice(), type=m.type;
 
-  let h='<div class="label">'+VINE+'<div class="acc"><span>'+(isNew?"Nieuw maaksel":"Bewerken")+'</span><span>'+esc(m.batch)+'</span></div>'+
+  let h='<div class="label">'+VINE+'<div class="acc"><span>'+(isNew?"Nieuw brouwsel":"Bewerken")+'</span><span>'+esc(m.batch)+'</span></div>'+
     '<h2 id="mkTitle">'+esc(m.naam||"Wat heb je gemaakt?")+'</h2></div>'+
     '<div class="f" style="margin-top:14px"><label>Naam</label><input id="mkNaam" value="'+esc(m.naam)+'" placeholder="bv. Vlierbloesem-oxymel"></div>'+
-    '<div class="f"><label>Soort maaksel</label><div class="seg" id="mkType">'+
+    '<div class="f"><label>Soort brouwsel</label><div class="seg" id="mkType">'+
       MAAKSELS.map(t=>'<button data-v="'+t.k+'"'+(type===t.k?' class="on"':'')+'>'+t.nm+'</button>').join("")+'</div></div>'+
     '<div class="warn oker" style="margin:10px 18px 0"><b>Vuistregel</b><span id="mkHintT"></span></div>'+
     '<div class="f" style="margin-top:14px"><label>Planten of zwammen erin</label><input id="mkQ" placeholder="Zoek en tik aan"></div>'+
@@ -4292,7 +4587,7 @@ function maakEdit(id, prefill){
   document.getElementById("mkCancel").onclick=()=> isNew ? (closeSheet(), renderKast()) : maakSheet(m.id);
   document.getElementById("mkSave").onclick=async ()=>{
     const naam=document.getElementById("mkNaam").value.trim();
-    if(!naam){ toast("Geef het maaksel een naam"); return; }
+    if(!naam){ toast("Geef het brouwsel een naam"); return; }
     m.naam=naam; m.type=type; m.soorten=soorten;
     m.gemaakt=document.getElementById("mkD").value||today();
     m.rijp=document.getElementById("mkR").value;
@@ -4734,7 +5029,7 @@ async function doExport(withPhotos){
   toast("Back-up maken…");
   const out={app:"gaea",v:APP_VERSION,t:new Date().toISOString(),
     pins:S.pins,maaksels:S.maaksels,srs:Object.values(S.srs),leer:S.leer,taxa:S.taxa,
-    fotos:[]};
+    eigen:S.eigen||[], fotos:[]};
   if(withPhotos){
     for(const p of await dbAll("photos"))
       out.fotos.push({id:p.id,pin:p.pin,stage:p.stage,t:p.t,data:await blobToDataURL(p.blob)});
@@ -4758,10 +5053,11 @@ function doImport(){
       if(d.taxa){ S.taxa=Object.assign(S.taxa,d.taxa); lsSet("taxa",S.taxa); }
       for(const ph of (d.fotos||[]))
         await dbPut("photos",{id:ph.id,pin:ph.pin,stage:ph.stage,t:ph.t,blob:dataURLtoBlob(ph.data)});
+      if(Array.isArray(d.eigen)){ S.eigen = d.eigen; eigenBewaar(); }
       S.pins=await dbAll("pins"); S.maaksels=await dbAll("maaksels");
       S.srs=Object.fromEntries((await dbAll("srs")).map(r=>[r.k,r]));
       drawMarkers(); renderSet();
-      toast("Hersteld: "+(d.pins||[]).length+" vondsten, "+(d.maaksels||[]).length+" maaksels");
+      toast("Hersteld: "+(d.pins||[]).length+" vondsten, "+(d.maaksels||[]).length+" brouwsels");
     }catch(e){ toast("Bestand kon niet gelezen worden"); }
   };
   fp.click();
@@ -4824,6 +5120,37 @@ function ontdekKiezer(){
 /* =======================================================================
    KNOPPEN EN OPSTART
    ======================================================================= */
+/* Thuis. Eén tik brengt je erheen, lang indrukken zet de huidige plek vast.
+   Handig als je vanuit de tuin of de keuken werkt en telkens terugwilt. */
+(function(){
+  const b = document.getElementById("btnThuis");
+  if(!b) return;
+  const teken = ()=> b.classList.toggle("mos", !!S.thuis);
+  teken();
+  let lang = null, ging = false;
+  const zetVast = ()=>{
+    ging = true;
+    const c = S.pos ? {lat:S.pos.lat, lng:S.pos.lng} : S.map.getCenter();
+    S.thuis = {lat:c.lat, lng:c.lng, z:Math.max(S.map.getZoom(), 16)};
+    lsSet("thuis", S.thuis); teken();
+    toast(S.pos ? "Thuis gezet op je huidige plek" : "Thuis gezet op het midden van de kaart");
+  };
+  const start = ()=>{ ging=false; clearTimeout(lang); lang = setTimeout(zetVast, 650); };
+  const stop  = ()=>{ clearTimeout(lang); };
+  b.addEventListener("touchstart", start, {passive:true});
+  b.addEventListener("touchend", stop, {passive:true});
+  b.addEventListener("touchmove", stop, {passive:true});
+  b.addEventListener("mousedown", start);
+  b.addEventListener("mouseup", stop);
+  b.addEventListener("mouseleave", stop);
+  b.onclick = ()=>{
+    if(ging){ ging=false; return; }
+    if(!S.thuis){ zetVast(); return; }
+    wisSpook();
+    S.map.flyTo([S.thuis.lat, S.thuis.lng], S.thuis.z || 16, {duration:.9});
+  };
+})();
+
 document.getElementById("btnGps").onclick=()=>setFollow(!S.follow);
 document.getElementById("btnOntdek").onclick=ontdekKiezer;
 document.getElementById("btnLayer").onclick=()=>{
