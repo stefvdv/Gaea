@@ -1,5 +1,5 @@
-/* Wildpluk service worker — VERSION altijd gelijk aan APP_VERSION in index.html */
-const VERSION = "0.6.0";
+/* Gaea service worker — VERSION altijd gelijk aan APP_VERSION in index.html */
+const VERSION = "0.8.1";
 const SHELL = "wildpluk-shell-v" + VERSION;
 const LIB   = "wildpluk-lib-v" + VERSION;
 const TILES = "wildpluk-tiles";          /* niet versiegebonden */
@@ -7,7 +7,11 @@ const BEELD = "wildpluk-beeld";          /* foto's van soorten, ook niet versieg
 const BEELD_MAX = 900;
 const TILE_MAX = 1500;
 
-const SHELL_FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./badge-96.png"];
+const SHELL_FILES = ["./", "./index.html", "./manifest.webmanifest",
+  "./icon-192.png", "./icon-512.png", "./badge-96.png"];
+
+/* Al het sierbeeld zit als data-URI in index.html, dus er is geen
+   losse art-map meer om te cachen. */
 const LIB_FILES = [
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js",
   "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
@@ -15,7 +19,8 @@ const LIB_FILES = [
 
 self.addEventListener("install", e => {
   e.waitUntil((async () => {
-    await (await caches.open(SHELL)).addAll(SHELL_FILES);
+    const c = await caches.open(SHELL);
+    await c.addAll(SHELL_FILES);
     const l = await caches.open(LIB);
     await Promise.all(LIB_FILES.map(u => fetch(u, {mode:"cors"}).then(r => r.ok && l.put(u, r)).catch(()=>{})));
     self.skipWaiting();
@@ -151,6 +156,7 @@ async function checkHerinnering() {
 
   const PORTJES = [
     ["Er staat iets te bloeien", "Vijf soorten, twee minuten, en je weet ze morgen nog."],
+    ["Gaea heeft iets voor je", "Vijf minuten planten kijken zonder je jas aan te doen."],
     ["Het bos vraagt naar je", "Een paar planten wachten op herhaling. Kop thee erbij?"],
     ["Even langs de veldschool", "Wie je vandaag oefent, herken je straks in de berm."],
     ["De dryade tikt op je schouder", "Kleine ronde. Namen, gebruik, en waar je voor moet oppassen."],
@@ -170,7 +176,7 @@ async function checkHerinnering() {
     body,
     icon: new URL("icon-192.png", basis).href,
     badge: new URL("badge-96.png", basis).href,
-    tag: "wildpluk-quiz",
+    tag: "gaea-quiz",
     data: { scr: "leer" }
   });
 }

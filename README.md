@@ -1,8 +1,15 @@
-# Wildpluk v0.6.0
+# Gaea v0.8.1
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
 Alles lokaal (IndexedDB). Geen account, geen server, behalve de GBIF-proxy.
+
+**Heette tot v0.6 Wildpluk.** De opslagsleutels zijn met opzet niet meegehernoemd:
+localStorage houdt het voorvoegsel `wildpluk:` en de IndexedDB heet nog `wildpluk`,
+zodat bestaande vondsten, maaksels en voortgang gewoon blijven staan. Alleen wat
+je ziet is veranderd. Back-ups worden weggeschreven als `app:"gaea"`; import
+accepteert beide. Nieuwe batchcodes beginnen met `GA-`, oude `WP-`-codes blijven
+zoals ze zijn.
 
 ## Deployen (Netlify)
 Map in een Git-repo, koppelen aan Netlify. Geen build step.
@@ -15,7 +22,8 @@ De app valt automatisch terug op `https://api.gbif.org/v1/` als de proxy er niet
 Lokaal: `npx serve .` — geolocatie en service worker vragen https of localhost.
 
 ## Bestanden
-    index.html            app: stijl, soorten, recepten, logica
+    index.html            app: stijl, soorten, recepten, logica én al het sierbeeld
+    sw.js                 service worker; VERSION == APP_VERSION
     sw.js                 service worker; VERSION == APP_VERSION
     _redirects            GBIF-proxy voor Netlify
     manifest.webmanifest  PWA-manifest
@@ -68,18 +76,26 @@ Het onderscheid dat de app overal maakt:
   Equisetum, plus de combinatiemonografie *Species pectorales* voor borstthee.
 - **Volksgebruik** — alles zonder die vlag. Interessant, niet gedekt.
 
-## Gebruikstekening
-Elk soortenblad opent met een schematische pentekening. Wat je gebruikt is
-ingekleurd, de rest blijft lijn, en de kleur zegt welk soort deel het is:
-groen blad, oker bloem, rood vrucht, bruin wortel, schors bast.
+## Botanische plaat
+Eén algemene plaat voor alles wat een plant is: penwortel met zijwortels,
+stengel, drie bladparen met steel, middennerf en zijnerven, een gesloten knop,
+een bloemscherm met zes bloempjes van elk zes kroonblaadjes, en bessen aan
+zijstelen. Per soort wordt ingekleurd wat je van die soort gebruikt; de rest
+blijft pentekening.
 
-Vier groeivormen (kruid, boom, zwam, wier) en een parser die `delen` leest.
-Nederlandse samenstellingen tellen mee — wortelknolletje kleurt de wortel,
-bladsteel kleurt blad én stengel. Bij giftige zwammen blijft alles lijn,
-want daar gebruik je niets van.
+De kleur zegt welk soort deel het is: groen blad, oker bloem, rood vrucht,
+bruin wortel, olijf stengel, schors bast.
 
-Dit is een schema, geen soortgetrouwe botanische plaat. Voor herkenning zijn
-je eigen foto's en het GBIF-beeld leidend.
+Twee varianten daarnaast, omdat een plantenplaat daar niets zegt: een
+plaatjeszwam (hoed, plaatjes, ring, beursje, sporenstip) en een wier (thallus
+met middennerf en hechtorgaan).
+
+`welkeDelen()` leest het veld `delen`. Nederlandse samenstellingen tellen mee —
+wortelknolletje kleurt de wortel, bladsteel kleurt blad én stengel. Bij giftige
+zwammen blijft alles lijn, want daar gebruik je niets van.
+
+Dit is een schema, geen soortgetrouwe plaat. Voor herkenning zijn je eigen
+foto's en het GBIF-beeld leidend.
 
 ## Ontdek-laag (GBIF)
 Vergrootglasknop op de kaart. Kies maximaal 3 soorten; de app haalt waarnemingen
@@ -108,10 +124,88 @@ Weging: eigen plekken > gifplanten > paddenstoelen > eerder foute antwoorden.
 Periodic Background Sync (`wildpluk-dagelijks`, min. 6 u). Werkt alleen als de app
 op het startscherm staat. Chrome bepaalt het exacte moment; marge van ongeveer een uur.
 
+## Geïllustreerde assets
+De zes aangeleverde bladen zijn met `snij.py` uitgesneden: alfamasker, licht
+dichtsmeren zodat losse blaadjes bij hun ornament horen, samenhangende gebieden
+labelen, bijsnijden, verkleinen en kwantiseren met behoud van transparantie.
+
+In gebruik:
+- **Ronde reliëfknoppen** voor kaartlaag, instellingen, GPS, ontdekken, sluiten en
+  de plus op *Pin hier*. Geen achtergrond meer, alleen de penning met een
+  slagschaduw; de actieve knop krijgt een groene gloed.
+- **Vierkante tegels** als navigatie: kaart, pin, mand, blad, boek. Inactief
+  gedempt en grijzer, actief in kleur met gloed.
+- **Scheidingslijnen** onder elke schermkop (slinger met medaillon), boven elke
+  sectiekop in een blad (fijne band) en achter elke groepskop (haarlijn).
+- **Hoekornamenten** in alle vier de hoeken van elk blad, en een klein eikentakje
+  rechtsonder op elke kaart in de lijsten.
+- **Takjes** als leeg-schermteken en als vervaagd accent in waarschuwingsblokken.
+- **Flesjes** rechtsonder op elk voorraadpotje — groen glas voor natte maaksels
+  (tinctuur, oxymel, azijn, siroop, olie, likeur, honing, ferment), amber voor
+  droge (gedroogd, zout, thee, poeder).
+- **Boommedaillon** als zegel in elke schermkop.
+- **Lijst** als `border-image` rond het specimenblad, met het binnenvlak
+  weggesneden zodat het papier van de app zelf zichtbaar blijft.
+
+`snij.py` staat erbij, dus nieuwe bladen kun je met dezelfde methode uitsnijden.
+
+**Alles zit als data-URI in `index.html`.** Er is geen `art/`-map meer. Dat scheelt
+26 losse bestanden bij het deployen, en het maakt de app in één klap volledig
+offline-compleet zonder aparte cachestap in de service worker. Prijs: index.html
+is ongeveer 2 MB, en bij elke update haalt de browser dat opnieuw op. Voor een
+persoonlijke app op wifi is dat prima; wil je het ooit terug naar losse bestanden,
+draai dan `snij.py` opnieuw en vervang de data-URI's door `url(art/naam.png)`.
+
+## Vormgeving
+Alles wat een oppervlak is deelt één behandeling: lichte bovenrand, donkere
+onderrand, zachte slagschaduw. Dat zit in de tokens `--relief`, `--relief-diep`
+en `--relief-ink`, plus een fijne schubtextuur (`--schub`) als data-URI over de
+donkere panelen.
+
+- Kaarten (vondsten, maaksels, kwalen, instellingen) krijgen een verlopend paneel,
+  een gouden haarlijn langs de bovenrand en een eikenblad in de hoek.
+- Knoppen zijn geperst: verloop, binnenlicht, gouden rand op de primaire.
+- De navigatiebalk heeft een gouden haarlijn en een streepje boven het actieve item.
+- Elke schermkop draagt het dryade-zegel, met daaronder een knoopregel:
+  gouden lijn, symbool, gouden lijn.
+- Elk blad heeft een dubbele omlijsting in het papier en keltische hoekknopen
+  linksboven en rechtsboven, plus de rank rechtsboven en linksonder.
+
+## Startanimatie
+De kruidenvrouw met vijzel en flacon, in een gouden lijst. Het origineel is te
+druk voor een klein scherm, dus de plaat is bewerkt: bijgesneden tot kop, handen,
+vijzel en flacon, mediaanfilter tegen ruis, licht verzacht en daarna heel licht
+verscherpt zodat de vormen blijven, iets minder verzadigd, en een vignet dat de
+randen laat wegvallen. Van 941 naar 760 px, 196 kB.
+
+Bewegen doet hij zo:
+- de plaat komt op en zoomt langzaam uit van 110% naar 100% over 4,6 s
+- een groene gloed pulseert over de flacon in haar hand, 3,1 s
+- een gouden gloed pulseert trager over de vijzel, 4,2 s
+- de kaars linksonder flikkert onregelmatig, 1,7 s
+- zestien sporen stijgen op vanaf willekeurige punten, elk met eigen duur,
+  vertraging en zijwaartse drift
+- de gouden lijst komt na een halve seconde op
+- daarna GAEA, een uitrollende sierlijn en de ondertitel
+
+Ongeveer 3,4 s. Tikken slaat het over; bij `prefers-reduced-motion` staat alles
+stil en verdwijnt het scherm na 0,9 s.
+
 ## Iconen
-`icon-192/512/maskable.png` zijn een dryadekop in Green Man-stijl: bladerkroon,
-schorsranken, gouden ring, op diep bosgroen. Gegenereerd door `maak_icoon.py`
-(geen SVG-rasterizer in de omgeving, dus met PIL geteakend op 8x en teruggeschaald).
+`icon-192/512/maskable.png` zijn een dryadekop in Green Man-stijl. Volledig
+opnieuw getekend in v0.7, met per element een schaduw-, kleur- en lichtpas:
+bladeren met slagschaduw, verzachte schaduwhelft, middennerf, zijnerven en
+randlicht; schorsstrengen met kern, highlight en donkere onderkant; een gezicht
+met kernschaduw langs de rand, licht van linksboven, wenkbrauwrichel en randlicht;
+ogen met iris-ringen, straaltjes, ooglidschaduw en twee spiegelingen; een flacon
+met glasverloop, meniscus, zeven bellen en een gloed.
+
+De ring is bewust terughoudend: twee fijne gouden cirkels met een verloop over de
+omtrek en vier knoopjes op de assen, in plaats van dik vlechtwerk dat de kop
+overschreeuwt. Achtergrond met radiale gloed, vignet en fijne korrel.
+
+Gegenereerd door `maak_icoon.py` — geen SVG-rasterizer in de omgeving, dus met
+PIL getekend op 6× en met LANCZOS teruggeschaald.
 
 `badge-96.png` is apart en essentieel: Android maakt van de meldings-badge een
 silhouet en gooit alle kleur weg. Een dekkend vierkant icoon wordt dan een blok.
