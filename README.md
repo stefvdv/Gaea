@@ -1,4 +1,4 @@
-# Gaea's Natural Health — v0.12.0
+# Gaea's Natural Health — v0.12.1
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -130,6 +130,10 @@ foto's en het GBIF-beeld leidend.
 Er is geen knop meer om de kaart te vullen: de waarnemingen horen er gewoon te
 staan. `autoVul()` draait bij het opstarten en telkens als je stil komt te liggen
 na een verplaatsing, met 900 ms vertraging.
+
+Het bijvullen gebeurt zwijgend: je vroeg er niet om, dus hoef je er ook niets
+over te lezen. Alleen de eenmalige naamophaling meldt zich, en dan alleen als
+je het zelf hebt aangevraagd.
 
 Per kaartbeeld wordt een sleutel bijgehouden — de vier hoeken op twee decimalen,
 dus ongeveer een kilometer. Fijner heeft geen zin, want de meeste GBIF-records
@@ -303,6 +307,11 @@ die vast op je huidige GPS-positie, of op het midden van de kaart als GPS uit
 staat. Opgeslagen onder `admiral_app:thuis`. De knop licht op zodra er een
 thuis bekend is.
 
+Hij droeg aanvankelijk de klasse `beeld`, en die zet `background:none` met
+`svg{display:none}` omdat hij een aangeleverde illustratie verwacht. Die was er
+niet, dus de knop was onzichtbaar maar wel aanraakbaar. Hij heeft nu een eigen
+klasse `thuisbtn` met de getekende vorm, in dezelfde maat als zijn buren.
+
 ## Swipe
 Horizontaal vegen wisselt van scherm, in de volgorde kaart, vondsten, voorraad,
 gids, leren.
@@ -313,6 +322,12 @@ schuine of trage sleep binnen een lijst nooit per ongeluk telt: minstens 72 px
 horizontaal, binnen 600 ms, horizontaal minstens 2,2 keer zo ver als verticaal,
 en niet meer dan 90 px verticaal. Bladen, quiz, loep, invoervelden, segmentknoppen
 en de soortenkiezer zijn uitgezonderd.
+
+## Soort kiezen
+De zoekbalk toont niets zolang je niets hebt getypt. Een willekeurige greep uit
+219 soorten helpt niet; je weet zelf wat je gevonden hebt. Bij een nieuwe vondst
+krijgt het veld na 320 ms de focus, zodat het toetsenbord meteen opengaat — eerder
+focussen wordt tijdens de openingsanimatie van het blad door Android genegeerd.
 
 ## Randwerk
 Een sierlijst langs de vier schermranden: eikenhoeken in de hoeken, gouden
@@ -333,10 +348,16 @@ Drie regels, en verder niets:
 De speld overleeft niets: van scherm wisselen, de terugknop, de app naar de
 achtergrond of afsluiten — hij is weg. Hij komt nooit in `S.pins` of IndexedDB.
 
-Wat er in v0.11 misging: de tikafhandeling op de speld riep `newPin()` aan in
-plaats van `nieuweVondst()`. `newPin` schrijft direct naar IndexedDB. Elke tik
-op een speld maakte dus meteen een naamloze vondst aan, zonder formulier. Het
-uitlegwolkje is weg; het gedrag spreekt nu voor zich.
+Twee dingen gingen hier achtereenvolgens mis. In v0.11 riep de tikafhandeling
+op de speld `newPin()` aan in plaats van `nieuweVondst()`; `newPin` schrijft
+direct naar IndexedDB, dus elke tik maakte meteen een naamloze vondst aan.
+In v0.12.0 was dat opgelost, maar toen sloeg de speld stap 1 en 2 over: hij
+verschijnt precies onder je vinger, dus de klik die volgt op dezelfde aanraking
+landt er meteen bovenop en opende het formulier.
+
+Daarom negeert de speld nu elke tik binnen 500 ms na zijn geboorte. Pas een
+échte tweede aanraking opent het formulier. Het uitlegwolkje is weg; het gedrag
+spreekt voor zich.
 
 ## Veldschool
 Leitner, dozen 0–7, intervallen 0/1/2/4/8/16/32/64 dagen. Zeven vraagsoorten:

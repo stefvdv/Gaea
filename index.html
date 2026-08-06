@@ -523,6 +523,14 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   filter:drop-shadow(0 2px 5px rgba(0,0,0,.7))}
 .iconbtn.beeld{width:46px;height:46px}
 .fab.ghost.beeld{width:54px;height:54px}
+/* De thuisknop heeft geen eigen illustratie, dus hij houdt de getekende vorm.
+   Wel dezelfde maat als zijn buren, anders staat de rij scheef. */
+.fab.ghost.thuisbtn{width:54px;height:54px;border-radius:50%;
+  background:rgba(31,46,36,.94);border:1px solid var(--goud-d);
+  box-shadow:0 2px 6px rgba(0,0,0,.5), inset 0 1px 0 rgba(232,206,128,.18);
+  color:var(--goud-l)}
+.fab.ghost.thuisbtn svg{display:block;width:22px;height:22px}
+.fab.ghost.thuisbtn.mos{background:var(--mos-d);border-color:var(--mos);color:#fff}
 .iconbtn.beeld:active, .fab.ghost.beeld:active{transform:scale(.93)}
 .iconbtn.beeld svg, .fab.ghost.beeld svg, .fab .kop-plus svg{display:none}
 .iconbtn.beeld.on, .fab.ghost.beeld.on, .fab.ghost.beeld.mos{
@@ -746,7 +754,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 
 <div class="fabs" id="fabs">
   <button class="fab ghost beeld" id="btnOntdek" aria-label="Ontdek-laag"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M16.2 16.2 21 21" stroke-linecap="round"/><path d="M11 8v6M8 11h6" stroke-linecap="round"/></svg></button>
-  <button class="fab ghost beeld" id="btnThuis" aria-label="Naar huis"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6.5 9.6V19h11V9.6"/><path d="M10 19v-5h4v5"/></svg></button>
+  <button class="fab ghost thuisbtn" id="btnThuis" aria-label="Naar huis"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6.5 9.6V19h11V9.6"/><path d="M10 19v-5h4v5"/></svg></button>
   <button class="fab ghost beeld" id="btnGps" aria-label="Volg mijn positie"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></button>
 </div>
 
@@ -871,7 +879,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.12.0";
+const APP_VERSION = "0.12.1";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -2810,7 +2818,7 @@ async function vulKaart(stil){
   if(onbekend.length){
     /* Eenmalig, daarna staat elke soortsleutel in localStorage. Bij de eerste
        keer duurt dit even; daarom één melding en verder stil. */
-    if(!S.vulGemeld){ toast("Even soortnamen ophalen bij GBIF, dat is eenmalig"); S.vulGemeld = true; }
+    if(!S.vulGemeld && !stil){ toast("Even soortnamen ophalen bij GBIF, dat is eenmalig"); S.vulGemeld = true; }
     for(const k of onbekend) await taxonKey(k);
   }
   const keys = kandidaten.map(k=>S.taxa[k]).filter(Boolean);
@@ -2867,9 +2875,9 @@ async function vulKaart(stil){
       : (rauw ? "GBIF gaf "+rauw+" records maar geen koppeling"
               : "Geen waarnemingen in dit kaartbeeld — zoom uit of probeer een ander gebied"));
     if(S.scr!=="map") go("map");
-  } else if(nieuw){
-    toast(nieuw+" waarnemingen erbij · "+soorten+" soorten in beeld");
   }
+  /* Bij het automatisch bijvullen blijft het stil: je vroeg er niet om,
+     dus hoef je er ook niets over te lezen. */
 }
 
 async function soortBeeld(k){
@@ -3027,7 +3035,7 @@ function initTik(){
     /* recht op de speld: het formulier voor een nieuwe vondst */
     if(doel && doel.closest && doel.closest(".spook")){
       const p = S.spook;
-      if(p){ wisSpook(); nieuweVondst(p.lat, p.lng); }
+      if(p && Date.now() - p.t >= 500){ wisSpook(); nieuweVondst(p.lat, p.lng); }
       return;
     }
     /* op een bestaande pin: laat Leaflet zijn werk doen */
@@ -3086,10 +3094,14 @@ function zetSpook(lat, lng){
   m.on("click", (ev)=>{
     if(ev && ev.originalEvent) L.DomEvent.stopPropagation(ev.originalEvent);
     const p = S.spook;
+    /* De speld verschijnt precies onder je vinger, dus de klik die volgt op
+       dezelfde aanraking landt er meteen bovenop. Een halve seconde rust
+       zorgt dat pas een échte tweede tik het formulier opent. */
+    if(!p || Date.now() - p.t < 500) return;
     wisSpook();
-    if(p) nieuweVondst(p.lat, p.lng, null);
+    nieuweVondst(p.lat, p.lng, null);
   });
-  S.spook = {marker:m, lat, lng};
+  S.spook = {marker:m, lat, lng, t:Date.now()};
 }
 
 function renderChips(){
@@ -3740,7 +3752,7 @@ async function openSheet(id){
     '<div class="pick" id="pnPick"></div></div>';
 
   h += '<div class="row"><button class="btn sec2" data-act="maak">Hier iets van maken</button>'+
-       '<button class="btn sec2" data-act="route">Route hierheen</button></div>'+
+       '</div>'+
        '<div class="row"><button class="btn sec2" data-act="close">Sluiten</button>'+
        '<button class="btn danger" data-act="del">Verwijderen</button></div>';
   showSheet(h);
@@ -3752,7 +3764,8 @@ async function openSheet(id){
     const pnPick = document.getElementById("pnPick");
     const teken = ()=>{
       const t = pnQ.value.trim().toLowerCase();
-      const hits = SPECIES.filter(x=> !t || x.nl.toLowerCase().includes(t)
+      if(!t){ pnPick.innerHTML = ""; return; }
+      const hits = SPECIES.filter(x=> x.nl.toLowerCase().includes(t)
         || x.la.toLowerCase().includes(t)).slice(0, 60);
       pnPick.innerHTML = hits.map(x=>'<button data-k="'+x.k+'"><span class="dot d-'+klass(x)+'"></span>'+
         '<span><span class="nm">'+esc(x.nl)+'</span><br><span class="la">'+esc(x.la)+'</span></span></button>').join("")
@@ -3782,7 +3795,6 @@ async function openSheet(id){
     else if(a==="harvest") harvestForm(pin.id);
     else if(a==="del") delPin(pin.id);
     else if(a==="soort") specSheet(pin.spec, pin.id);
-    else if(a==="route") window.open("https://www.google.com/maps/dir/?api=1&destination="+pin.lat+","+pin.lng,"_blank");
     else if(a==="maak") maakEdit(null,{pin:pin.id, soorten:pin.spec?[pin.spec]:[], naam:sp?sp.nl+" — ":""});
   });
   bodyEl.querySelectorAll("[data-del]").forEach(b=> b.onclick = async ()=>{
@@ -3870,7 +3882,10 @@ function editPin(id,isNew){
   const q = document.getElementById("edQ"), listEl = document.getElementById("edPick");
   function renderPick(){
     const t = q.value.trim().toLowerCase();
-    const hits = SPECIES.filter(s=> !t || s.nl.toLowerCase().includes(t) || s.la.toLowerCase().includes(t)).slice(0,50);
+    /* Zolang er niets getypt is blijft de lijst leeg. Een willekeurige greep
+       uit 219 soorten helpt niemand; je weet zelf wat je gevonden hebt. */
+    if(!t){ listEl.innerHTML = ""; return; }
+    const hits = SPECIES.filter(s=> s.nl.toLowerCase().includes(t) || s.la.toLowerCase().includes(t)).slice(0,50);
     listEl.innerHTML = hits.map(s=>'<button data-k="'+s.k+'"><span class="dot d-'+klass(s)+'"></span>'+
       '<span><span class="nm">'+esc(s.nl)+'</span><br><span class="la">'+esc(s.la)+'</span></span></button>').join("")
       || '<div style="padding:10px 4px;font-size:13.5px;color:var(--inkt-2)">Niet in de gids. Wat je typt wordt de eigen naam.</div>';
@@ -3882,8 +3897,12 @@ function editPin(id,isNew){
       q.value=""; renderPick();
     });
   }
-  q.oninput = ()=>{ custom=q.value.trim(); renderPick(); };
+  q.addEventListener("input", ()=>{ custom=q.value.trim(); renderPick(); });
   renderPick();
+  /* Bij een nieuwe vondst wil je meteen typen. Het blad schuift open met een
+     animatie; focussen tijdens die beweging wordt op Android genegeerd,
+     vandaar de korte vertraging. */
+  if(isNew && !pin.spec) setTimeout(()=>{ try{ q.focus({preventScroll:true}); }catch(e){ q.focus(); } }, 320);
   segWire("edHoev"); segWire("edToe"); segWire("edZeker"); segWire("edVerv",true);
   bodyEl.querySelector('[data-act="clear"]').onclick = ()=>{
     sel=null; custom=""; q.value="";
