@@ -1,4 +1,4 @@
-# Gaea v0.8.1
+# Gaea v0.8.2
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -192,20 +192,21 @@ Ongeveer 3,4 s. Tikken slaat het over; bij `prefers-reduced-motion` staat alles
 stil en verdwijnt het scherm na 0,9 s.
 
 ## Iconen
-`icon-192/512/maskable.png` zijn een dryadekop in Green Man-stijl. Volledig
-opnieuw getekend in v0.7, met per element een schaduw-, kleur- en lichtpas:
-bladeren met slagschaduw, verzachte schaduwhelft, middennerf, zijnerven en
-randlicht; schorsstrengen met kern, highlight en donkere onderkant; een gezicht
-met kernschaduw langs de rand, licht van linksboven, wenkbrauwrichel en randlicht;
-ogen met iris-ringen, straaltjes, ooglidschaduw en twee spiegelingen; een flacon
-met glasverloop, meniscus, zeven bellen en een gloed.
+Vanaf v0.8.2 gebouwd uit het aangeleverde portret in plaats van getekend.
+`maak_icoon.py` snijdt de kop van de kruidenvrouw uit (uitsnede 0,31–0,75 breed,
+0,105–0,353 hoog), tempert het detail zodat het op 48 dp nog leest, legt er een
+vignet overheen dat naar het bosgroen van de app trekt, en zet daar een gouden
+dubbele ring met vier knopen omheen en de groene flacon linksonder met een gloed.
 
-De ring is bewust terughoudend: twee fijne gouden cirkels met een verloop over de
-omtrek en vier knoopjes op de assen, in plaats van dik vlechtwerk dat de kop
-overschreeuwt. Achtergrond met radiale gloed, vignet en fijne korrel.
+- `icon-512/192.png` — afgeronde vierkant, ring en flacon, 96 kleuren
+- `icon-maskable.png` — geen ring of flacon, 66% geschaald binnen een groen veld,
+  met een zachte ronde rand zodat je in de ronde uitsnede van Android geen
+  vierkante fotorand ziet liggen
+- `badge-96.png` — nog steeds getekend, want Android maakt van de badge een
+  silhouet en gooit alle kleur weg; een foto werkt daar per definitie niet
 
-Gegenereerd door `maak_icoon.py` — geen SVG-rasterizer in de omgeving, dus met
-PIL getekend op 6× en met LANCZOS teruggeschaald.
+Hetzelfde boommedaillon staat nu ook als merkteken in de bovenbalk en in elke
+schermkop.
 
 `badge-96.png` is apart en essentieel: Android maakt van de meldings-badge een
 silhouet en gooit alle kleur weg. Een dekkend vierkant icoon wordt dan een blok.
