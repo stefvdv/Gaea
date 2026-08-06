@@ -134,7 +134,47 @@ try{
         }));
         return raak+"/"+totaal+" gekoppeld; niet gevonden: "+[...new Set(mis)].slice(0,14).join(" | ");
       }],
-    ["bandHtml", ()=>bandHtml([3,4,5],true).length]
+    ["bandHtml", ()=>bandHtml([3,4,5],true).length],
+    ["dubbele antwoorden", ()=>{
+        let stuk=0, gecheckt=0;
+        for(const niv of ["makkelijk","gemiddeld","moeilijk"]){
+          S.leer.niveau = niv;
+          for(let ronde=0; ronde<3; ronde++)
+            for(const s of SPECIES){
+              const q = makeQuestion(s.k); if(!q || !q.opts) continue;
+              gecheckt++;
+              if(new Set(q.opts).size !== q.opts.length){ stuk++;
+                if(stuk<6) console.log("      dubbel: ["+q.kind+"] "+s.k+" -> "+JSON.stringify(q.opts)); }
+            }
+        }
+        S.leer.niveau = "gemiddeld";
+        return stuk ? stuk+" van "+gecheckt+" MET DUBBELE ANTWOORDEN" : gecheckt+" vragen, geen dubbele antwoorden";
+      }],
+    ["chips tellen", ()=>{
+        S.pins = [
+          {id:"a",spec:"duizendblad",lat:52,lng:5,gemaakt:"2026-08-01"},
+          {id:"b",spec:"vlier",lat:52,lng:5,gemaakt:"2026-08-01"},
+          {id:"c",spec:"groeneknolamaniet",lat:52,lng:5,gemaakt:"2026-08-01"}
+        ];
+        const c={eet:0,med:0,gif:0,zwam:0,onb:0};
+        S.pins.forEach(p=> pinVakken(p).forEach(v=> c[v]++));
+        S.pins = [];
+        return "eet "+c.eet+" · med "+c.med+" · gif "+c.gif+" · zwam "+c.zwam;
+      }],
+    ["zwamaandeel", ()=>{
+        const uit = [];
+        for(const niv of ["makkelijk","gemiddeld","moeilijk"]){
+          S.leer.niveau = niv;
+          let zwam=0, tot=0;
+          for(let i=0;i<40;i++){
+            const keys = balanceer(pickN(nivNu().pool().map(x=>x.k), 10));
+            keys.forEach(k=>{ tot++; if(SPEC_BY_K[k].grp==="zwam") zwam++; });
+          }
+          uit.push(niv+" "+Math.round(100*zwam/tot)+"%");
+        }
+        S.leer.niveau = "gemiddeld";
+        return uit.join(" · ");
+      }]
   ];
   for(const [naam,fn] of proeven){
     try{ const r = fn(); console.log("  ok  "+naam+(r!==undefined?"  -> "+r:"")); }

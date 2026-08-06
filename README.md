@@ -1,4 +1,4 @@
-# Gaea's Natural Health — v0.13.0
+# Gaea's Natural Health — v0.15.0
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -73,8 +73,26 @@ Drie soorten herkomst, en de app zegt het er per soortenblad bij:
 Dat onderscheid staat ook in Instellingen, onder "Waar komt de informatie vandaan".
 
 ## Gids
-219 soorten: 96 kruiden, 40 bomen en struiken, 40 paddenstoelen en 43 tuin-,
-keuken- en apotheekkruiden. 48 daarvan zijn giftig.
+255 soorten: 115 kruiden, 42 bomen en struiken, 46 paddenstoelen en 52 tuin-,
+keuken- en apotheekkruiden. 59 daarvan zijn giftig.
+
+Nieuw in v0.14 vooral de soorten die al in verwarringswaarschuwingen genoemd
+werden maar zelf geen blad hadden — die knoppen liepen dood. Daardoor loopt de
+koppeling van `dubbelSleutel()` van 47 op 67 naar 86 op 101. Verder meer salies
+(veldsalie, scharlei, ananassalie), meer tuinkruiden, en de giftige
+voorjaarsbollen die naast daslook opkomen: narcis en sneeuwklokje.
+
+### Bij het toevoegen van data
+Een soort toevoegen is nooit één regel. De hele keten:
+`SPECIES` → `KWALEN_MAP` en zo nodig `EMA_MAP` → recepten die ernaar verwijzen →
+en dan `node proef.js`, dat controleert op dubbele sleutels, dubbele
+wetenschappelijke namen, dubbele Nederlandse namen, ontbrekende `herken` of
+`let`, recepten die naar onbekende soorten wijzen, en quizvragen met twee
+identieke antwoorden.
+
+Die laatste controle vond meteen iets: `vingerhoedstuin` en `kluifzwam` hadden
+allebei een dubbelganger met dezelfde wetenschappelijke naam, en dat gaf
+quizvragen met twee identieke keuzes. Samengevoegd.
 Ze staan er juist in om te leren kennen en te pinnen.
 Nieuw in v0.6 onder meer: de kust (zeekraal, zulte, strandbiet, zeesla, blaaswier,
 suikerwier), de klassieke lookalike-paren bij zwammen (stobbezwammetje naast
@@ -185,6 +203,16 @@ zijn onveranderd gebleven, anders was je hele voorraadkast verdwenen.
 16 soorten brouwsel met eigen rijp- en houdbaarheidstermijn, batchcode
 `GA-JJMM-NN`.
 
+Op elk potje staat een flesje met de resterende hoeveelheid eronder in woorden
+(Vol, Driekwart, Half, Bijna op, Op). Het flesje is een stuk helderder dan eerst
+en het dunne voorraadbalkje is weg — twee dingen die hetzelfde vertelden.
+
+Soort brouwsel, restant en waarvoor je het gebruikt zijn keuzelijsten in plaats
+van rijen knoppen. Bij "waarvoor" voegt de keuzelijst een chip toe die je weer
+kunt weghalen, want dat is er meer dan één. De lijst voor het lijf is van zeven
+naar 35 posten gegaan: er is veel meer waar een kruid iets bij kan betekenen dan
+hoest, huid en slaap.
+
 ### Eigen recepten
 Je kunt zelf recepten schrijven: naam, keuken of lijf, tijd, opbrengst,
 ingrediënten (één per regel, `hoeveelheid - naam`), werkwijze, een let-op en
@@ -203,26 +231,28 @@ hopscheuten als wilde asperge, berkenbastaftreksel, kaasjeskruid als
 koudwateraftreksel, eikenschorsspoeling en vlierbloesembeignets.
 
 ## Veldschool
-Leitner, dozen 0 tot 7, intervallen 0/1/2/4/8/16/32/64 dagen. Drie niveaus:
+Leitner met zeven trappen, intervallen 0/1/2/4/8/16/32/64 dagen. Een soort klimt
+een trap bij een goed antwoord en valt terug naar trap 1 bij een fout, dus je
+herhaalt vooral wat je nog niet zeker weet. Dat heette eerder "doos", wat
+niemand iets zegt; het heet nu "trap 2 van 7" met een regel uitleg erboven.
+
+Drie niveaus:
 
 - **Makkelijk** — bekende, ongevaarlijke soorten: tuinkruiden, wat nu in seizoen
-  is, en soorten die je zelf hebt gepind. Drie antwoorden. Namen, beeld, delen.
-- **Gemiddeld** — alle 219 soorten, vier antwoorden, alle vraagsoorten.
-- **Moeilijk** — alleen giftige soorten, soorten met verwarringsgevaar en soorten
-  met erkend gebruik. Vier antwoorden, en de afleiders komen waar mogelijk uit
-  hetzelfde geslacht: dezelfde eerste helft van de wetenschappelijke naam. Dat is
-  precies waar de fouten in het veld worden gemaakt.
+  is, en soorten die je zelf hebt gepind. Drie antwoorden.
+- **Gemiddeld** — alle soorten, vier antwoorden, alle vraagsoorten.
+- **Moeilijk** — alleen giftige soorten, soorten met verwarringsgevaar en
+  soorten met erkend gebruik, met afleiders uit hetzelfde geslacht.
 
-Elke derde vraag is beeldherkenning. Eerst je eigen foto's, en als die er nog niet
-zijn beeld uit GBIF. `beeldVooruit()` haalt drie soorten tegelijk op met een harde
-grens van vier seconden: liever een ronde zonder beeld dan een ronde die blijft
-hangen. Wat later binnenkomt is er de volgende keer, want `FOTO_KAS` houdt het
-per sessie vast.
+### Balans
+Giftige paddenstoelen scoorden op twee punten tegelijk in `leerGewicht()` en
+vulden daardoor hele rondes met amanieten. Ze horen zwaar te wegen, maar een
+ronde over niets dan knolamanieten leert je niets over de rest van het bos.
+`balanceer()` legt er een plafond op: hooguit een derde van de vragen gaat over
+zwammen, behalve op moeilijk, waar je daar juist voor kiest. Gemeten aandeel nu
+ongeveer 15% op makkelijk en gemiddeld, 23% op moeilijk.
 
-Onder elke GBIF-foto staat de fotograaf en de licentie — voorwaarde van de
-Creative Commons-licentie, geen bronvermelding.
-
-Afleiders komen altijd uit dezelfde wereld: bij een zwamvraag alleen zwammen.
+Elke derde vraag is beeldherkenning, eerst je eigen foto's en anders GBIF.
 
 ## Startanimatie
 De kruidenvrouw in de gotische lijst. In lagen:
@@ -322,19 +352,29 @@ inhoud niet lezen, maar de service worker bewaart het ondoorzichtige antwoord in
 de cache `wildpluk-beeld` (LRU op 900), en daarna werkt het offline. Nogmaals
 tikken stopt de kuur. Reken op enkele tientallen MB — doe het op wifi.
 
-## Kaartknoppen
-Drie knoppen op één rij onderaan, gecentreerd boven de navigatiebalk:
-ontdekken, thuis, GPS.
+## Indeling van het kaartscherm
+**Topbalk** — alleen nog het eikenmerkteken (34 px, even groot als de
+navigatietegels) met de filterchips ernaast op dezelfde regel. De naam "Gaea" en
+het versienummer zijn eruit: die staan al op het opstartscherm en in de
+instellingen, en op een telefoon is die regel te kostbaar.
 
-**Thuis** — één tik brengt je naar je vaste plek, lang indrukken (650 ms) zet
-die vast op je huidige GPS-positie, of op het midden van de kaart als GPS uit
-staat. Opgeslagen onder `admiral_app:thuis`. De knop licht op zodra er een
-thuis bekend is.
+**Onderaan de kaart** — vier knoppen op één rij: kaartlaag, ontdekken, thuis, GPS.
+De lagenknop stond rechtsboven en zat in de weg.
 
-Hij droeg aanvankelijk de klasse `beeld`, en die zet `background:none` met
-`svg{display:none}` omdat hij een aangeleverde illustratie verwacht. Die was er
-niet, dus de knop was onzichtbaar maar wel aanraakbaar. Hij heeft nu een eigen
-klasse `thuisbtn` met de getekende vorm, in dezelfde maat als zijn buren.
+**Navigatiebalk** — zes plekken nu: kaart, vondsten, voorraad, gids, leren,
+instellingen. De instellingen zaten in de topbalk en horen bij de navigatie.
+
+## Filterchips
+`soortVakken()` geeft alle eigenschappen van een soort terug, niet één.
+Duizendblad is eetbaar én medicinaal en telde eerder alleen als eetbaar, omdat
+`klass()` één etiket teruggeeft — die functie kiest een kleur voor een speld en
+moet dus wel één antwoord geven, maar voor tellen en filteren is dat verkeerd.
+
+De GBIF-waarnemingen tellen mee, want die staan ook op de kaart.
+
+Bij het filteren blijft een vondst staan zolang minstens één van zijn
+eigenschappen aangevinkt is. Anders zou duizendblad verdwijnen zodra je
+"eetbaar" uitzet terwijl je "medicinaal" nog aan hebt.
 
 ## Swipe
 Horizontaal vegen wisselt van scherm, in de volgorde kaart, vondsten, voorraad,
@@ -346,6 +386,38 @@ schuine of trage sleep binnen een lijst nooit per ongeluk telt: minstens 72 px
 horizontaal, binnen 600 ms, horizontaal minstens 2,2 keer zo ver als verticaal,
 en niet meer dan 90 px verticaal. Bladen, quiz, loep, invoervelden, segmentknoppen
 en de soortenkiezer zijn uitgezonderd.
+
+## Vondstblad
+Alles wat de gids over de soort weet staat nu meteen op het vondstblad zelf; de
+knop "Alles over …" is weg. Om het in één schermlengte te houden zitten de meeste
+onderdelen in uitklapsecties (`klap()`, een `<details>`): wat je gebruikt,
+medicinaal gebruik, recepten met deze soort, je andere plekken van die soort, en
+beeld uit GBIF. Alleen de veldkenmerken staan open, want dat is wat je in het
+veld wilt zien.
+
+Het beeld wordt pas opgehaald als je die sectie openklapt. Anders zou elke
+geopende vondst meteen aan het netwerk gaan trekken.
+
+## Loep
+Een venster boven het blad (`z-index:700`), niet schermvullend: 92vw bij 74vh met
+een rand en een donkere waas eromheen, zodat je ziet waar je vandaan komt.
+Knijpen met twee vingers tot 6×, dubbeltik naar 2,6×, terugknop sluit hem.
+
+De CSS voor `#loep` ontbrak volledig — verloren in een van de eerdere
+stijlongelukken. Daardoor stond de loep zonder positionering of z-index in de
+stroom en verscheen hij achter het blad.
+
+## Afsluiten
+De terugknop klimt eerst door alles wat openstaat: loep, quiz, spookpin, blad,
+en dan terug naar de kaart. Sta je op de kaart met niets open, dan vraagt de
+volgende druk om bevestiging voor je de app verlaat. Zonder die vraag gooi je
+jezelf eruit terwijl je alleen een blad wilde sluiten.
+
+## Beginnen waar je bent
+Bij het opstarten wordt de kaart op je positie gezet, op minstens zoom 16. Lukt
+dat niet binnen zes seconden — geen signaal, geen toestemming — dan blijft het
+laatste kaartbeeld staan. Heb je in die tijd al een blad geopend of een speld
+gezet, dan springt de kaart niet meer weg.
 
 ## Bladen openen
 `showSheet()` noteert wanneer het blad opengaat, en de achtergronddoek negeert
