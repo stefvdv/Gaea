@@ -1,4 +1,4 @@
-# Gaea v0.10.0
+# Gaea v0.11.0
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -53,7 +53,7 @@ Drie soorten herkomst, en de app zegt het er per soortenblad bij:
 Dat onderscheid staat ook in Instellingen, onder "Waar komt de informatie vandaan".
 
 ## Gids
-218 soorten: 96 kruiden, 39 bomen en struiken, 40 paddenstoelen en 43 tuin-,
+219 soorten: 96 kruiden, 40 bomen en struiken, 40 paddenstoelen en 43 tuin-,
 keuken- en apotheekkruiden. 48 daarvan zijn giftig.
 Ze staan er juist in om te leren kennen en te pinnen.
 Nieuw in v0.6 onder meer: de kust (zeekraal, zulte, strandbiet, zeesla, blaaswier,
@@ -130,30 +130,35 @@ geen vindplaats. "Eigen vondst hier zetten" maakt een pin met status
 "nog te bevestigen".
 
 ## Voorraadkast en recepten
-Store `maaksels`; 16 typen met eigen rijpingstijd en houdbaarheid, batchcode
-WP-JJMM-NN, status rijpend/klaar/over datum/op, en de weergave "Waarvoor" die
-alles groepeert op gebruik.
+16 soorten maaksel met eigen rijp- en houdbaarheidstermijn, batchcode `GA-JJMM-NN`.
 
-22 recepten (12 keuken, 10 lijf) met ingrediëntenlijst en stappen. "Zet in de
-voorraadkast" maakt het maaksel aan met de juiste rijpings- en houdbaarheidsdatum.
+62 recepten: 33 keuken en 29 voor het lijf. Nieuw in v0.11 onder meer
+krentenboompjessaus, iepenzaadsalade, robiniabeignets, eikelmeel met de
+koudwatermethode, gefermenteerde bramenbladthee, gefermenteerde bospaddenstoelen,
+zeewierbouillon, jeneverbes-kruidenzout, salietinctuur, tijmhoestsiroop met anijs,
+goudsbloemzalf, gember-oxymel, lavendel-slaapkussen en verse aloëgel.
 
 ## Veldschool
-Leitner, dozen 0 tot 7, intervallen 0/1/2/4/8/16/32/64 dagen.
+Leitner, dozen 0 tot 7, intervallen 0/1/2/4/8/16/32/64 dagen. Drie niveaus:
 
-Elke derde vraag is beeldherkenning. Eerst je eigen foto's, en als die er nog
-niet zijn beeld uit GBIF voor de soorten van deze ronde. `beeldVooruit()` haalt
-vooraf beeld op voor maximaal zes soorten, zodat een vraag niet halverwege op
-het netwerk staat te wachten; `FOTO_KAS` houdt het per sessie vast.
+- **Makkelijk** — bekende, ongevaarlijke soorten: tuinkruiden, wat nu in seizoen
+  is, en soorten die je zelf hebt gepind. Drie antwoorden. Namen, beeld, delen.
+- **Gemiddeld** — alle 219 soorten, vier antwoorden, alle vraagsoorten.
+- **Moeilijk** — alleen giftige soorten, soorten met verwarringsgevaar en soorten
+  met erkend gebruik. Vier antwoorden, en de afleiders komen waar mogelijk uit
+  hetzelfde geslacht: dezelfde eerste helft van de wetenschappelijke naam. Dat is
+  precies waar de fouten in het veld worden gemaakt.
 
-Onder elke GBIF-foto staat de fotograaf en de licentie. Dat is geen
-bronvermelding maar een voorwaarde van de Creative Commons-licentie waaronder
-die beelden vrijgegeven zijn.
+Elke derde vraag is beeldherkenning. Eerst je eigen foto's, en als die er nog niet
+zijn beeld uit GBIF. `beeldVooruit()` haalt drie soorten tegelijk op met een harde
+grens van vier seconden: liever een ronde zonder beeld dan een ronde die blijft
+hangen. Wat later binnenkomt is er de volgende keer, want `FOTO_KAS` houdt het
+per sessie vast.
 
-Elk soortenblad heeft een knop **Herkenning oefenen** die meteen één beeldvraag
-over die soort opent.
+Onder elke GBIF-foto staat de fotograaf en de licentie — voorwaarde van de
+Creative Commons-licentie, geen bronvermelding.
 
-Afleiders komen altijd uit dezelfde wereld: bij een zwamvraag alleen zwammen,
-bij een plantvraag alleen planten.
+Afleiders komen altijd uit dezelfde wereld: bij een zwamvraag alleen zwammen.
 
 ## Startanimatie
 De kruidenvrouw in de gotische lijst. In lagen:
@@ -252,6 +257,18 @@ foto's per soort op. Dat gebeurt met `fetch(url, {mode:"no-cors"})`: we mogen de
 inhoud niet lezen, maar de service worker bewaart het ondoorzichtige antwoord in
 de cache `wildpluk-beeld` (LRU op 900), en daarna werkt het offline. Nogmaals
 tikken stopt de kuur. Reken op enkele tientallen MB — doe het op wifi.
+
+## Kaartknoppen
+Alle knoppen staan op één rij onderaan de kaart, gecentreerd boven de
+navigatiebalk. Rechtsonder was hinderlijk bij het navigeren. De knop "Pin hier"
+is weg: een vondst begint bij de spookpin.
+
+## Randwerk
+Een sierlijst langs de vier schermranden: eikenhoeken in de hoeken, gouden
+haarlijnen langs boven, onder, links en rechts. Ligt boven de schermen maar onder
+de bladen, en vangt geen tikken op — anders zou hij de kaart blokkeren precies
+waar je wilt pinnen. Op het kaartscherm staat hij een stuk terughoudender, daar
+telt elke pixel.
 
 ## Spookpin
 De spookpin slaat niets op. Hij is er om te zien of je de juiste plek raakt.
@@ -439,6 +456,18 @@ foto's per soort op. Dat gebeurt met `fetch(url, {mode:"no-cors"})`: we mogen de
 inhoud niet lezen, maar de service worker bewaart het ondoorzichtige antwoord in
 de cache `wildpluk-beeld` (LRU op 900), en daarna werkt het offline. Nogmaals
 tikken stopt de kuur. Reken op enkele tientallen MB — doe het op wifi.
+
+## Kaartknoppen
+Alle knoppen staan op één rij onderaan de kaart, gecentreerd boven de
+navigatiebalk. Rechtsonder was hinderlijk bij het navigeren. De knop "Pin hier"
+is weg: een vondst begint bij de spookpin.
+
+## Randwerk
+Een sierlijst langs de vier schermranden: eikenhoeken in de hoeken, gouden
+haarlijnen langs boven, onder, links en rechts. Ligt boven de schermen maar onder
+de bladen, en vangt geen tikken op — anders zou hij de kaart blokkeren precies
+waar je wilt pinnen. Op het kaartscherm staat hij een stuk terughoudender, daar
+telt elke pixel.
 
 ## Spookpin
 De spookpin slaat niets op. Hij is puur om te zien of je de juiste plek raakt.
