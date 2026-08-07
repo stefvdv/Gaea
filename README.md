@@ -1,4 +1,4 @@
-# Gaea's Natural Health — v0.15.0
+# Gaea's Natural Health — v0.18.0
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -231,45 +231,81 @@ hopscheuten als wilde asperge, berkenbastaftreksel, kaasjeskruid als
 koudwateraftreksel, eikenschorsspoeling en vlierbloesembeignets.
 
 ## Veldschool
-Leitner met zeven trappen, intervallen 0/1/2/4/8/16/32/64 dagen. Een soort klimt
-een trap bij een goed antwoord en valt terug naar trap 1 bij een fout, dus je
-herhaalt vooral wat je nog niet zeker weet. Dat heette eerder "doos", wat
-niemand iets zegt; het heet nu "trap 2 van 7" met een regel uitleg erboven.
+Leitner met zeven trappen, intervallen 0/1/2/4/8/16/32/64 dagen. Drie niveaus:
+makkelijk (bekende soorten, drie antwoorden), gemiddeld (alles, vier antwoorden),
+moeilijk (giftig en verwarrend, afleiders uit hetzelfde geslacht).
 
-Drie niveaus:
+**Om de andere vraag beeld.** Herkennen doe je met je ogen, dus de helft van de
+ronde is een foto. Eerst je eigen foto's, dan GBIF.
 
-- **Makkelijk** — bekende, ongevaarlijke soorten: tuinkruiden, wat nu in seizoen
-  is, en soorten die je zelf hebt gepind. Drie antwoorden.
-- **Gemiddeld** — alle soorten, vier antwoorden, alle vraagsoorten.
-- **Moeilijk** — alleen giftige soorten, soorten met verwarringsgevaar en
-  soorten met erkend gebruik, met afleiders uit hetzelfde geslacht.
+**Tip na vijf seconden.** Loop je vast, dan verschijnt er een knop die één zetje
+geeft. Hij komt niet meteen, want dan is hij te verleidelijk. `tipVoor()` neemt
+de tip die de generator zelf meegaf, anders het eerste veldkenmerk, anders de
+groep waar de soort in zit — en slaat elke kandidaat over die het antwoord
+letterlijk bevat.
 
-### Balans
-Giftige paddenstoelen scoorden op twee punten tegelijk in `leerGewicht()` en
-vulden daardoor hele rondes met amanieten. Ze horen zwaar te wegen, maar een
-ronde over niets dan knolamanieten leert je niets over de rest van het bos.
-`balanceer()` legt er een plafond op: hooguit een derde van de vragen gaat over
-zwammen, behalve op moeilijk, waar je daar juist voor kiest. Gemeten aandeel nu
-ongeveer 15% op makkelijk en gemiddeld, 23% op moeilijk.
+### Beeld dat ergens op slaat
+Een GBIF-waarneming mag alles zijn: een winterskelet, een herbariumvel, een
+bordje met een naam erop. Een dorre pol in februari zegt niets over dragon.
+`soortBeeld()` vraagt daarom alleen om waarnemingen uit de maanden waarin de
+soort er echt staat (`&month=`), en alleen om waarnemingen die een mens in het
+veld deed (`&basisOfRecord=HUMAN_OBSERVATION`). Levert dat minder dan drie
+beelden op, dan pas volgt de rest, met het buitenseizoen achteraan.
 
-Elke derde vraag is beeldherkenning, eerst je eigen foto's en anders GBIF.
+### Vraagkeuring
+`keuring.js` legt elke vraag die de app kan stellen langs zeven meetlatten:
+dubbele antwoorden, lege antwoorden, te weinig antwoorden, een antwoord dat niet
+tussen de opties staat, een antwoord dat al in de vraag staat, een ontbrekende
+tip, en een tip die het antwoord verklapt. Alle drie de niveaus, alle 255
+soorten, twee rondes.
+
+Dat vond vier soorten fouten:
+
+- **Naam-vragen die zichzelf beantwoorden.** Taxus/*Taxus baccata*,
+  Robinia/*Robinia pseudoacacia*, Narcis/*Narcissus*. `naamVerklikt()` slaat die
+  over.
+- **Deel-vragen die zichzelf beantwoorden.** Van goudsbloem gebruik je de bloem,
+  van mierikswortel de wortel.
+- **Verwarringsvragen die zichzelf beantwoorden.** Kapjesmorielje verwar je met
+  de morielje.
+- **Woordelijk gelijke afleiders.** "Bij een allergie voor composieten
+  voorzichtig" staat bij een handvol composieten, dus stonden er twee identieke
+  knoppen. `unieke()` ontdubbelt nu op tekst in plaats van op soort.
 
 ## Startanimatie
-De kruidenvrouw in de gotische lijst. In lagen:
-- de lijst komt op en schaalt van 94% naar 100%
-- de vrouw verschijnt daarna en ademt heel licht door, 6 s per cyclus
-- een groene gloed pulseert over de flacon in haar linkerhand, 3,2 s
-- een gouden gloed pulseert trager over de vijzel, 4,4 s
-- veertien sporen stijgen op vanaf willekeurige punten, elk met eigen duur,
-  vertraging en zijwaartse drift
-- daarna GAEA, een uitrollende vlechtlijn en de ondertitel
+Een rank die uitgroeit tot een volledige omlijsting, met de dryade erin.
 
-Ongeveer 3,4 s. Tikken slaat het over; bij `prefers-reduced-motion` staat alles
-stil en verdwijnt het scherm na 0,9 s.
+Acht stadia van dezelfde tekening liggen precies over elkaar en komen om de
+0,30 seconde op, elk met een fade van 0,58s die iets van onderen opkomt. Omdat
+elk volgend stadium het vorige overdekt leest de reeks als één doorgroeiende
+rank en niet als een diavoorstelling. Tijdlijn:
 
-De vrouw zit als JPEG in de app, samengesteld op een donkere bosachtergrond.
-Transparantie is daar niet nodig en dat scheelt een factor zes: 105 kB in plaats
-van 600 kB.
+    0,25s  stadium 1   lage rank langs de onderrand
+    0,55s  stadium 2   de rank klimt langs de zijkanten
+    0,85s  stadium 3   hoger, nog open bovenaan
+    1,15s  stadium 4   de lijst sluit zich, kaal vlechtwerk
+    1,45s  stadium 5   eerste blad
+    1,75s  stadium 6   voller
+    2,05s  stadium 7   vollediger
+    2,35s  stadium 8   het volle blad
+    2,50s  de dryade verschijnt in de lijst
+    2,90s  de lichtjes bij vijzel en flacon gaan aan
+    3,05s  de naam, 3,50s de ondertitel
+    4,90s  weg, of eerder bij een tik
+
+### Waarom de stadia sluitend passen
+`groei.py` snijdt elk bestand bij op wat er echt zichtbaar is en zet het daarna
+terug op dezelfde plek in het oorspronkelijke kader van 1024×1536. Zonder die
+tweede stap zou elk stadium op zijn eigen bijgesneden maat schalen en zouden de
+ranken bij elke wissel verspringen.
+
+### Omvang
+Negen illustraties op vol formaat zijn 24 MB. Als PNG met paletreductie nog
+altijd 3 MB — te veel om in te lijven. Als WebP op 400 px breed en kwaliteit 55
+is het geheel 428 KB, ongeveer 570 KB als data-URI. WebP kan doorschijnende
+randen met verloop aan, wat een palet-PNG niet kan; dat scheelt hier een factor
+zeven. Netto werd `index.html` zelfs kleiner, omdat de oude lijst en de vorige
+kruidenvrouw eruit konden.
 
 ## Iconen
 Vanaf v0.9 opgebouwd uit de kruidenvrouw en de gouden eikenring, dus uit
@@ -353,16 +389,25 @@ de cache `wildpluk-beeld` (LRU op 900), en daarna werkt het offline. Nogmaals
 tikken stopt de kuur. Reken op enkele tientallen MB — doe het op wifi.
 
 ## Indeling van het kaartscherm
-**Topbalk** — alleen nog het eikenmerkteken (34 px, even groot als de
-navigatietegels) met de filterchips ernaast op dezelfde regel. De naam "Gaea" en
-het versienummer zijn eruit: die staan al op het opstartscherm en in de
-instellingen, en op een telefoon is die regel te kostbaar.
+**Topbalk** — het eikenmerkteken op 46 px, dezelfde maat als het zegel in de
+schermkoppen, met de filterchips ernaast op dezelfde regel.
 
-**Onderaan de kaart** — vier knoppen op één rij: kaartlaag, ontdekken, thuis, GPS.
-De lagenknop stond rechtsboven en zat in de weg.
+**Onderaan de kaart** — vier munten op één rij: kaartlaag, ontdekken, thuis, GPS.
+Alle vier `.fab.ghost.beeld`, dus alle vier 54 px met hun eigen illustratie.
+De thuisknop heeft nu `mun-huis.png` in plaats van een getekend huisje.
 
-**Navigatiebalk** — zes plekken nu: kaart, vondsten, voorraad, gids, leren,
-instellingen. De instellingen zaten in de topbalk en horen bij de navigatie.
+**Navigatiebalk** — zes plekken: kaart, vondsten, voorraad, gids, leren,
+instellingen. De instellingenmunt zit in een `.tegel`, net als de andere vijf.
+
+### Waarom die knoppen ontspoorden
+`#btnLayer` en `#btnSet` hadden al ID-regels met een muntafbeelding, bedoeld voor
+de kleine `.iconbtn` in de topbalk. Toen ik die ID's meenam naar de nieuwe
+plekken kwamen de munten mee, op een maat die daar niet past: een munt van 54 px
+in een navigatiebalk van 32. Vandaar de kolossale, half doorzichtige knoppen.
+
+Les: een ID-regel met een afbeelding reist mee met het ID. Bij het verplaatsen
+van een knop hoort de bijbehorende CSS-selector mee te verhuizen, of de knop
+hoort een nieuw ID te krijgen.
 
 ## Filterchips
 `soortVakken()` geeft alle eigenschappen van een soort terug, niet één.
@@ -677,3 +722,19 @@ traditioneel gebruikt wordt, met in de uitleg of het EMA-gedekt is.
 - Determinatiehulp via Pl@ntNet, met verplichte verwarringscheck vóór "eetbaar"
 - Zebra ZD421-labels rechtstreeks vanuit de voorraadkast
 - Per-veld bronvermelding zodra er een geverifieerde tekstbron is gekozen
+
+
+## Jaarwiel
+Acht stations met hun gangbare volksnamen: Yule, Imbolc, Ostara, Beltane, Litha,
+Lughnasadh, Mabon, Samhain. Waar een Nederlandse naam bestaat staat die erbij in
+het bijschrift — midwinter, lichtmis, lente-evening, meifeest, midzomer,
+herfst-evening. Lammas heette in v0.15 nog met zijn Angelsaksische kerknaam; dat
+is nu Lughnasadh.
+
+
+## Een val in proef.js zelf
+De keuringen stonden eerst in een template literal binnen `proef.js`. Daar wordt
+`\s` stilletjes `s`, dus `/\s+/g` werd `/s+/g` en haalde elke letter s uit de
+tekst. Dat gaf vals alarm op "hysop" in "hyssopus". De keuringen staan nu in
+`keuring.js` en worden met `readFileSync` ingelezen, zodat er niets meer aan de
+broncode geknabbeld wordt.
