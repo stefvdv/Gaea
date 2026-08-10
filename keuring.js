@@ -14,8 +14,9 @@ try{
           (zonder.length?zonder.map(s=>s.k).join(","):"geen")+" · grootste: "+top;
       }],
     ["nivNu",      ()=>nivNu().nm],
-    ["pool.makkelijk", ()=>NIVEAUS.makkelijk.pool().length],
-    ["pool.moeilijk",  ()=>NIVEAUS.moeilijk.pool().length],
+    ["pool.herkennen", ()=>NIVEAUS.herkennen.pool().length],
+    ["pool.gebruik",   ()=>NIVEAUS.gebruik.pool().length],
+    ["pool.namen",     ()=>NIVEAUS.namen.pool().length],
     ["afleiders",  ()=>afleiders(SPECIES[0],3).length],
     ["makeQuestion", ()=>{
         let n=0;

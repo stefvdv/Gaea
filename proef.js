@@ -12,6 +12,9 @@ function El(tag){
                    else f?this._s.add(c):this._s.delete(c); return f; },
       contains(c){return this._s.has(c)} },
     attrs:{}, _html:"", _text:"",
+    /* <select>-gedrag: options telt de <option>-tags in de gezette innerHTML,
+       met minimaal lengte 1 zoals een echte select met placeholder. */
+    get options(){ const n=(this._html.match(/<option/g)||[]).length; return {length:Math.max(n,1)}; },
     get innerHTML(){return this._html}, set innerHTML(v){this._html=String(v)},
     get textContent(){return this._text}, set textContent(v){this._text=String(v)},
     get value(){return this._val||""}, set value(v){this._val=String(v)},
