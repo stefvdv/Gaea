@@ -997,7 +997,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.23.0";
+const APP_VERSION = "0.24.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -3919,6 +3919,15 @@ function jaarstand(nu){
   const dagen = Math.ceil((volgende.t - nu)/DAY);
   return {vorige:vorige.f, volgende:volgende.f, dagen};
 }
+/* De maankaart met het jaarwiel is uit beeld gehaald: op de Veldschool en in
+   het Herbarium stond hij tussen dingen waar je iets mee doet, en zelf deed
+   hij niets.
+
+   Daarmee liggen ook maanfase(), jaarstand(), maanSvg(), MAANNAMEN en WIEL
+   stil — nergens anders in de app wordt er iets mee gedaan. Ze blijven staan
+   omdat de acht stations en de maanstand kloppende, afgeronde code zijn en
+   een plek in het Herbarium of bij een vondst zomaar weer nuttig kan zijn.
+   Terugzetten is één regel: h += hemelHtml(); */
 function hemelHtml(){
   const nu=new Date(), f=maanfase(nu), i=Math.floor(f*8+0.5)%8, js=jaarstand(nu);
   return '<div class="hemel"><div class="maan">'+maanSvg(f)+'</div>'+
@@ -5058,7 +5067,6 @@ function renderSpec(){
       (fMnd ? " · "+MND_VOL[fMnd-1] : "");
 
   let h="";
-  if(v==="nu") h += hemelHtml();
   if(v==="zwam") h += '<div class="empty" style="margin:0 12px 14px;padding:13px;background:rgba(192,133,82,.09);border:1px solid rgba(192,133,82,.3);border-radius:14px;text-align:left"><b style="font-size:15px">Zwammen zijn een vak apart</b><span style="font-size:13px;color:var(--kalk-2)">Deze lijst is om te lezen en te leren, niet om op te determineren. Laat elke eerste vondst van een soort nakijken door een kenner.</span></div>';
   if(v==="nu" && mijn.length){
     h += '<p class="grouphd">Jouw plekken, nu</p>' + mijn.map(p=>'<button class="rec" data-id="'+p.id+'">'+
@@ -5478,9 +5486,12 @@ const BOXDAGEN=[0,1,2,4,8,16,32,64];
 const NIVEAUS = {
   herkennen: {
     nm:"Herkennen",
-    uitleg:"Foto's, veldkenmerken en waarmee je iets kunt verwarren",
+    uitleg:"Alleen foto's — kies welke soort je ziet",
     opties:4, pool:()=> SPECIES,
-    vragen:["beeld","herken","verwar","deel","maand"], beeldDeel:0.6
+    /* Alleen beeld. De tekstvragen staan hier als vangnet voor het geval er
+       geen enkele foto op te halen valt; ze komen alleen aan bod als beeld
+       echt niet lukt. */
+    vragen:["herken","verwar"], beeldDeel:1
   },
   gebruik: {
     nm:"Gebruik",
@@ -5560,7 +5571,7 @@ function renderLeer(){
     (klaarVandaag?"Nog een ronde":"Begin de oefening")+
     '<small>'+(klaarVandaag?"Vandaag al gedaan — mooi. Extra mag altijd."
       :Math.min(S.leer.doel,Math.max(due.length,4))+" vragen · ongeveer twee minuten")+'</small></button>';
-  h+=hemelHtml()+'<p class="grouphd">Waar je op geoefend wordt</p>'+
+  h+='<p class="grouphd">Waar je op geoefend wordt</p>'+
     '<div class="srow" style="cursor:default"><div class="t"><b>Namen</b><span>Nederlands ↔ Latijn</span></div><span class="v">'+SPECIES.length+'</span></div>'+
     '<div class="srow" style="cursor:default"><div class="t"><b>Verwarringsgevaar</b><span>Waarmee je een soort kunt verwisselen</span></div><span class="v" style="color:#D4837B">'+SPECIES.filter(s=>s.dubbel&&s.dubbel.length).length+'</span></div>'+
     '<div class="srow" style="cursor:default"><div class="t"><b>Veldkenmerken</b><span>Waar je in het veld naar kijkt</span></div><span class="v">'+SPECIES.filter(s=>s.herken).length+'</span></div>'+
@@ -5727,18 +5738,21 @@ async function beeldVoor(k){
 /* Zet vooraf beeld klaar voor de soorten van deze ronde. Drie tegelijk en
    met een harde grens van vier seconden: liever een ronde zonder beeld dan
    een ronde die blijft hangen. Wat later binnenkomt, is er de volgende keer. */
-async function beeldVooruit(keys){
-  const kandidaten = keys.filter(k=> S.taxa[k] !== undefined).slice(0, 5);
-  const rest = keys.filter(k=> !kandidaten.includes(k)).slice(0, 3);
+async function beeldVooruit(keys, hoeveel){
+  const max = hoeveel || 8;
+  const kandidaten = keys.filter(k=> S.taxa[k] !== undefined).slice(0, max);
+  const rest = keys.filter(k=> !kandidaten.includes(k)).slice(0, Math.max(0, max - kandidaten.length));
   const lijst = kandidaten.concat(rest);
   if(!lijst.length) return [];
   const werk = Promise.all(lijst.map(async k=>{
     const b = await beeldVoor(k);
     return b.length ? k : null;
   }));
-  const klok = new Promise(r=> setTimeout(()=> r(null), 5000));
+  /* Ruimer als de hele ronde uit beeld moet bestaan: dan is wachten beter dan
+     een ronde die stilletjes terugvalt op tekst. */
+  const klok = new Promise(r=> setTimeout(()=> r(null), max > 8 ? 9000 : 5000));
   const uit = await Promise.race([werk, klok]);
-  /* na de klok laten we het ophalen gewoon doorlopen, voor de volgende ronde */
+  /* na de klok laat het ophalen zich gewoon uitlopen, voor de volgende ronde */
   return (uit || []).filter(Boolean);
 }
 
@@ -5850,22 +5864,42 @@ async function startQuiz(){
   if(!keys.length) keys=pickN([...vijver],n);
   keys = balanceer(keys);
   QZ.list=[]; QZ.i=0; QZ.goed=0; QZ.done=false;
-  /* Een derde van de ronde is beeldherkenning. Eerst je eigen foto's, en
-     als die er nog niet zijn beeld uit GBIF voor de soorten van deze ronde. */
-  const metBeeld = await beeldVooruit(keys);
-  let beeldTeller = 0;
-  for(let i=0;i<keys.length;i++){
-    let q=null;
-    /* Bij Herkennen gaat het merendeel over beeld; bij de andere categorieën
-       is beeld een tussendoortje. */
-    const beeldKans = nivNu().beeldDeel !== undefined ? nivNu().beeldDeel : 0.5;
-    if(Math.random() < beeldKans){
-      q = await qFoto();
-      if(!q && beeldTeller < metBeeld.length) q = await qBeeld(metBeeld[beeldTeller++]);
+
+  const beeldKans = nivNu().beeldDeel !== undefined ? nivNu().beeldDeel : 0.5;
+  const alleenBeeld = beeldKans >= 1;
+
+  if(alleenBeeld){
+    /* Herkennen is één ding: je ziet een foto en kiest de soort. Daarom halen
+       we ruim kandidaten op — meer dan er vragen nodig zijn — en vullen we de
+       ronde met wat er beeld heeft. Wie geen foto oplevert, valt af. */
+    toast("Foto's ophalen…");
+    const extra = pickN([...vijver].filter(k=>!keys.includes(k)), 8);
+    const metBeeld = await beeldVooruit(keys.concat(extra), 16);
+    for(const k of metBeeld){
+      if(QZ.list.length >= keys.length) break;
+      const q = await qFoto() || await qBeeld(k);
+      if(q) QZ.list.push(q);
     }
-    if(!q) q=makeQuestion(keys[i]);
-    if(q) QZ.list.push(q);
+    if(!QZ.list.length){
+      /* Geen enkel beeld te krijgen — offline, of de bronnen hebben niets.
+         Dan liever tekstherkenning dan een lege ronde, maar wel gezegd. */
+      toast("Geen foto's beschikbaar — even op kenmerken dan");
+      for(const k of keys){ const q = makeQuestion(k); if(q) QZ.list.push(q); }
+    }
+  } else {
+    const metBeeld = await beeldVooruit(keys);
+    let beeldTeller = 0;
+    for(let i=0;i<keys.length;i++){
+      let q=null;
+      if(Math.random() < beeldKans){
+        q = await qFoto();
+        if(!q && beeldTeller < metBeeld.length) q = await qBeeld(metBeeld[beeldTeller++]);
+      }
+      if(!q) q=makeQuestion(keys[i]);
+      if(q) QZ.list.push(q);
+    }
   }
+
   if(!QZ.list.length){ toast("Geen vragen te maken"); return; }
   quizEl.classList.add("on"); showQ();
 }

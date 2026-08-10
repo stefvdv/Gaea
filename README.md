@@ -1,4 +1,4 @@
-# Gaea's Natural Health — v0.23.0
+# Gaea's Natural Health — v0.24.0
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -273,8 +273,8 @@ koudwateraftreksel, eikenschorsspoeling en vlierbloesembeignets.
 Leitner met zeven trappen, intervallen 0/1/2/4/8/16/32/64 dagen. Je kiest niet
 hoe zwaar maar waarover, want dat is wat wisselt met waar je mee bezig bent:
 
-- **Herkennen** — foto's, veldkenmerken, verwarringsgevaar, plantendeel en
-  seizoen. Zestig procent van de vragen is beeld.
+- **Herkennen** — alleen foto's. Je ziet een beeld en kiest uit vier soorten
+  welke het is. Verder niets: geen tekstvragen ertussen.
 - **Gebruik** — waar het voor is, welk deel, wanneer, waar je op moet letten,
   welk recept je ermee maakt en wat voor brouwsel dat oplevert.
 - **Namen & stoffen** — wetenschappelijke namen, de werkzame stof en de
@@ -298,6 +298,16 @@ in over anderhalve seconde, daarna de naam. Weg na 3,2 seconden of bij een tik.
 Groeien in stappen las als een reeks losse plaatjes in plaats van één rank, hoe
 je de overgangen ook zet. Boven en onder is nu hetzelfde beeld, het bovenste
 ondersteboven met `scaleY(-1)`.
+
+## De maankaart
+Die stond op de Veldschool en in het Herbarium en is eruit. Hij stond tussen
+dingen waar je iets mee doet, en zelf deed hij niets.
+
+`hemelHtml()` blijft in de code staan, samen met `maanfase()`, `jaarstand()`,
+`maanSvg()`, `MAANNAMEN` en `WIEL`. Die liggen nu allemaal stil — nergens anders
+in de app wordt er iets mee gedaan. Ze blijven omdat het kloppende, afgeronde
+code is en een plek elders zomaar weer nuttig kan zijn. Terugzetten is één
+regel: `h += hemelHtml();`
 
 ## Herinnering
 Een website kan zichzelf niet op een vast tijdstip wakker maken. Van de drie
