@@ -1,4 +1,4 @@
-# Gaea's Natural Health — v0.22.0
+# Gaea's Natural Health — v0.23.0
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -25,7 +25,19 @@ Lokaal: `npx serve .` — geolocatie en service worker vragen https of localhost
     index.html            app: stijl, soorten, recepten, logica én al het sierbeeld
     sw.js                 service worker; VERSION == APP_VERSION
     manifest.webmanifest  naam, iconen, kleuren
-    proef.js              droogloop in een neppe DOM, zie hieronder
+    _redirects            proxy naar GBIF, iNaturalist en Wikimedia Commons
+    icon-192/512/maskable badge-96
+    proef.js + keuring.js droogloop in een nagebouwde browser
+    maak_icoon.py         genereert de iconen; vereist de bronillustraties
+
+De verwerkingsscripts `groei.py` en `vrij.py` horen niet meer in de repo: de
+eerste maakte de groeireeks die in v0.21 uit de startanimatie verdween, de
+tweede verwerkte de oude losse illustraties die inmiddels allemaal als data-URI
+in `index.html` zitten. Ze kunnen bovendien geen van beide draaien, want hun
+bronmappen staan niet in de repo.
+
+Datzelfde geldt voor `maak_icoon.py` — die heeft `art_nieuw/` nodig. Die laat ik
+staan, want het is het enige verslag van hoe de iconen gemaakt zijn.
 
 ## Naam
 `manifest.webmanifest` bepaalt wat Android onder het icoon zet:

@@ -1,5 +1,5 @@
 /* Gaea service worker — VERSION altijd gelijk aan APP_VERSION in index.html */
-const VERSION = "0.22.0";
+const VERSION = "0.23.0";
 const SHELL = "wildpluk-shell-v" + VERSION;
 const LIB   = "wildpluk-lib-v" + VERSION;
 const TILES = "wildpluk-tiles";          /* niet versiegebonden */
@@ -50,7 +50,14 @@ self.addEventListener("fetch", e => {
   const url = new URL(req.url);
 
   /* GBIF nooit via de service worker cachen — dat doet de app zelf in IndexedDB */
+  /* Netwerkverkeer naar de beeld- en soortbronnen laten we met rust: dat is
+     verse data, geen app-bestand. Naast GBIF nu ook iNaturalist en Wikimedia,
+     die als reserve dienen wanneer GBIF niets heeft. */
   if (url.pathname.startsWith("/gbif/") || /(^|\.)gbif\.org$/.test(url.hostname)) return;
+  if (url.pathname.startsWith("/inat/") || /(^|\.)inaturalist\.org$/.test(url.hostname)) return;
+  if (url.pathname.startsWith("/wiki/") || /(^|\.)wikimedia\.org$/.test(url.hostname)
+      || /(^|\.)wikipedia\.org$/.test(url.hostname)) return;
+  if (/(^|\.)staticflickr\.com$/.test(url.hostname)) return;
 
   /* kaarttegels: cache-first, zo werkt een eerder bezocht gebied offline */
   if (isTile(url)) {

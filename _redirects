@@ -1,2 +1,9 @@
 # GBIF-proxy — zelfde patroon als de EDHREC-proxy
 /gbif/*  https://api.gbif.org/v1/:splat  200
+
+# Reservebronnen voor soortfoto's. iNaturalist als tweede: door mensen
+# nagekeken determinaties en foto's die de soort tonen in plaats van een
+# waarneming. Wikimedia Commons als derde, vooral voor gekweekte soorten en
+# botanische platen.
+/inat/*  https://api.inaturalist.org/v1/:splat  200
+/wiki/*  https://commons.wikimedia.org/w/:splat  200

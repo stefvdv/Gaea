@@ -768,7 +768,7 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 @keyframes zweef{0%{opacity:0;transform:translate(0,0) scale(.4)}
   16%{opacity:.9}72%{opacity:.55}100%{opacity:0;transform:translate(var(--dx),-150px) scale(1.1)}}
 
-#splash .naam{position:absolute;left:8%;right:8%;bottom:1%;text-align:center;
+#splash .naam{position:absolute;left:8%;right:8%;bottom:calc(var(--safe-b) + 15%);text-align:center;
   font-family:var(--slab);font-size:26px;font-weight:600;color:var(--perkament);
   font-variation-settings:'WONK' 1,'SOFT' 40;letter-spacing:.2em;text-indent:.2em;
   opacity:0;animation:naamIn .9s cubic-bezier(.3,0,.2,1) 1.15s forwards;
@@ -997,7 +997,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.22.0";
+const APP_VERSION = "0.23.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -3409,7 +3409,7 @@ async function vulKaart(stil){
      dus hoef je er ook niets over te lezen. */
 }
 
-/* Beeld uit GBIF.
+/* Beeld voor een soort.
    Een waarneming mag alles zijn: een winterskelet, een herbariumvel, een
    bordje met een naam erop. Voor herkenning oefenen is dat waardeloos — een
    dorre pol in februari zegt niets over dragon. Daarom vragen we alleen om
@@ -3429,24 +3429,80 @@ function beeldenUit(r){
   return uit;
 }
 
+/* GBIF heeft van veel soorten weinig, en van tuinkruiden en apotheekplanten
+   vrijwel niets — die staan zelden als wilde waarneming genoteerd. Vandaar
+   twee reserves.
+
+   iNaturalist is de beste tweede: determinaties zijn door mensen nagekeken en
+   de foto's zijn gemaakt om een soort te tónen, niet om een waarneming vast
+   te leggen. Wikimedia Commons is de derde; daar staan botanische platen en
+   oude illustraties bij, wat voor gekweekte soorten juist goed uitkomt. */
+async function inatBeeld(la){
+  try{
+    const r = await fetch("/inat/taxa?q="+encodeURIComponent(la)+"&rank=species&per_page=1");
+    const d = await r.json();
+    const t = (d.results||[])[0];
+    if(!t) return [];
+    const fotos = (t.taxon_photos||[]).map(x=>x.photo).filter(Boolean);
+    if(t.default_photo && !fotos.some(f=>f.id===t.default_photo.id)) fotos.unshift(t.default_photo);
+    return fotos.map(f=>({
+      url: f.medium_url || f.url,
+      maker: String(f.attribution||"").replace(/\(c\)/ig,"").split(",")[0].trim() || "iNaturalist",
+      lic: String(f.license_code||"").toUpperCase(),
+      bron: "iNaturalist"
+    })).filter(x=>x.url);
+  }catch(e){ return []; }
+}
+
+async function commonsBeeld(la){
+  try{
+    const q = "action=query&generator=search&gsrsearch="+encodeURIComponent("filetype:bitmap "+la)+
+      "&gsrnamespace=6&gsrlimit=6&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=640&format=json&origin=*";
+    const r = await fetch("/wiki/api.php?"+q);
+    const d = await r.json();
+    const pag = ((d.query||{}).pages)||{};
+    const kaal = t => String(t||"").replace(/<[^>]*>/g,"").trim();
+    return Object.values(pag).map(pg=>{
+      const ii = (pg.imageinfo||[])[0]; if(!ii) return null;
+      const md = ii.extmetadata||{};
+      return {url: ii.thumburl || ii.url,
+        maker: kaal((md.Artist||{}).value) || "Wikimedia Commons",
+        lic: kaal((md.LicenseShortName||{}).value),
+        bron: "Wikimedia Commons"};
+    }).filter(Boolean);
+  }catch(e){ return []; }
+}
+
 async function soortBeeld(k){
-  const tk = await taxonKey(k); if(!tk) return [];
   const sp = SPEC_BY_K[k] || {};
   const mnd = (sp.mnd && sp.mnd.length) ? sp.mnd : null;
-  const basis = "occurrence/search?taxonKey="+tk+"&mediaType=StillImage"+
-                "&basisOfRecord=HUMAN_OBSERVATION&limit=30";
-  try{
-    let uit = [];
-    if(mnd) uit = beeldenUit(await gbif(basis + "&month=" + mnd.join(",")));
-    if(uit.length < 3){
-      const extra = beeldenUit(await gbif(basis)).filter(b=> !uit.some(x=>x.url===b.url));
-      uit = uit.concat(mnd
-        ? extra.filter(b=> !b.maand || mnd.includes(b.maand))
-               .concat(extra.filter(b=> b.maand && !mnd.includes(b.maand)))
-        : extra);
-    }
-    return uit.slice(0,8);
-  }catch(e){ return []; }
+  let uit = [];
+  const tk = await taxonKey(k);
+  if(tk){
+    const basis = "occurrence/search?taxonKey="+tk+"&mediaType=StillImage"+
+                  "&basisOfRecord=HUMAN_OBSERVATION&limit=30";
+    try{
+      if(mnd) uit = beeldenUit(await gbif(basis + "&month=" + mnd.join(",")));
+      if(uit.length < 3){
+        const extra = beeldenUit(await gbif(basis)).filter(b=> !uit.some(x=>x.url===b.url));
+        uit = uit.concat(mnd
+          ? extra.filter(b=> !b.maand || mnd.includes(b.maand))
+                 .concat(extra.filter(b=> b.maand && !mnd.includes(b.maand)))
+          : extra);
+      }
+    }catch(e){}
+  }
+  uit.forEach(b=>{ if(!b.bron) b.bron = "GBIF"; });
+
+  if(uit.length < 3 && sp.la){
+    const extra = (await inatBeeld(sp.la)).filter(b=> !uit.some(x=>x.url===b.url));
+    uit = uit.concat(extra);
+  }
+  if(uit.length < 3 && sp.la){
+    const extra = (await commonsBeeld(sp.la)).filter(b=> !uit.some(x=>x.url===b.url));
+    uit = uit.concat(extra);
+  }
+  return uit.slice(0,8);
 }
 
 /* =======================================================================
@@ -4385,7 +4441,7 @@ async function openSheet(id){
         '<span>'+esc(shortd(x.gemaakt))+'</span><span>'+esc(x.plek||"—")+' ›</span></button>').join(""),
       andere.length+"");
 
-    h += klap("Beeld uit GBIF",
+    h += klap("Foto's van deze soort",
       '<div class="strip" id="gbifBeeld"><div style="font-size:13px;color:var(--inkt-2);padding:6px 0">Ophalen…</div></div>');
   }
   else h += '<div class="sec">'+sech("Welke soort is dit?","",'varen')+
@@ -4667,7 +4723,7 @@ async function specSheet(k, terugPin){
   }
   if(s.med)    h += '<div class="sec">'+sech("Toelichting","",'boek')+'<div class="prose">'+esc(s.med)+'</div></div>';
 
-  h += '<div class="sec">'+sech("Beeld uit GBIF","",'ster')+'<div class="strip" id="gbifBeeld">'+
+  h += '<div class="sec">'+sech("Foto's van deze soort","",'ster')+'<div class="strip" id="gbifBeeld">'+
        '<div style="font-size:13px;color:var(--inkt-2);padding:6px 0">Ophalen…</div></div></div>';
 
   const rec = RECEPTEN.filter(r=> r.soorten.includes(k));
@@ -4743,7 +4799,8 @@ function vulStrip(beelden){
     el.innerHTML = '<div style="font-size:13px;color:var(--inkt-2);padding:6px 0">Geen beeld gevonden, of geen verbinding. Jouw eigen foto\u2019s bij een vondst blijven de beste referentie.</div>';
   } else {
     el.innerHTML = beelden.map(b=>'<div class="ph"><img src="'+esc(b.url)+'" alt="" loading="lazy">'+
-      '<div class="lic">'+esc(b.maker)+(b.lic?' · '+esc(b.lic):'')+'</div></div>').join("");
+      '<div class="lic">'+esc(b.maker)+(b.lic?' · '+esc(b.lic):'')+
+      (b.bron && b.bron!=="GBIF" ? ' · '+esc(b.bron) : '')+'</div></div>').join("");
     /* De strip komt pas binnen nadat het blad al getekend is, dus de loep
        moet hier apart worden aangehaakt. */
     el.querySelectorAll(".ph img").forEach((img,i)=>{
