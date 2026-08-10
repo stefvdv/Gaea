@@ -6,6 +6,13 @@ try{
     ["renderSpec", ()=>renderSpec()],
     ["renderLeer", ()=>renderLeer()],
     ["renderSet",  ()=>renderSet()],
+    ["herbarium", ()=>{
+        const zonder = SPECIES.filter(s=>!famVan(s));
+        const fam = {}; SPECIES.forEach(s=>{const f=famVan(s); if(f) fam[f]=(fam[f]||0)+1;});
+        const top = Object.entries(fam).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([f,n])=>f+" "+n).join(", ");
+        return SPECIES.length+" soorten · "+Object.keys(fam).length+" families · zonder familie: "+
+          (zonder.length?zonder.map(s=>s.k).join(","):"geen")+" · grootste: "+top;
+      }],
     ["nivNu",      ()=>nivNu().nm],
     ["pool.makkelijk", ()=>NIVEAUS.makkelijk.pool().length],
     ["pool.moeilijk",  ()=>NIVEAUS.moeilijk.pool().length],
@@ -46,7 +53,7 @@ try{
           }
           return false;
         };
-        for(const niv of ["makkelijk","gemiddeld","moeilijk"]){
+        for(const niv of ["herkennen","gebruik","namen"]){
           S.leer.niveau = niv;
           for(let ronde=0; ronde<2; ronde++)
           for(const s of SPECIES){
@@ -68,14 +75,14 @@ try{
             else if(a && a.length > 4 && bevat(tip, a)) fout.tipVerklikt.push(id);
           }
         }
-        S.leer.niveau = "gemiddeld";
+        S.leer.niveau = "herkennen";
         const uit = Object.entries(fout).filter(([,v])=>v.length)
           .map(([k,v])=>k+" "+v.length+" ("+[...new Set(v)].slice(0,3).join(", ")+")");
         return uit.length ? "STUK: "+uit.join(" | ") : "alle vragen door de keuring";
       }],
     ["dubbele antwoorden", ()=>{
         let stuk=0, gecheckt=0;
-        for(const niv of ["makkelijk","gemiddeld","moeilijk"]){
+        for(const niv of ["herkennen","gebruik","namen"]){
           S.leer.niveau = niv;
           for(let ronde=0; ronde<3; ronde++)
             for(const s of SPECIES){
@@ -85,7 +92,7 @@ try{
                 if(stuk<6) console.log("      dubbel: ["+q.kind+"] "+s.k+" -> "+JSON.stringify(q.opts)); }
             }
         }
-        S.leer.niveau = "gemiddeld";
+        S.leer.niveau = "herkennen";
         return stuk ? stuk+" van "+gecheckt+" MET DUBBELE ANTWOORDEN" : gecheckt+" vragen, geen dubbele antwoorden";
       }],
     ["chips tellen", ()=>{
@@ -101,7 +108,7 @@ try{
       }],
     ["zwamaandeel", ()=>{
         const uit = [];
-        for(const niv of ["makkelijk","gemiddeld","moeilijk"]){
+        for(const niv of ["herkennen","gebruik","namen"]){
           S.leer.niveau = niv;
           let zwam=0, tot=0;
           for(let i=0;i<40;i++){
@@ -110,7 +117,7 @@ try{
           }
           uit.push(niv+" "+Math.round(100*zwam/tot)+"%");
         }
-        S.leer.niveau = "gemiddeld";
+        S.leer.niveau = "herkennen";
         return uit.join(" · ");
       }]
   ];

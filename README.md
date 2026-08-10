@@ -1,4 +1,4 @@
-# Gaea's Natural Health — v0.18.0
+# Gaea's Natural Health — v0.22.0
 
 Persoonlijke PWA voor eetbare en medicinale planten, bomen en paddenstoelen:
 vinden, herkennen, pinnen, bewaren en gebruiken. Vanilla JS, één `index.html`.
@@ -72,15 +72,34 @@ Drie soorten herkomst, en de app zegt het er per soortenblad bij:
 
 Dat onderscheid staat ook in Instellingen, onder "Waar komt de informatie vandaan".
 
-## Gids
-255 soorten: 115 kruiden, 42 bomen en struiken, 46 paddenstoelen en 52 tuin-,
-keuken- en apotheekkruiden. 59 daarvan zijn giftig.
+## Herbarium
+Heette Gids. 255 soorten: 115 kruiden, 42 bomen en struiken, 46 paddenstoelen en
+52 tuin-, keuken- en apotheekkruiden, waarvan 59 giftig.
 
-Nieuw in v0.14 vooral de soorten die al in verwarringswaarschuwingen genoemd
-werden maar zelf geen blad hadden — die knoppen liepen dood. Daardoor loopt de
-koppeling van `dubbelSleutel()` van 47 op 67 naar 86 op 101. Verder meer salies
-(veldsalie, scharlei, ananassalie), meer tuinkruiden, en de giftige
-voorjaarsbollen die naast daslook opkomen: narcis en sneeuwklokje.
+Acht tabbladen (Nu, Kruiden, Bomen, Paddenstoelen, Tuin, Giftig, Kwaal, Alles)
+en daaronder drie keuzelijsten die over álle tabbladen heen werken: **kwaal**,
+**maand** en **familie**. Een actieve keuzelijst kleurt mos, en de ondertitel
+zegt wat er aanstaat. De zoekbalk kijkt nu ook naar familienaam, Nederlandse
+familienaam, plantendeel en waar een soort voor gebruikt wordt.
+
+### Families
+`FAM_VAN_GESLACHT` koppelt elk van de 212 geslachten aan zijn familie, met
+`FAM_NL` voor de vijftig families waar een gangbare Nederlandse naam voor
+bestaat. 96 families in totaal; de grootste zijn Lamiaceae (25 soorten),
+Asteraceae (24), Apiaceae (21) en Rosaceae (18).
+
+Familie leren kennen is de snelste weg naar herkenning: wie de
+schermbloemenfamilie in zijn vingers heeft, kijkt anders naar een wit scherm
+langs de sloot. Daarom staat de familie ook op elk soortenblad, als knop —
+tikken opent het herbarium met dat filter al aan.
+
+`node proef.js` controleert of elk geslacht een familie heeft.
+
+### Soortenblad
+Alle informatie staat er al: veldkenmerken, familie, werkzame stof,
+verwarringsgevaar, wat je gebruikt, medicinaal gebruik, recepten, je eigen
+plekken. Het beeld uit GBIF staat nu in een raster van twee kolommen in plaats
+van een strook — op een soortenblad wil je vergelijken, niet scrollen.
 
 ### Bij het toevoegen van data
 Een soort toevoegen is nooit één regel. De hele keten:
@@ -201,7 +220,15 @@ Een *maaksel* heet vanaf v0.12 een **brouwsel** — in de tekst. De veldnaam
 zijn onveranderd gebleven, anders was je hele voorraadkast verdwenen.
 
 16 soorten brouwsel met eigen rijp- en houdbaarheidstermijn, batchcode
-`GA-JJMM-NN`.
+`GA-JJMM-NN`. Vier tabbladen: Klaar, Rijpend, Drogend en Kwaal.
+
+Drogen is geen rijpen. Een tinctuur staat te trekken, maar gedroogd kruid,
+poeder, kruidenzout en een theemelange liggen te drogen — dat vraagt om ander
+toezicht en heeft daarom een eigen kopje.
+
+Het flesje op elk potje wijst zichzelf: een leeg silhouet met daarboven
+hetzelfde beeld, afgeknipt op de hoogte die er nog in zit. Vol is vol, half is
+half. Het woord eronder is weg.
 
 Op elk potje staat een flesje met de resterende hoeveelheid eronder in woorden
 (Vol, Driekwart, Half, Bijna op, Op). Het flesje is een stuk helderder dan eerst
@@ -231,67 +258,94 @@ hopscheuten als wilde asperge, berkenbastaftreksel, kaasjeskruid als
 koudwateraftreksel, eikenschorsspoeling en vlierbloesembeignets.
 
 ## Veldschool
-Leitner met zeven trappen, intervallen 0/1/2/4/8/16/32/64 dagen. Drie niveaus:
-makkelijk (bekende soorten, drie antwoorden), gemiddeld (alles, vier antwoorden),
-moeilijk (giftig en verwarrend, afleiders uit hetzelfde geslacht).
+Leitner met zeven trappen, intervallen 0/1/2/4/8/16/32/64 dagen. Je kiest niet
+hoe zwaar maar waarover, want dat is wat wisselt met waar je mee bezig bent:
 
-**Om de andere vraag beeld.** Herkennen doe je met je ogen, dus de helft van de
-ronde is een foto. Eerst je eigen foto's, dan GBIF.
+- **Herkennen** — foto's, veldkenmerken, verwarringsgevaar, plantendeel en
+  seizoen. Zestig procent van de vragen is beeld.
+- **Gebruik** — waar het voor is, welk deel, wanneer, waar je op moet letten,
+  welk recept je ermee maakt en wat voor brouwsel dat oplevert.
+- **Namen & stoffen** — wetenschappelijke namen, de werkzame stof en de
+  stofgroep waar die bij hoort.
 
-**Tip na vijf seconden.** Loop je vast, dan verschijnt er een knop die één zetje
-geeft. Hij komt niet meteen, want dan is hij te verleidelijk. `tipVoor()` neemt
-de tip die de generator zelf meegaf, anders het eerste veldkenmerk, anders de
-groep waar de soort in zit — en slaat elke kandidaat over die het antwoord
-letterlijk bevat.
+### Werkzame stoffen
+`STOF` beschrijft voor 70 soorten waar de werking of het gevaar in zit: de stof,
+de groep, en één zin over waarom het uitmaakt. Salicine in wilg wordt in het
+lichaam salicylzuur. Sinigrine in mierikswortel is smaakloos tot je raspt.
+Amatoxinen in de knolamaniet overleven het koken. Het staat ook op het
+soortenblad onder "Werkzame stof".
 
-### Beeld dat ergens op slaat
-Een GBIF-waarneming mag alles zijn: een winterskelet, een herbariumvel, een
-bordje met een naam erop. Een dorre pol in februari zegt niets over dragon.
-`soortBeeld()` vraagt daarom alleen om waarnemingen uit de maanden waarin de
-soort er echt staat (`&month=`), en alleen om waarnemingen die een mens in het
-veld deed (`&basisOfRecord=HUMAN_OBSERVATION`). Levert dat minder dan drie
-beelden op, dan pas volgt de rest, met het buitenseizoen achteraan.
-
-### Vraagkeuring
-`keuring.js` legt elke vraag die de app kan stellen langs zeven meetlatten:
-dubbele antwoorden, lege antwoorden, te weinig antwoorden, een antwoord dat niet
-tussen de opties staat, een antwoord dat al in de vraag staat, een ontbrekende
-tip, en een tip die het antwoord verklapt. Alle drie de niveaus, alle 255
-soorten, twee rondes.
-
-Dat vond vier soorten fouten:
-
-- **Naam-vragen die zichzelf beantwoorden.** Taxus/*Taxus baccata*,
-  Robinia/*Robinia pseudoacacia*, Narcis/*Narcissus*. `naamVerklikt()` slaat die
-  over.
-- **Deel-vragen die zichzelf beantwoorden.** Van goudsbloem gebruik je de bloem,
-  van mierikswortel de wortel.
-- **Verwarringsvragen die zichzelf beantwoorden.** Kapjesmorielje verwar je met
-  de morielje.
-- **Woordelijk gelijke afleiders.** "Bij een allergie voor composieten
-  voorzichtig" staat bij een handvol composieten, dus stonden er twee identieke
-  knoppen. `unieke()` ontdubbelt nu op tekst in plaats van op soort.
+De vraagkeuring vond hier meteen iets: bij "Pyrrolizidine-alkaloïden" staat de
+stofgroep al in de stofnaam, dus die vraag beantwoordt zichzelf en wordt
+overgeslagen.
 
 ## Startanimatie
-Een rank die uitgroeit tot een volledige omlijsting, met de dryade erin.
+De omlijsting staat er meteen, tegen de schermrand aan; alleen de dryade fadet
+in over anderhalve seconde, daarna de naam. Weg na 3,2 seconden of bij een tik.
 
-Acht stadia van dezelfde tekening liggen precies over elkaar en komen om de
-0,30 seconde op, elk met een fade van 0,58s die iets van onderen opkomt. Omdat
-elk volgend stadium het vorige overdekt leest de reeks als één doorgroeiende
-rank en niet als een diavoorstelling. Tijdlijn:
+Groeien in stappen las als een reeks losse plaatjes in plaats van één rank, hoe
+je de overgangen ook zet. Boven en onder is nu hetzelfde beeld, het bovenste
+ondersteboven met `scaleY(-1)`.
 
-    0,25s  stadium 1   lage rank langs de onderrand
-    0,55s  stadium 2   de rank klimt langs de zijkanten
-    0,85s  stadium 3   hoger, nog open bovenaan
-    1,15s  stadium 4   de lijst sluit zich, kaal vlechtwerk
-    1,45s  stadium 5   eerste blad
-    1,75s  stadium 6   voller
-    2,05s  stadium 7   vollediger
-    2,35s  stadium 8   het volle blad
-    2,50s  de dryade verschijnt in de lijst
-    2,90s  de lichtjes bij vijzel en flacon gaan aan
-    3,05s  de naam, 3,50s de ondertitel
-    4,90s  weg, of eerder bij een tik
+## Herinnering
+Een website kan zichzelf niet op een vast tijdstip wakker maken. Van de drie
+mogelijke wegen is er maar één die altijd werkt, en die is nu de hoofdweg.
+
+`herinneringOpen()` kijkt of het gekozen tijdstip vandaag voorbij is en je nog
+niet geoefend hebt. Zo ja, dan staat er bovenaan de Veldschool een kaart met wat
+er klaarstaat, en komt er tegelijk een systeemmelding binnen. Wegklikken met
+"Later" zet hem tot morgen stil.
+
+`showTrigger` en `periodicsync` zitten er nog als bonus in — als de browser ze
+kan, mooi meegenomen — maar de instellingen beloven ze niet meer. Wat er staat
+is: vanaf dit tijdstip staat je ronde klaar, en wie een seintje wil zónder de
+app te openen zet een wekker in de klok-app met Gaea als snelkoppeling.
+
+De standaardtijd is 21:00 in plaats van 09:00.
+
+## Kaartmerkjes
+De GBIF-waarnemingen waren dashed stipjes die niets zeiden. Nu een plantje of
+een paddenstoeltje, groen voor plant, oranje voor zwam en rood zodra de soort
+giftig is.
+
+### Fijner in beeld
+Het doek is 400/676 in plaats van 400/600 en de stukken zijn smaller, zodat de
+omlijsting ruimte om zich heen heeft in plaats van tegen de randen te drukken.
+
+### De aardkluit
+De aangeleverde ranken staan op een dichte donkere voet. Op ware grootte is dat
+een bodem; op 94% van een telefoonscherm is het een massieve balk met harde
+zijranden, dwars over de bovenkant van het beeld. Eerst heb ik hem weggesneden,
+maar dan verdween ook de verbindende lijn en bleven er losse plukjes in de
+hoeken over. Nu blijft de voet staan maar loopt zijn dekking naar onderen af
+naar 18%, zodat hij oplost in het donkere verloop van de achtergrond.
+
+### De gespiegelde helft kost niets
+Dezelfde afbeelding met `scaleY(-1)` in een CSS-variabele, zodat de
+invliegbeweging in de keyframes eromheen blijft werken. Acht unieke stukken van
+samen 177 KB, plus de dryade.
+
+### Twee keer half zo zwaar
+De gespiegelde helft kost niets: dezelfde afbeelding met `scaleY(-1)` in een
+CSS-variabele, zodat de invliegbeweging in de keyframes eromheen blijft werken.
+Acht unieke stukken dus, geen twaalf.
+
+En ze worden niet tot volledige lijsten samengesteld maar los over elkaar
+gelegd. Acht stukjes van gemiddeld 22 KB tegen twaalf volledige lijsten van
+vijftig: het geheel weegt 278 KB in plaats van 428 KB, en `index.html` werd
+kleiner dan in v0.18.
+
+### Uitsnijden
+`snijranken.py` snijdt de aangeleverde vellen op een raster. Twee dingen bleken
+nodig. Ten eerste: de bestanden hebben al een alfakanaal — wat eruitziet als een
+witte achtergrond is de achtergrond van de viewer. Ik heb eerst een hele
+wit-verwijderaar gebouwd voor niets.
+
+Ten tweede loopt het raster dwars door de tekeningen heen, zodat er onderaan
+elke cel een streep van de rij erboven achterblijft. Die zag je terug als
+zwarte balken over de dryade. `opruimen()` labelt de losse eilandjes en gooit
+weg wat tegen de bovenrand plakt, laag is en breed uitloopt — dat is precies het
+profiel van zo'n afgesneden streep.
 
 ### Waarom de stadia sluitend passen
 `groei.py` snijdt elk bestand bij op wat er echt zichtbaar is en zet het daarna
