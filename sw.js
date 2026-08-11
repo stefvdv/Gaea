@@ -1,5 +1,5 @@
 /* Gaea service worker — VERSION altijd gelijk aan APP_VERSION in index.html */
-const VERSION = "0.24.1";
+const VERSION = "0.25.0";
 const SHELL = "wildpluk-shell-v" + VERSION;
 const LIB   = "wildpluk-lib-v" + VERSION;
 const TILES = "wildpluk-tiles";          /* niet versiegebonden */
@@ -121,86 +121,4 @@ self.addEventListener("fetch", e => {
       }
     })());
   }
-});
-
-/* ---------------- dagelijkse herinnering ---------------- */
-const openDB = () => new Promise((res, rej) => {
-  const rq = indexedDB.open("wildpluk", 4);
-  rq.onsuccess = () => res(rq.result);
-  rq.onerror = () => rej(rq.error);
-});
-const readStore = (db, n) => new Promise(res => {
-  try {
-    const r = db.transaction(n, "readonly").objectStore(n).getAll();
-    r.onsuccess = () => res(r.result || []);
-    r.onerror = () => res([]);
-  } catch (e) { res([]); }
-});
-const writeMeta = (db, v) => new Promise(res => {
-  try {
-    const r = db.transaction("meta", "readwrite").objectStore("meta").put(v);
-    r.onsuccess = () => res(true);
-    r.onerror = () => res(false);
-  } catch (e) { res(false); }
-});
-const vandaag = () => new Date().toISOString().slice(0, 10);
-
-async function checkHerinnering() {
-  let db;
-  try { db = await openDB(); } catch (e) { return; }
-  const push = (await readStore(db, "meta")).find(m => m.k === "push");
-  if (!push || !push.aan || push.laatst === vandaag()) return;
-
-  const [uu, mm] = (push.tijd || "09:00").split(":").map(Number);
-  const nu = new Date();
-  if (nu.getHours() * 60 + nu.getMinutes() < uu * 60 + mm) return;
-
-  const srs = await readStore(db, "srs");
-  const t = vandaag();
-  const klaar = srs.filter(r => r.due <= t).length;
-
-  await writeMeta(db, {k:"push", aan:true, tijd:push.tijd, laatst:t});
-
-  const PORTJES = [
-    ["Er staat iets te bloeien", "Vijf soorten, twee minuten, en je weet ze morgen nog."],
-    ["Gaea heeft iets voor je", "Vijf minuten planten kijken zonder je jas aan te doen."],
-    ["Het bos vraagt naar je", "Een paar planten wachten op herhaling. Kop thee erbij?"],
-    ["Even langs de veldschool", "Wie je vandaag oefent, herken je straks in de berm."],
-    ["De dryade tikt op je schouder", "Kleine ronde. Namen, gebruik, en waar je voor moet oppassen."],
-    ["Tijd voor een paar bladeren", "Korte oefening. Je streak blijft staan, en dat scheelt weer."]
-  ];
-  const p = PORTJES[new Date().getDate() % PORTJES.length];
-  const body = srs.length === 0
-    ? "Nog niet begonnen. Tien vragen en je kent je eerste soorten uit je hoofd."
-    : klaar > 0
-      ? klaar + " soorten staan klaar. " + p[1]
-      : "Alles herhaald. Zin in een extra ronde?";
-
-  /* absolute paden: een relatief pad valt op sommige toestellen terug
-     op het browsericoon, en dan zie je een blokje in de statusbalk */
-  const basis = self.registration.scope;
-  return self.registration.showNotification(p[0], {
-    body,
-    icon: new URL("icon-192.png", basis).href,
-    badge: new URL("badge-96.png", basis).href,
-    tag: "gaea-quiz",
-    data: { scr: "leer" }
-  });
-}
-
-self.addEventListener("periodicsync", e => {
-  if (e.tag === "wildpluk-dagelijks") e.waitUntil(checkHerinnering());
-});
-self.addEventListener("message", e => {
-  if (e.data && e.data.type === "check") e.waitUntil(checkHerinnering());
-});
-self.addEventListener("notificationclick", e => {
-  e.notification.close();
-  const scr = (e.notification.data && e.notification.data.scr) || "leer";
-  e.waitUntil((async () => {
-    for (const c of await self.clients.matchAll({type:"window", includeUncontrolled:true})) {
-      if (c.url.includes(self.registration.scope)) { c.postMessage({type:"open", scr}); return c.focus(); }
-    }
-    return self.clients.openWindow("./index.html#" + scr);
-  })());
 });

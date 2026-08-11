@@ -65,9 +65,9 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .pinwrap.sel{animation:zwel 1.5s ease-in-out infinite}
 @keyframes zwel{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
 .me-dot{width:16px;height:16px;border-radius:50%;background:#7FC0D8;border:2.5px solid #EAF6FA;box-shadow:0 0 0 1px rgba(0,0,0,.45)}
-.ontdek-merk{width:20px;height:20px;display:grid;place-items:center;
-  filter:drop-shadow(0 1px 3px rgba(0,0,0,.9))}
-.ontdek-merk svg{width:19px;height:19px}
+.ontdek-merk{width:26px;height:26px;display:grid;place-items:center;
+  filter:drop-shadow(0 0 2px rgba(0,0,0,.95)) drop-shadow(0 2px 4px rgba(0,0,0,.7))}
+.ontdek-merk svg{width:25px;height:25px}
 .ontdek-merk.plant{color:#9CB870}
 .ontdek-merk.zwam{color:#D9924E}
 .ontdek-merk.gif{color:#CE6055}
@@ -816,6 +816,41 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23A8B79A' stroke-width='1.8' stroke-linecap='round'/></svg>");
   background-repeat:no-repeat;background-position:right 9px center}
 .fltrij select.aan{border-color:var(--mos);background-color:rgba(94,122,68,.18);color:#fff}
+/* ---- app-eigen keuzemenu in plaats van het systeemmenu ---- */
+select[data-asel]{display:none !important}
+.aselknop{display:block;text-align:left;background:rgba(228,231,214,.06);border:1px solid var(--lijn);
+  border-radius:11px;padding:10px 30px 10px 11px;color:var(--kalk);font-size:13px;position:relative;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aselknop::after{content:"";position:absolute;right:12px;top:50%;width:7px;height:7px;margin-top:-5px;
+  border-right:1.7px solid var(--salie);border-bottom:1.7px solid var(--salie);transform:rotate(45deg)}
+.aselknop.aan{border-color:var(--mos);background:rgba(94,122,68,.18);color:#fff}
+.fltrij .aselknop{flex:1;min-width:0;font-size:12.5px;padding:9px 26px 9px 10px}
+.f .aselknop{width:100%;font-size:14.5px;padding:12px 32px 12px 13px;border-radius:12px}
+.asel-schim{position:fixed;inset:0;z-index:940;background:rgba(8,13,10,.62);display:flex;
+  align-items:flex-end;justify-content:center;opacity:0;transition:opacity .16s}
+.asel-schim.on{opacity:1}
+.asel-lijst{width:min(560px,100%);max-height:72vh;overflow:auto;background:var(--bos);
+  border:1px solid rgba(201,162,39,.4);border-bottom:none;border-radius:20px 20px 0 0;
+  padding:6px 10px calc(var(--safe-b) + 16px);box-shadow:0 -8px 30px rgba(0,0,0,.5)}
+.asel-kop{font:600 11.5px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--goud);
+  padding:14px 10px 8px;display:flex;align-items:center;gap:8px}
+.asel-kop::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(201,162,39,.45),transparent)}
+.asel-groep{font:600 10.5px var(--ui);letter-spacing:.12em;text-transform:uppercase;color:var(--kalk-2);
+  padding:12px 10px 4px}
+.asel-item{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;text-align:left;
+  padding:13px 11px;border-radius:11px;color:var(--kalk);font-size:15px;background:none;border:none}
+.asel-item:active{background:rgba(156,184,112,.12)}
+.asel-item.on{color:var(--mos);font-weight:700}
+.asel-item.on::after{content:"\2713";color:var(--mos);font-weight:700}
+/* ---- laadanimatie op de startknop ---- */
+.startbtn .laad{display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.startbtn .laad svg{width:15px;height:15px;transform-origin:50% 100%;animation:groeisel 1.15s ease-in-out infinite}
+@keyframes groeisel{0%,100%{transform:scale(.55);opacity:.35}55%{transform:scale(1.05);opacity:1}}
+/* ---- merk op eigen foto in het gedeelde fotoraster ---- */
+.ph .eigenmerk{position:absolute;top:5px;left:5px;width:22px;height:22px;border-radius:50%;z-index:2;
+  background:rgba(20,26,16,.8);display:grid;place-items:center;color:var(--mos);
+  box-shadow:0 1px 3px rgba(0,0,0,.55)}
+.ph .eigenmerk svg{width:13px;height:13px}
 .chips2{display:flex;flex-wrap:wrap;gap:7px;margin:0 18px 10px}
 .chip2{padding:6px 11px;border-radius:11px;font-size:13px;font-weight:600;
   background:rgba(94,122,68,.16);color:var(--inkt);border:1px solid rgba(94,122,68,.4)}
@@ -930,7 +965,6 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <section class="screen" id="scr-leer">
   <div class="kop" id="kop-leer"><div class="rij"><h1 style="margin:0">Veldschool</h1></div></div>
   <p class="sub">Elke dag een paar vragen. Namen, gebruik, en vooral: waarmee je iets kunt verwarren.</p>
-  <div id="leerHerinner"></div>
   <div id="leerBody"></div>
 </section>
 
@@ -938,11 +972,6 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
   <div class="kop" id="kop-set"><div class="rij"><h1 style="margin:0">Instellingen</h1></div></div>
   <p class="sub">Alles staat lokaal op dit toestel. Niets gaat naar een server.</p>
   <div class="knoopregel" data-orn="sleutel"></div>
-  <p class="grouphd">Dagelijkse herinnering</p>
-  <button class="srow" id="setNotif"><div class="t"><b>Herinnering aanzetten</b><span id="notifState">Uit</span></div><span class="v" id="notifV">○</span></button>
-  <button class="srow" id="setNotifTime"><div class="t"><b>Vanaf wanneer</b><span>Daarna staat de herinnering klaar</span></div><span class="v" id="notifTime">21:00</span></button>
-  <button class="srow" id="setNotifTest"><div class="t"><b>Test de melding</b><span>Stuurt er nu direct één</span></div><span class="v">↗</span></button>
-  <p class="sub" id="notifNote" style="margin-top:-2px;line-height:1.55"></p>
   <p class="grouphd">Gegevens</p>
   <button class="srow" id="setExport"><span class="munt"></span><div class="t"><b>Exporteer back-up</b><span>JSON met vondsten en brouwsels</span></div><span class="v">.json</span></button>
   <button class="srow" id="setExportPh"><span class="munt"></span><div class="t"><b>Exporteer met foto's</b><span>Groter bestand, volledig herstelbaar</span></div><span class="v">.json</span></button>
@@ -997,7 +1026,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.24.1";
+const APP_VERSION = "0.25.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -3148,7 +3177,6 @@ const S = {
   })(),
   scr:"map", open:null, urls:new Map(),
   leer:lsGet("leer",{streak:0,laatst:null,totaal:0,doel:10,niveau:"herkennen"}),
-  push:{aan:false,tijd:"21:00",laatst:null,gedag:null},
   specView:"nu", kastView:"alles", kastMode:"kast", recView:"alles",
   spook:null, ontdekVol:null, concept:null, thuis:lsGet("thuis",null), afsluiten:false,
   eigen:lsGet("eigenrecepten",[]),
@@ -3181,12 +3209,20 @@ function klass(x){
 /* Een stip zegt niet wat er staat. Een plantje of een paddenstoeltje wel, en
    de kleur zegt of het iets is om te plukken of om te mijden. */
 const MERK_SVG = {
-  plant:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+
-    '<path d="M12 21V10"/><path d="M12 12.4C12 8.7 9.3 6 5.6 6c0 3.7 2.7 6.4 6.4 6.4z"/>'+
-    '<path d="M12 11c0-4 3-7 7-7 0 4-3 7-7 7z"/></svg>',
-  zwam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+
-    '<path d="M3.4 11.6C3.4 6.9 7.2 3.4 12 3.4s8.6 3.5 8.6 8.2z"/>'+
-    '<path d="M9.6 11.6v6a2.4 2.4 0 0 0 4.8 0v-6"/></svg>'
+  /* Gevuld en met donkere rand: op een drukke luchtfoto verdronken de dunne
+     lijntekeningen. Het blad en de hoed zijn nu massief. */
+  plant:'<svg viewBox="0 0 24 24">'+
+    '<path d="M12 21.2V10.6" stroke="#10180F" stroke-width="4.4" stroke-linecap="round" fill="none"/>'+
+    '<path d="M12 21.2V10.6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/>'+
+    '<path fill="#10180F" d="M12.9 13.6C12.9 8.6 9.3 5 4.2 5c0 5 3.6 8.6 8.7 8.6z" transform="translate(-.6 -.5)"/>'+
+    '<path fill="currentColor" d="M12 12.9C12 8.5 8.8 5.3 4.3 5.3c0 4.4 3.2 7.6 7.7 7.6z"/>'+
+    '<path fill="#10180F" d="M11.2 11.4c0-5.2 3.8-9 9-9 0 5.2-3.8 9-9 9z" transform="translate(.6 -.4)"/>'+
+    '<path fill="currentColor" d="M12 10.8c0-4.6 3.4-8 8-8 0 4.6-3.4 8-8 8z"/></svg>',
+  zwam:'<svg viewBox="0 0 24 24">'+
+    '<path fill="#10180F" d="M2.4 12.6C2.4 6.9 6.7 3 12 3s9.6 3.9 9.6 9.6z" transform="translate(0 -.4)"/>'+
+    '<path fill="currentColor" d="M3 12.2C3 7 7 3.4 12 3.4s9 3.6 9 8.8z"/>'+
+    '<path d="M9.4 12.4v5.4a2.6 2.6 0 0 0 5.2 0v-5.4" stroke="#10180F" stroke-width="4" fill="none" stroke-linecap="round"/>'+
+    '<path d="M9.4 12.4v5.4a2.6 2.6 0 0 0 5.2 0v-5.4" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>'
 };
 function merkHtml(sp){
   const zwam = sp && sp.grp === "zwam";
@@ -3342,7 +3378,9 @@ async function vulKaart(stil){
     return;
   }
   S.vulBezig = true;
-  const kandidaten = SPECIES.filter(x=> !x.tags.includes("giftig") && x.tags.length).map(x=>x.k);
+  /* Alle soorten uit de gids, ook de giftige: juist die wil je zien staan
+     voordat je ernaast iets eetbaars plukt. */
+  const kandidaten = SPECIES.map(x=>x.k);
   const onbekend = kandidaten.filter(k=>!S.taxa[k]);
   if(onbekend.length){
     /* Eenmalig, daarna staat elke soortsleutel in localStorage. Bij de eerste
@@ -3389,7 +3427,7 @@ async function vulKaart(stil){
     if(o.id && bekend.has(o.id)) return;
     if(o.id) bekend.add(o.id);
     S.ontdekVol.push(o); nieuw++;
-    const m = L.marker([o.lat,o.lng],{icon:L.divIcon({className:"",iconSize:[20,20],iconAnchor:[10,10],
+    const m = L.marker([o.lat,o.lng],{icon:L.divIcon({className:"",iconSize:[26,26],iconAnchor:[13,13],
       html: merkHtml(o.k ? SPEC_BY_K[o.k] : null)})});
     m.on("click", ()=> ontdekSheet(o));
     S.ontdekLaag.addLayer(m);
@@ -3398,12 +3436,11 @@ async function vulKaart(stil){
   document.getElementById("btnOntdek").classList.add("mos");
   S.vulBezig = false;
   const soorten = new Set(S.ontdekVol.map(o=>o.k).filter(Boolean)).size;
-  if(!stil){
+  if(!stil && kaartInBeeld()){
     toast(S.ontdekVol.length
       ? S.ontdekVol.length+" waarnemingen · "+soorten+" soorten"+(fouten?" ("+fouten+" mislukt)":"")
       : (rauw ? "GBIF gaf "+rauw+" records maar geen koppeling"
               : "Geen waarnemingen in dit kaartbeeld — zoom uit of probeer een ander gebied"));
-    if(S.scr!=="map") go("map");
   }
   /* Bij het automatisch bijvullen blijft het stil: je vroeg er niet om,
      dus hoef je er ook niets over te lezen. */
@@ -3521,48 +3558,7 @@ async function soortBeeld(k){
    ======================================================================= */
 const SCHERMEN = ["map","list","kast","spec","leer"];
 
-function swipeOpzetten(){
-  let x0=0, y0=0, t0=0, bezig=false;
 
-  const magNiet = (doel)=>{
-    if(!doel || !doel.closest) return false;
-    /* Bladen, quiz, loep en de kaart hebben hun eigen sleepgedrag. */
-    return !!doel.closest(".sheet, .quiz, .loep, .leaflet-container, "+
-      ".pick, .opts, input, textarea, select, .seg, .tabs, .chips");
-  };
-
-  document.addEventListener("touchstart", e=>{
-    bezig = false;
-    if(e.touches.length !== 1) return;
-    if(sheetEl.classList.contains("on") || quizEl.classList.contains("on")) return;
-    if(S.scr === "map") return;
-    if(magNiet(e.target)) return;
-    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
-    t0 = Date.now(); bezig = true;
-  }, {passive:true});
-
-  document.addEventListener("touchend", e=>{
-    if(!bezig) return;
-    bezig = false;
-    const t = e.changedTouches && e.changedTouches[0];
-    if(!t) return;
-    const dx = t.clientX - x0, dy = t.clientY - y0, dt = Date.now() - t0;
-
-    /* De vier eisen: ver genoeg, vlot genoeg, duidelijk horizontaal,
-       en niet zo ver verticaal dat het een scroll was. */
-    if(Math.abs(dx) < 72) return;
-    if(dt > 600) return;
-    if(Math.abs(dx) < Math.abs(dy) * 2.2) return;
-    if(Math.abs(dy) > 90) return;
-
-    const i = SCHERMEN.indexOf(S.scr);
-    if(i < 0) return;
-    const j = dx < 0 ? i+1 : i-1;
-    if(j < 0 || j >= SCHERMEN.length) return;
-    go(SCHERMEN[j]);
-  }, {passive:true});
-}
-swipeOpzetten();
 
 /* =======================================================================
    KAART
@@ -3748,17 +3744,19 @@ function renderChips(){
   el.querySelectorAll("[data-f]").forEach(b=> b.onclick=()=>{
     S.filter[b.dataset.f]=!S.filter[b.dataset.f]; lsSet("filter",S.filter); drawMarkers(); });
 }
+const kaartInBeeld = ()=> S.scr === "map" && !sheetEl.classList.contains("on");
 async function tekenOntdek(){
   if(!S.ontdekAan){ S.ontdekLaag.clearLayers(); return; }
   if(S.ontdekVol) return;          /* automatische vulling blijft staan */
   S.ontdekLaag.clearLayers();
   const rijen = await ontdekWaarnemingen();
   rijen.forEach(o=>{
-    const m = L.marker([o.lat,o.lng],{icon:L.divIcon({className:"",iconSize:[20,20],iconAnchor:[10,10],
+    const m = L.marker([o.lat,o.lng],{icon:L.divIcon({className:"",iconSize:[26,26],iconAnchor:[13,13],
       html: merkHtml(o.k ? SPEC_BY_K[o.k] : null)})});
     m.on("click", ()=> ontdekSheet(o));
     S.ontdekLaag.addLayer(m);
   });
+  if(!kaartInBeeld()) return;
   if(rijen.length) toast(rijen.length+" waarnemingen uit GBIF");
   else if(S.ontdekSoorten.length) toast("Geen GBIF-waarnemingen in dit kaartbeeld");
 }
@@ -3832,6 +3830,69 @@ async function hydratePhotos(root){
     const u = await photoURL(el.dataset.ph); if(u) el.src = u;
   }
 }
+
+/* =======================================================================
+   KEUZEMENU
+   Het systeemmenu van Android valt uit de toon bij de rest van de app.
+   Elke <select> blijft gewoon in de DOM staan (alle bestaande code leest en
+   zet .value en luistert naar change), maar wordt onzichtbaar; ernaast komt
+   een knop in appstijl die een eigen lijst opent. Nieuwe selects in bladen
+   worden door de waarnemer vanzelf omgezet.
+   ======================================================================= */
+function aselLabel(sel){
+  const o = sel.options[sel.selectedIndex];
+  return o ? o.textContent : "\u2014";
+}
+function aselMaak(sel){
+  if(sel.dataset.asel) return;
+  sel.dataset.asel = "1";
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "aselknop" + (sel.classList.contains("aan") ? " aan" : "");
+  b.textContent = aselLabel(sel);
+  const sync = ()=>{ b.textContent = aselLabel(sel); b.classList.toggle("aan", sel.classList.contains("aan")); };
+  sel.addEventListener("change", ()=> setTimeout(sync, 0));
+  b.addEventListener("click", e=>{ e.preventDefault(); e.stopPropagation(); aselOpen(sel, sync); });
+  sel.after(b);
+}
+let aselEl = null;
+function aselSluit(){
+  if(!aselEl) return;
+  const el = aselEl; aselEl = null;
+  el.classList.remove("on");
+  setTimeout(()=> el.remove(), 170);
+}
+function aselOpen(sel, sync){
+  aselSluit();
+  const label = sel.closest(".f, .fltrij");
+  const lbl = label && label.querySelector && label.querySelector("label");
+  const schim = document.createElement("div");
+  schim.className = "asel-schim";
+  const item = o => '<button class="asel-item'+(o.selected?" on":"")+'" data-v="'+esc(o.value)+'">'+esc(o.textContent)+'</button>';
+  let h = '<div class="asel-kop">'+esc(lbl ? lbl.textContent : (sel.options[0] ? sel.options[0].textContent : "Kies"))+'</div>';
+  for(const kind of sel.children){
+    if(kind.tagName === "OPTGROUP"){
+      h += '<div class="asel-groep">'+esc(kind.label)+'</div>';
+      for(const o of kind.children) h += item(o);
+    } else h += item(kind);
+  }
+  schim.innerHTML = '<div class="asel-lijst">'+h+'</div>';
+  document.body.appendChild(schim);
+  requestAnimationFrame(()=> schim.classList.add("on"));
+  aselEl = schim;
+  schim.addEventListener("click", e=>{ if(e.target === schim) aselSluit(); });
+  schim.querySelectorAll(".asel-item").forEach(x=> x.onclick = ()=>{
+    sel.value = x.dataset.v;
+    sel.dispatchEvent(new Event("change", {bubbles:true}));
+    if(sync) sync();
+    aselSluit();
+  });
+  const aan = schim.querySelector(".asel-item.on");
+  if(aan) aan.scrollIntoView({block:"center"});
+}
+new MutationObserver(()=>{
+  document.querySelectorAll("select:not([data-asel])").forEach(aselMaak);
+}).observe(document.documentElement, {childList:true, subtree:true});
+document.querySelectorAll("select").forEach(aselMaak);
 
 /* =======================================================================
    SYMBOLEN — druïde-alfabet, overal in de app gebruikt
@@ -4404,9 +4465,13 @@ async function openSheet(id){
   if(sp && sp.let)
     h += '<div class="warn oker"><b>Let op</b>'+esc(sp.let)+'</div>';
 
-  h += '<div class="sec">'+sech("Foto's per stadium",'<button data-act="addph">Toevoegen</button>','bloem')+'<div class="strip">';
-  (pin.fotos||[]).forEach(f=> h += '<div class="ph"><img data-ph="'+f+'" alt=""><button class="x" data-del="'+f+'">×</button><div class="st" data-stg="'+f+'">—</div></div>');
-  h += '<button class="ph add" data-act="addph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h1.7l1.2-2h6.2l1.2 2h1.7A2.5 2.5 0 0 1 20 8.5v9A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5Z"/><circle cx="12" cy="13" r="3.3"/></svg>Groeistadium vastleggen</button></div></div>';
+  /* Eén fotosectie: eerst je eigen foto's (met merkje en stadium), daarna de
+     foto's van de soort uit GBIF, in hetzelfde raster. */
+  h += '<div class="sec">'+sech("Foto's",'<button data-act="addph">Toevoegen</button>','bloem')+
+    '<div class="strip fotoraster"'+(sp?' id="gbifBeeld" data-soort="'+esc(sp.k)+'"':'')+'>'+
+    eigenFotoTegels(pin.fotos, true)+
+    '<button class="ph add" data-act="addph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h1.7l1.2-2h6.2l1.2 2h1.7A2.5 2.5 0 0 1 20 8.5v9A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5Z"/><circle cx="12" cy="13" r="3.3"/></svg>Groeistadium vastleggen</button>'+
+    (sp?'<div data-wacht style="font-size:13px;color:var(--inkt-2);padding:6px 0">Ophalen…</div>':'')+'</div></div>';
 
   h += '<div class="sec">'+sech("Veldgegevens",'<button data-act="edit">Bewerken</button>','pin')+
     kv("Plek", pin.plek||"—")+kv("Standplaats", pin.habitat||"—")+kv("Hoeveelheid", pin.hoev||"—")+
@@ -4456,8 +4521,6 @@ async function openSheet(id){
         '<span>'+esc(shortd(x.gemaakt))+'</span><span>'+esc(x.plek||"—")+' ›</span></button>').join(""),
       andere.length+"");
 
-    h += klap("Foto's van deze soort",
-      '<div class="strip" id="gbifBeeld"><div style="font-size:13px;color:var(--inkt-2);padding:6px 0">Ophalen…</div></div>');
   }
   else h += '<div class="sec">'+sech("Welke soort is dit?","",'varen')+
     '<div class="f"><input id="pnQ" placeholder="Typ een naam, de lijst filtert mee"></div>'+
@@ -4517,18 +4580,14 @@ async function openSheet(id){
     const q = S.pins.find(x=>x.id===b.dataset.plek);
     if(q) openSheet(q.id);
   });
-  /* Het beeld wordt pas opgehaald als je de sectie openklapt: anders staat
-     elke geopende vondst meteen aan het netwerk te trekken. */
-  const gb = bodyEl.querySelector("#gbifBeeld");
-  if(gb && sp){
-    const det = gb.closest("details");
-    let gehaald = false;
-    det.addEventListener("toggle", ()=>{
-      if(!det.open || gehaald) return;
-      gehaald = true;
-      soortBeeld(sp.k).then(b=> vulStrip(b)).catch(()=>{
-        gb.innerHTML = '<div style="font-size:13px;color:var(--inkt-2);padding:6px 0">Geen beeld, of geen verbinding.</div>';
-      });
+  /* De fotosectie staat nu bovenaan, dus het beeld komt direct. De kas en de
+     30-dagencache houden het netwerk rustig; het token voorkomt dat een laat
+     antwoord in het blad van een andere soort belandt. */
+  if(sp){
+    soortBeeld(sp.k).then(b=> vulStrip(b, sp.k)).catch(()=>{
+      const gb = document.getElementById("gbifBeeld");
+      if(gb && gb.dataset.soort === sp.k)
+        gb.querySelectorAll("[data-wacht]").forEach(x=> x.textContent = "Geen beeld, of geen verbinding.");
     });
   }
   bodyEl.querySelectorAll("[data-del]").forEach(b=> b.onclick = async ()=>{
@@ -4692,6 +4751,13 @@ async function delPin(id,silent){
 /* =======================================================================
    BLAD: SOORT
    ======================================================================= */
+/* Merkje op een eigen foto in het gedeelde raster: klein blad in een munt. */
+const EIGENMERK = '<span class="eigenmerk">'+svg(0, SYM.blad)+'</span>';
+function eigenFotoTegels(fotos, metStadium){
+  return (fotos||[]).map(f=>'<div class="ph"><img data-ph="'+f+'" alt="">'+EIGENMERK+
+    (metStadium?'<button class="x" data-del="'+f+'">×</button><div class="st" data-stg="'+f+'">—</div>'
+               :'<div class="lic">Eigen foto</div>')+'</div>').join("");
+}
 async function specSheet(k, terugPin){
   const s = SPEC_BY_K[k]; if(!s) return;
   const mine = S.pins.filter(p=>p.spec===k);
@@ -4715,6 +4781,14 @@ async function specSheet(k, terugPin){
       'en bewaar een restant of een foto. De arts kan het Nationaal Vergiftigingen Informatie Centrum raadplegen. '+
       'Wacht niet op klachten: bij amatoxinen komen die pas na uren, als de schade al begonnen is.</div>';
 
+  /* Foto's meteen bovenaan: het beeld is waar je een soort aan herkent.
+     Eigen foto's van je vondsten staan in hetzelfde raster, met een merkje. */
+  const eigenFotos = mine.flatMap(p=> p.fotos||[]);
+  h += '<div class="sec">'+sech("Foto's van deze soort","",'ster')+
+       '<div class="strip fotoraster" id="gbifBeeld" data-soort="'+esc(k)+'">'+
+       eigenFotoTegels(eigenFotos)+
+       '<div data-wacht style="font-size:13px;color:var(--inkt-2);padding:6px 0">Ophalen…</div></div></div>';
+
   h += '<div class="sec">'+sech("Wat je gebruikt","",'hand')+gebruiksTekening(s)+'</div>';
 
   const fam = famVan(s);
@@ -4737,9 +4811,6 @@ async function specSheet(k, terugPin){
     h += '</div>';
   }
   if(s.med)    h += '<div class="sec">'+sech("Toelichting","",'boek')+'<div class="prose">'+esc(s.med)+'</div></div>';
-
-  h += '<div class="sec">'+sech("Foto's van deze soort","",'ster')+'<div class="strip" id="gbifBeeld">'+
-       '<div style="font-size:13px;color:var(--inkt-2);padding:6px 0">Ophalen…</div></div></div>';
 
   const rec = RECEPTEN.filter(r=> r.soorten.includes(k));
   if(rec.length){
@@ -4767,8 +4838,9 @@ async function specSheet(k, terugPin){
     document.querySelectorAll("#specToggle button").forEach(x=>x.classList.toggle("on", x.dataset.v==="alle"));
     setTimeout(()=>{
       vulHerbariumFilters();
-      const fm=document.getElementById("fltFam"); if(fm) fm.value = b.dataset.fam;
-      renderSpec();
+      const fm=document.getElementById("fltFam");
+      if(fm){ fm.value = b.dataset.fam; fm.dispatchEvent(new Event("change",{bubbles:true})); }
+      else renderSpec();
     }, 40);
   });
   /* Vanaf je eigen plek: blad dicht, kaart erheen. */
@@ -4799,26 +4871,34 @@ async function specSheet(k, terugPin){
       closeSheet(); go("map"); tekenOntdek();
     }
   });
+  hydratePhotos(bodyEl);
   /* beeld asynchroon */
   const beelden = await soortBeeld(k);
-  vulStrip(beelden);
+  vulStrip(beelden, k);
 }
 
 /* Vult de GBIF-strip. Staat apart omdat zowel het soortenblad als het
    vondstblad hem gebruikt. */
-function vulStrip(beelden){
+function vulStrip(beelden, soortK){
   const el = document.getElementById("gbifBeeld");
   if(!el) return;
+  /* Het blad kan intussen gewisseld zijn naar een andere soort; een laat
+     antwoord mag dan niet meer in het verkeerde blad landen. Vandaar het
+     token: alleen vullen als de strip nog bij dezelfde soort hoort. */
+  if(soortK && el.dataset.soort && el.dataset.soort !== soortK) return;
   el.classList.add("fotoraster");
+  el.querySelectorAll("[data-wacht]").forEach(x=> x.remove());
+  const eigen = el.querySelectorAll(".ph").length;
   if(!beelden.length){
-    el.innerHTML = '<div style="font-size:13px;color:var(--inkt-2);padding:6px 0">Geen beeld gevonden, of geen verbinding. Jouw eigen foto\u2019s bij een vondst blijven de beste referentie.</div>';
+    if(!eigen) el.insertAdjacentHTML("beforeend",
+      '<div style="font-size:13px;color:var(--inkt-2);padding:6px 0">Geen beeld gevonden, of geen verbinding. Jouw eigen foto\u2019s bij een vondst blijven de beste referentie.</div>');
   } else {
-    el.innerHTML = beelden.map(b=>'<div class="ph"><img src="'+esc(b.url)+'" alt="" loading="lazy">'+
+    el.insertAdjacentHTML("beforeend", beelden.map(b=>'<div class="ph gbifph"><img src="'+esc(b.url)+'" alt="" loading="lazy">'+
       '<div class="lic">'+esc(b.maker)+(b.lic?' · '+esc(b.lic):'')+
-      (b.bron && b.bron!=="GBIF" ? ' · '+esc(b.bron) : '')+'</div></div>').join("");
+      (b.bron && b.bron!=="GBIF" ? ' · '+esc(b.bron) : '')+'</div></div>').join(""));
     /* De strip komt pas binnen nadat het blad al getekend is, dus de loep
        moet hier apart worden aangehaakt. */
-    el.querySelectorAll(".ph img").forEach((img,i)=>{
+    el.querySelectorAll(".gbifph img").forEach((img,i)=>{
       img.addEventListener("click", e=>{
         e.stopPropagation();
         const b = beelden[i] || {};
@@ -4882,7 +4962,6 @@ function ontdekSheet(o){
   showSheet('<div class="label">'+VINE+HOEKRANK+'<div class="acc"><span>GBIF-waarneming</span><span>'+(o.jaar||"—")+'</span></div>'+
     '<h2>'+esc(s ? s.nl : (o.naam || "Onbekende soort"))+'</h2>'+
     '<div class="la">'+esc(s ? s.la : (o.naam || "niet in de gids"))+'</div></div>'+
-    '<div class="warn oker"><b>Dit is geen eigen vondst</b>Een waarneming die iemand anders ooit heeft doorgegeven. Veel records zijn afgerond op honderden meters tot een kilometer, en gevoelige soorten worden bewust vervaagd. Zie het als zoekgebied, niet als vindplaats.</div>'+
     '<div class="sec">'+sech("Gegevens","",'kaart')+kv("Bron", o.bron)+kv("Jaar", o.jaar||"onbekend")+
     kv("Onzekerheid", o.onzeker?Math.round(o.onzeker)+" m":"niet opgegeven")+
     '<div class="kv"><span>Coördinaten</span><span class="coords">'+o.lat.toFixed(5)+", "+o.lng.toFixed(5)+'</span></div></div>'+
@@ -5505,7 +5584,7 @@ const NIVEAUS = {
     opties:4,
     pool:()=> SPECIES.filter(x=> (x.kwalen && x.kwalen.length) || x.med ||
       x.tags.includes("eetbaar") || x.tags.includes("giftig")),
-    vragen:["waarvoor","deel","maand","let","recept","brouwsel"], beeldDeel:0.15
+    vragen:["waarvoor","deel","maand","let","recept","brouwsel","med"], beeldDeel:0.15
   },
   namen: {
     nm:"Namen & stoffen",
@@ -5553,11 +5632,39 @@ function balanceer(keys){
   const max = Math.max(1, Math.ceil(keys.length / 3));
   const zwam = [], rest = [];
   keys.forEach(k => ((SPEC_BY_K[k]||{}).grp === "zwam" ? zwam : rest).push(k));
-  if(zwam.length <= max) return keys;
-  const vijver = nivNu().pool().filter(x=> x.grp !== "zwam").map(x=>x.k);
-  const aanvul = shuffle(vijver.filter(k=> !rest.includes(k)));
-  const uit = rest.concat(zwam.slice(0, max));
-  while(uit.length < keys.length && aanvul.length) uit.push(aanvul.pop());
+  let uit = keys;
+  if(zwam.length > max){
+    const vijver = nivNu().pool().filter(x=> x.grp !== "zwam").map(x=>x.k);
+    const aanvul = shuffle(vijver.filter(k=> !rest.includes(k)));
+    uit = rest.concat(zwam.slice(0, max));
+    while(uit.length < keys.length && aanvul.length) uit.push(aanvul.pop());
+  }
+  /* Op Gebruik geldt nog een tweede deksel. Soorten zonder kwaal, recept,
+     plukdeel of maand kunnen daar maar één vraag opleveren: "wat moet je
+     onthouden". Belangrijk voor het giftige werk, maar met ruim vijftig van
+     zulke soorten in de vijver kaapt het anders de halve ronde. Dus ook
+     hier: hooguit een derde, de rest aangevuld met soorten waar echt iets
+     over te vragen valt. */
+  if(S.leer.niveau === "gebruik"){
+    const metRecept = new Set();
+    alleRecepten().forEach(r=> (r.soorten||[]).forEach(k=> metRecept.add(k)));
+    const alleenLet = k => { const x = SPEC_BY_K[k] || {};
+      return !!x.let && !(x.kwalen && x.kwalen.length) && !metRecept.has(k) &&
+             (!x.delen || x.delen === "—") && !(x.mnd && x.mnd.length); };
+    const let_ = [], vol = [];
+    uit.forEach(k => (alleenLet(k) ? let_ : vol).push(k));
+    /* Strakker dan het zwamdeksel, want een op de vijf soorten in de vijver
+       ís al let-only — een ruime grens verandert dan niets. Eén per ronde
+       van tien: het giftige werk houdt zijn vaste stoel, maar de ronde gaat
+       over kwalen en bereiding. */
+    const maxLet = Math.max(1, Math.floor(uit.length / 8));
+    if(let_.length > maxLet){
+      const aanvul = shuffle(nivNu().pool().map(x=>x.k)
+        .filter(k=> !alleenLet(k) && !vol.includes(k)));
+      uit = vol.concat(let_.slice(0, maxLet));
+      while(uit.length < keys.length && aanvul.length) uit.push(aanvul.pop());
+    }
+  }
   return shuffle(uit);
 }
 function renderLeer(){
@@ -5596,7 +5703,6 @@ function renderLeer(){
     }).join("");
   }
   document.getElementById("leerBody").innerHTML=h;
-  tekenHerinner();
   const niv = document.getElementById("leerNiv");
   if(niv) niv.querySelectorAll("button").forEach(b=> b.onclick=()=>{
     S.leer.niveau = b.dataset.v; lsSet("leer", S.leer); renderLeer();
@@ -5692,6 +5798,17 @@ function qLet(s){
   return {kind:"Let op",risk:true,q:"Wat moet je onthouden bij <em>"+esc(s.nl)+"</em>?",
     opts:shuffle([s.let,...w]).map(esc), aTxt:esc(s.let), uitleg:s.let,
     tip:"Denk aan waar het bij deze soort echt mis kan gaan: de plek, het seizoen of het deel."};
+}
+/* Hoe je een soort inzet. De med-tekst als bereidingsvraag: dekt 99 soorten,
+   ruim meer dan de recepten, dus dit is de brede kant van Bereiding. */
+function qMed(s){
+  if(!s.med || s.med.length < 30) return null;
+  const n = nivNu().opties - 1;
+  const w = unieke(zelfdeWereld(s).filter(x=>x.med && x.med.length>30 && x.k!==s.k).map(x=>x.med), s.med, n);
+  if(w.length < n) return null;
+  return {kind:"Bereiding",risk:false,q:"Hoe zet je <em>"+esc(s.nl)+"</em> in?",
+    opts:shuffle([s.med,...w]).map(esc), aTxt:esc(s.med), uitleg:s.med,
+    tip:"Denk aan het deel dat je oogst en wat daarvan te maken valt."};
 }
 function qHerken(s){
   const n = nivNu().opties - 1;
@@ -5837,13 +5954,20 @@ function makeQuestion(k){
   const s=SPEC_BY_K[k], toegestaan=new Set(nivNu().vragen);
   let gens=[];
   if(STOF[k]) gens.push(qStof, qStofgroep);
-  gens.push(qRecept, qBrouwsel);
-  if(s.kwalen && s.kwalen.length) gens.push(qWaarvoor);
+  /* Vaker erin = vaker aan de beurt. Op Gebruik horen kwaal en bereiding
+     voorop te staan; "wat moet je onthouden" is het vangnet, niet de
+     hoofdmoot, dus die blijft er maar één keer in. */
+  gens.push(qRecept, qRecept, qRecept, qBrouwsel, qBrouwsel, qBrouwsel);
+  if(s.med) gens.push(qMed, qMed);
+  if(s.kwalen && s.kwalen.length) gens.push(qWaarvoor, qWaarvoor, qWaarvoor);
   if(s.dubbel&&s.dubbel.length){ gens.push(qDubbel,qDubbel); }
-  if(s.let) gens.push(qLet);
+  /* De waarschuwingsvraag alleen waar de waarschuwing de les ís: bij gif.
+     Voorzichtigheden bij eetbare soorten staan in de uitleg van de andere
+     vragen; als eigen vraag verdrongen ze kwaal en bereiding. */
+  if(s.let && s.tags.includes("giftig")) gens.push(qLet);
   if(s.herken) gens.push(qHerken,qHerken);
   gens.push(qLatijn,qNL);
-  if(s.delen&&s.delen!=="—") gens.push(qDeel);
+  if(s.delen&&s.delen!=="—") gens.push(qDeel, qDeel);
   if(s.mnd.length) gens.push(qMaand);
   const gefilterd = gens.filter(g=> !GEN_NAAM.has(g) || toegestaan.has(GEN_NAAM.get(g)));
   gens = gefilterd.length ? gefilterd : gens;
@@ -5855,7 +5979,8 @@ function makeQuestion(k){
    uit kan maken. Zonder deze koppeling filtert het niveau niets. */
 [[qNL,"nl"],[qLatijn,"latijn"],[qDeel,"deel"],[qMaand,"maand"],[qLet,"let"],
  [qHerken,"herken"],[qDubbel,"verwar"],[qWaarvoor,"waarvoor"],
- [qStof,"stof"],[qStofgroep,"stofgroep"],[qRecept,"recept"],[qBrouwsel,"brouwsel"]]
+ [qStof,"stof"],[qStofgroep,"stofgroep"],[qRecept,"recept"],[qBrouwsel,"brouwsel"],
+ [qMed,"med"]]
   .forEach(([g,nm])=>{ if(typeof g === "function") GEN_NAAM.set(g,nm); });
 
 const QZ={list:[],i:0,goed:0,cur:null,sel:-1,done:false};
@@ -5871,6 +5996,15 @@ async function startQuiz(){
   keys = balanceer(keys);
   QZ.list=[]; QZ.i=0; QZ.goed=0; QZ.done=false;
 
+  /* De knop zelf wordt het laadscherm: kleine groeiende varen tot de ronde
+     er staat. renderLeer() zet hem bij het sluiten weer terug. */
+  const sb = document.getElementById("leerStart");
+  if(sb){
+    sb.disabled = true;
+    const sm = sb.querySelector("small");
+    if(sm) sm.innerHTML = '<span class="laad">'+svg(0, SYM.varen)+' Ronde klaarzetten\u2026</span>';
+  }
+
   const beeldKans = nivNu().beeldDeel !== undefined ? nivNu().beeldDeel : 0.5;
   const alleenBeeld = beeldKans >= 1;
 
@@ -5878,7 +6012,6 @@ async function startQuiz(){
     /* Herkennen is één ding: je ziet een foto en kiest de soort. Daarom halen
        we ruim kandidaten op — meer dan er vragen nodig zijn — en vullen we de
        ronde met wat er beeld heeft. Wie geen foto oplevert, valt af. */
-    toast("Foto's ophalen…");
     const extra = pickN([...vijver].filter(k=>!keys.includes(k)), 8);
     const metBeeld = await beeldVooruit(keys.concat(extra), 16);
     for(const k of metBeeld){
@@ -6001,154 +6134,6 @@ document.getElementById("qQuit").onclick=()=>{ quizEl.classList.remove("on"); re
 /* =======================================================================
    MELDINGEN
    ======================================================================= */
-async function loadPush(){
-  const p=await dbGet("meta","push");
-  if(p) S.push={aan:!!p.aan, tijd:p.tijd||"09:00", laatst:p.laatst||null};
-}
-const savePush = ()=> dbPut("meta",{k:"push",aan:S.push.aan,tijd:S.push.tijd,laatst:S.push.laatst});
-const pushKan = ()=> ("Notification" in window) && ("serviceWorker" in navigator);
-async function regPeriodic(){
-  try{
-    const reg=await navigator.serviceWorker.ready;
-    if(!("periodicSync" in reg)) return false;
-    const st=await navigator.permissions.query({name:"periodic-background-sync"});
-    if(st.state!=="granted") return false;
-    await reg.periodicSync.register("wildpluk-dagelijks",{minInterval:6*3600*1000});
-    return true;
-  }catch(e){ return false; }
-}
-async function toggleNotif(){
-  if(S.push.aan){
-    S.push.aan=false; await savePush(); renderSet(); toast("Herinnering uit");
-    try{ const reg=await navigator.serviceWorker.ready; if(reg.periodicSync) await reg.periodicSync.unregister("wildpluk-dagelijks"); }catch(e){}
-    return;
-  }
-  if(!pushKan()){ toast("Meldingen kunnen niet in deze browser"); return; }
-  if(await Notification.requestPermission()!=="granted"){ toast("Zonder toestemming geen herinnering"); return; }
-  S.push.aan=true; await savePush();
-  const gepland = await planTriggers();
-  const ok = await regPeriodic();
-  renderSet();
-  toast(gepland ? "Staat aan — gepland op "+S.push.tijd
-      : ok ? "Staat aan. De browser kiest het moment; meestal in de avond."
-           : "Staat aan, maar alleen als de app openstaat. Zie de uitleg hieronder.");
-}
-const PORTJES = [
-  ["Er staat iets te bloeien","Vijf soorten, twee minuten, en je weet ze morgen nog."],
-  ["Het bos vraagt naar je","Een paar planten wachten op herhaling. Kop thee erbij?"],
-  ["Even langs de veldschool","Wie je vandaag oefent, herken je straks in de berm."],
-  ["De dryade tikt op je schouder","Kleine ronde. Namen, gebruik, en waar je voor moet oppassen."],
-  ["Gaea heeft iets voor je","Vijf minuten planten kijken zonder je jas aan te doen."],
-  ["Tijd voor een paar bladeren","Korte oefening. Je streak blijft staan, en dat scheelt weer."]
-];
-function portje(n){
-  const p = PORTJES[new Date().getDate() % PORTJES.length];
-  let body = p[1];
-  if(n > 0) body = n + " soorten staan klaar. " + p[1];
-  return {titel:p[0], body};
-}
-async function testNotif(){
-  if(!pushKan()){ toast("Meldingen kunnen niet in deze browser"); return; }
-  if(Notification.permission!=="granted" && await Notification.requestPermission()!=="granted"){ toast("Geen toestemming"); return; }
-  const reg=await navigator.serviceWorker.ready;
-  const basis = new URL(reg.scope || location.href);
-  const url = pad => new URL(pad, basis).href;
-  const p = portje(dueKeys().length);
-  reg.showNotification(p.titel,{
-    body:p.body, icon:url("icon-192.png"), badge:url("badge-96.png"),
-    tag:"gaea-quiz", data:{scr:"leer"}});
-  toast("Melding verstuurd");
-}
-/* =======================================================================
-   DE HERINNERING, EERLIJK UITGELEGD
-   Een website kan zichzelf niet op een vast tijdstip wakker maken. Er zijn
-   drie wegen en alle drie hebben ze een gat:
-
-   1. showTrigger met een TimestampTrigger plant een melding op de seconde
-      nauwkeurig. Precies wat we willen, maar het is nooit verder gekomen dan
-      een proef in Chrome 80 tot 83. We proberen het, want als het er is kost
-      het niets — en op sommige Chromium-bouwsels staat het aan.
-   2. periodicsync laat de browser af en toe iets doen op de achtergrond. De
-      browser bepaalt wanneer, hooguit een paar keer per dag, en alleen als de
-      app geïnstalleerd is. Daarmee haal je een avond, geen tijdstip.
-   3. Zelf kijken zodra de app open is. Werkt altijd, maar alleen als je al
-      kijkt — dus als inhaalslag, niet als wekker.
-
-   Alle drie zitten er nu in. Wil je een melding die écht om 21:00 komt, dan
-   is een wekker in de klok-app van je telefoon met Gaea als snelkoppeling
-   het enige wat sluitend is.
-   ======================================================================= */
-async function toonHerinnering(){
-  if(!pushKan() || Notification.permission!=="granted") return false;
-  try{
-    const reg = await navigator.serviceWorker.ready;
-    const basis = new URL(reg.scope || location.href);
-    const p = portje(dueKeys().length);
-    await reg.showNotification(p.titel,{
-      body:p.body, icon:new URL("icon-192.png",basis).href,
-      badge:new URL("badge-96.png",basis).href, tag:"gaea-quiz", data:{scr:"leer"}});
-    return true;
-  }catch(e){ return false; }
-}
-
-/* Een melding vooruit plannen, als de browser dat kan. */
-async function planTriggers(){
-  if(!("Notification" in window) || !("showTrigger" in Notification.prototype)) return false;
-  try{
-    const reg = await navigator.serviceWorker.ready;
-    const basis = new URL(reg.scope || location.href);
-    for(const n of await reg.getNotifications({tag:"gaea-gepland", includeTriggered:true})) n.close();
-    const [uu,mm] = (S.push.tijd||"21:00").split(":").map(Number);
-    for(let d=0; d<7; d++){
-      const t = new Date(); t.setHours(uu, mm, 0, 0); t.setDate(t.getDate()+d);
-      if(t <= Date.now()) continue;
-      const p = PORTJES[t.getDate() % PORTJES.length];
-      await reg.showNotification(p[0], {
-        body:p[1], icon:new URL("icon-192.png",basis).href,
-        badge:new URL("badge-96.png",basis).href,
-        tag:"gaea-gepland-"+d, data:{scr:"leer"},
-        showTrigger:new TimestampTrigger(t.getTime())});
-    }
-    return true;
-  }catch(e){ return false; }
-}
-
-/* Inhaalslag: staat de app open en is het tijdstip voorbij zonder dat je
-   vandaag hebt geoefend, dan komt de melding alsnog. */
-/* Staat de tijd van vandaag al voorbij, en heb je nog niet geoefend? */
-function herinneringOpen(){
-  if(!S.push.aan) return false;
-  if(S.leer.laatst===today()) return false;
-  const [uu,mm] = (S.push.tijd||"21:00").split(":").map(Number);
-  const n = new Date();
-  return n.getHours()*60+n.getMinutes() >= uu*60+mm;
-}
-
-/* De banner op de veldschool. Dit is de weg die altijd werkt: zodra je de app
-   opent nadat je tijd voorbij is, staat de herinnering er. */
-function tekenHerinner(){
-  const el = document.getElementById("leerHerinner");
-  if(!el) return;
-  if(!herinneringOpen() || S.push.gedag===today()){ el.innerHTML = ""; return; }
-  const n = dueKeys().length;
-  el.innerHTML = '<div class="herinner"><div><b>Je ronde van vandaag staat klaar</b>'+
-    '<span>'+(n ? n+" soorten wachten op herhaling." : "Alles herhaald — een extra ronde mag altijd.")+
-    '</span></div><button class="weg" id="herinnerWeg">Later</button></div>';
-  document.getElementById("herinnerWeg").onclick = async ()=>{
-    S.push.gedag = today(); await savePush(); tekenHerinner();
-  };
-}
-
-async function herinneringInhalen(){
-  tekenHerinner();
-  if(!herinneringOpen()) return;
-  if(S.push.laatst===today()) return;
-  if(await toonHerinnering()){ S.push.laatst=today(); await savePush(); }
-}
-
-setInterval(herinneringInhalen, 60000);
-document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) herinneringInhalen(); });
-setTimeout(herinneringInhalen, 4000);
 
 /* =======================================================================
    INSTELLINGEN EN BACK-UP
@@ -6161,18 +6146,6 @@ async function renderSet(){
   }
   document.getElementById("cacheInfo").textContent=t;
   try{ const g=await dbAll("gbif"); document.getElementById("gbifInfo").textContent=g.length+" bewaarde GBIF-antwoorden"; }catch(e){}
-  document.getElementById("notifState").textContent=S.push.aan?"Aan, elke dag rond "+S.push.tijd:"Uit";
-  document.getElementById("notifV").textContent=S.push.aan?"●":"○";
-  document.getElementById("notifV").style.color=S.push.aan?"var(--mos)":"var(--kalk-2)";
-  document.getElementById("notifTime").textContent=S.push.tijd;
-  const n=document.getElementById("notifNote");
-  if(!pushKan()) n.textContent="Deze browser ondersteunt geen meldingen.";
-  else if(!window.matchMedia("(display-mode: standalone)").matches)
-    n.textContent="Een website kan zichzelf niet op een vast tijdstip wakker maken. Vanaf "+S.push.tijd+
-      " staat je ronde klaar: open je Gaea daarna, dan zie je de herinnering meteen op de Veldschool "+
-      "en komt er ook een melding binnen. Wil je een seintje zónder de app te openen, zet dan een wekker "+
-      "in je klok-app met Gaea als snelkoppeling — dat is het enige wat sluitend is.";
-  else n.textContent="Android bepaalt zelf het precieze moment; reken op een marge van een uur rond je tijdstip.";
 }
 const blobToDataURL = b => new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b);});
 function dataURLtoBlob(d){
@@ -6344,14 +6317,6 @@ document.getElementById("setBeeld").onclick = async ()=>{
 document.getElementById("setGbifWipe").onclick=async ()=>{
   await dbClear("gbif"); toast("GBIF-cache geleegd"); renderSet();
 };
-document.getElementById("setNotif").onclick=toggleNotif;
-document.getElementById("setNotifTest").onclick=testNotif;
-document.getElementById("setNotifTime").onclick=()=>{
-  const t=prompt("Hoe laat wil je de herinnering? (uu:mm)",S.push.tijd);
-  if(!t) return;
-  if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(t.trim())){ toast("Gebruik het formaat 09:00"); return; }
-  S.push.tijd=t.trim(); savePush().then(renderSet); toast("Tijdstip aangepast");
-};
 document.getElementById("setWipe").onclick=async ()=>{
   if(!confirm("Alles wissen? Maak eerst een back-up.")) return;
   if(!confirm("Zeker weten? Dit kan niet ongedaan gemaakt worden.")) return;
@@ -6400,8 +6365,9 @@ function vraagAfsluiten(){
 window.addEventListener("popstate",()=>{
   if(S.afsluiten) return;
   if(afsluitOpen){ afsluitOpen = false; closeSheet(); history.pushState({},""); return; }
-  if(loepEl.classList.contains("on")) sluitLoep();
-  else if(quizEl.classList.contains("on")) quizEl.classList.remove("on");
+  if(aselEl) aselSluit();
+  else if(loepEl.classList.contains("on")) sluitLoep();
+  else if(quizEl.classList.contains("on")){ quizEl.classList.remove("on"); renderLeer(); }
   else if(S.spook) wisSpook();
   else if(sheetEl.classList.contains("on")) closeSheet();
   else if(S.scr!=="map") go("map");
@@ -6417,7 +6383,6 @@ history.pushState({},"");
     S.pins=await dbAll("pins");
     S.maaksels=await dbAll("maaksels");
     S.srs=Object.fromEntries((await dbAll("srs")).map(r=>[r.k,r]));
-    await loadPush();
   }catch(e){ toast("Opslag niet beschikbaar"); }
   drawMarkers();
   if(S.ontdekAan) document.getElementById("btnOntdek").classList.add("mos");
