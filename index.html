@@ -377,8 +377,6 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .qmeld{display:block;margin:11px 0 0;padding:8px 12px;border-radius:10px;font-size:12px;
   background:rgba(228,231,214,.07);border:1px solid var(--line);color:var(--kalk-2)}
 .qmeld:disabled{opacity:.6}
-.qcredit{font-family:var(--mono);font-size:9px;letter-spacing:.05em;color:var(--kalk-2);
-  text-align:center;margin:-8px 0 13px;opacity:.7}
 .tipvak{margin:14px 0 4px;min-height:2px}
 .tipbtn{width:100%;padding:11px 14px;border-radius:13px;font-size:14px;font-weight:600;
   background:rgba(201,162,39,.13);border:1px solid rgba(201,162,39,.42);color:var(--goud-l);
@@ -1029,7 +1027,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.25.1";
+const APP_VERSION = "0.25.2";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -3497,6 +3495,20 @@ function vreemdOnderwerp(tekst, sp){
   });
 }
 
+/* Sommige makers zetten een heel gebruiksreglement in het naamveld. Alleen
+   de naam zelf is bruikbaar; de rest knippen we eraf. */
+function kortMaker(t){
+  let n = String(t||"").replace(/<[^>]*>/g,"").replace(/\s+/g," ").trim();
+  /* "This Photo was taken by Wolfgang Moroder. Feel free to..." \u2014 de naam
+     staat middenin de zin, dus die eerst eruit vissen. */
+  const genomen = n.match(/(?:taken|made|created|photographed)\s+by\s+([^.,;|]+)/i);
+  if(genomen) n = genomen[1].trim();
+  n = n.split(/[.\u00b7|;]|\bThis\b|\bPlease\b|\bFeel free\b/)[0].trim();
+  n = n.replace(/^(photo|foto|image|by)\s+(taken\s+)?(by\s+)?/i,"").trim();
+  if(n.length > 44) n = n.slice(0,44).replace(/\s\S*$/,"") + "\u2026";
+  return n || "onbekend";
+}
+
 function beeldenUit(r, sp){
   const uit = [];
   (r.results||[]).forEach(o=>{
@@ -3504,7 +3516,7 @@ function beeldenUit(r, sp){
       if(m.type!=="StillImage" || !m.identifier) return;
       const bijschrift = [m.title, m.description, o.occurrenceRemarks].filter(Boolean).join(" ");
       if(vreemdOnderwerp(bijschrift, sp)) return;
-      uit.push({url:m.identifier, maker:m.rightsHolder||m.creator||"onbekend",
+      uit.push({url:m.identifier, maker:kortMaker(m.rightsHolder||m.creator),
         maand:o.month||null,
         lic:(m.license||"").replace(/^http.*creativecommons\.org\/licenses\//,"CC ").replace(/\/$/,"").toUpperCase()});
     });
@@ -3530,7 +3542,7 @@ async function inatBeeld(la){
     if(t.default_photo && !fotos.some(f=>f.id===t.default_photo.id)) fotos.unshift(t.default_photo);
     return fotos.map(f=>({
       url: f.medium_url || f.url,
-      maker: String(f.attribution||"").replace(/\(c\)/ig,"").split(",")[0].trim() || "iNaturalist",
+      maker: kortMaker(String(f.attribution||"").replace(/\(c\)/ig,"").split(",")[0]) || "iNaturalist",
       lic: String(f.license_code||"").toUpperCase(),
       bron: "iNaturalist"
     })).filter(x=>x.url);
@@ -3563,7 +3575,7 @@ async function commonsBeeld(sp){
                    (sp && sp.nl ? noemtWoord(laag, sp.nl.toLowerCase()) : false);
       if(!raak) return null;
       return {url: ii.thumburl || ii.url,
-        maker: kaal((md.Artist||{}).value) || "Wikimedia Commons",
+        maker: kortMaker(kaal((md.Artist||{}).value)) || "Wikimedia Commons",
         lic: kaal((md.LicenseShortName||{}).value),
         bron: "Wikimedia Commons"};
     }).filter(Boolean);
@@ -6153,8 +6165,7 @@ function showQ(){
   document.getElementById("qCnt").textContent=(QZ.i+1)+"/"+QZ.list.length;
   const body=document.getElementById("qBody");
   body.innerHTML='<div class="qkind'+(q.risk?" risk":"")+'">'+esc(q.kind)+'</div><h2 class="qtext">'+q.q+'</h2>'+
-    (q.img?'<img class="qimg" src="'+q.img+'" alt="">':'')+
-    (q.credit?'<div class="qcredit">'+esc(q.credit)+'</div>':'')+
+    (q.img?'<img class="qimg" src="'+q.img+'" alt="" id="qImg">':'')+
     '<div class="opts">'+q.opts.map((o,i)=>'<button class="opt" data-i="'+i+'">'+o+'</button>').join("")+'</div>'+
     '<div class="tipvak" id="qTipVak"></div>';
   body.scrollTop=0;
@@ -6168,6 +6179,11 @@ function showQ(){
       vak.innerHTML = '<div class="tiptekst"><b>Tip</b>'+esc(tipVoor(q))+'</div>';
     };
   }, 5000);
+  /* De maker staat niet meer onder de vraag: bij Commons is dat soms een
+     half licentieverdrag en dat duwt de antwoorden van het scherm. Tik de
+     foto aan en de loep toont hem alsnog. */
+  const qi = document.getElementById("qImg");
+  if(qi && q.credit) qi.onclick = ()=> openLoep(q.img, q.credit);
   body.querySelectorAll("[data-i]").forEach(b=> b.onclick=()=>{ if(QZ.sel>=0) return; QZ.sel=+b.dataset.i; check(); });
   document.getElementById("qFb").className="qfb";
   const nx=document.getElementById("qNext"); nx.className="qbtn off"; nx.disabled=true; nx.textContent="Kies een antwoord";
