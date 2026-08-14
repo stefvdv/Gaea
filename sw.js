@@ -1,5 +1,5 @@
 /* Gaea service worker — VERSION altijd gelijk aan APP_VERSION in index.html */
-const VERSION = "0.25.2";
+const VERSION = "0.26.0";
 const SHELL = "wildpluk-shell-v" + VERSION;
 const LIB   = "wildpluk-lib-v" + VERSION;
 const TILES = "wildpluk-tiles";          /* niet versiegebonden */

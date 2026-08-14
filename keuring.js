@@ -14,6 +14,20 @@ try{
           (zonder.length?zonder.map(s=>s.k).join(","):"geen")+" · grootste: "+top;
       }],
     ["nivNu",      ()=>nivNu().nm],
+    /* Het herbarium is de naslag bij de vragen: elke soort waarover iets
+       gevraagd wordt, moet er te vinden zijn. */
+    ["herbarium compleet", ()=>{
+      const in_h = new Set(SPECIES.map(x=>x.k));
+      let mis = 0;
+      Object.keys(NIVEAUS).forEach(n=> NIVEAUS[n].pool().forEach(sp=>{ if(!in_h.has(sp.k)) mis++; }));
+      return mis === 0 ? SPECIES.length+" soorten, alle vragen gedekt" : mis+" SOORTEN ONTBREKEN";
+    }],
+    /* Bij gif hoort de gifplaat, nooit de plukkaart. */
+    ["gifplaat", ()=>{
+      const gif = SPECIES.filter(x=>x.tags.includes("giftig"));
+      const fout = gif.filter(sp=> !gifTekening(sp).includes("Ga uit van")).length;
+      return fout === 0 ? gif.length+" giftige soorten, geen plukkaart" : fout+" FOUT";
+    }],
     ["pool.herkennen", ()=>NIVEAUS.herkennen.pool().length],
     ["pool.gebruik",   ()=>NIVEAUS.gebruik.pool().length],
     ["pool.namen",     ()=>NIVEAUS.namen.pool().length],

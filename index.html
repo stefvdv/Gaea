@@ -438,7 +438,9 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .k-na{background:rgba(156,184,112,.17);color:var(--mos);border:1px solid rgba(156,184,112,.42)}
 .k-twijfel{background:rgba(217,164,65,.16);color:#E0B45F;border:1px solid rgba(217,164,65,.42)}
 .k-fout{background:rgba(168,68,58,.17);color:#D4837B;border:1px solid rgba(168,68,58,.45)}
-.rec .nood{margin:14px 18px 0;padding:12px 14px;border-radius:12px;border:2px solid var(--meekrap);
+/* Stond eerst alleen binnen .rec, waardoor het blok op het soortenblad
+   zonder kader en zonder marge tegen de schermrand aan liep. */
+.nood{margin:14px 18px 0;padding:12px 14px;border-radius:12px;border:2px solid var(--meekrap);
   background:rgba(168,68,58,.12);font-size:13.5px;color:#7C271F;line-height:1.5}
 .nood b{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:5px}
 .nood a{color:#7C271F;font-weight:700}
@@ -1027,7 +1029,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.25.2";
+const APP_VERSION = "0.26.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -4339,10 +4341,10 @@ function vul(aan, soort){
 /* Eén botanische plaat voor alles wat een plant is: wortel, stengel,
    blad, knop, bloem en vrucht. Wat je van die soort gebruikt wordt
    ingekleurd, de rest blijft pentekening. */
-function plaatPlant(d){
+function plaatPlant(d, tint){
   const ink = (o=1) => 'fill="none" stroke="'+INKT+'" stroke-opacity="'+o+'" stroke-linecap="round" stroke-linejoin="round"';
   const aan = k => d.has(k);
-  const kl = k => DEELKLEUR[k][0];
+  const kl = k => tint || DEELKLEUR[k][0];
   const vlak = (k, extra) => aan(k)
     ? 'fill="'+kl(k)+'" fill-opacity=".88" stroke="'+INKT+'" stroke-opacity=".85" stroke-width="1.5" stroke-linejoin="round"'
     : 'fill="#F3EDDC" fill-opacity=".55" stroke="'+INKT+'" stroke-opacity=".55" stroke-width="1.2" stroke-linejoin="round"';
@@ -4444,10 +4446,10 @@ function plaatPlant(d){
 
   return g + '</svg>';
 }
-function plaatZwam(d){
+function plaatZwam(d, tint){
   const ink = (o=1) => 'fill="none" stroke="'+INKT+'" stroke-opacity="'+o+'" stroke-linecap="round" stroke-linejoin="round"';
   const vlak = k => d.has(k)
-    ? 'fill="'+DEELKLEUR[k][0]+'" fill-opacity=".88" stroke="'+INKT+'" stroke-opacity=".85" stroke-width="1.5" stroke-linejoin="round"'
+    ? 'fill="'+(tint||DEELKLEUR[k][0])+'" fill-opacity=".88" stroke="'+INKT+'" stroke-opacity=".85" stroke-width="1.5" stroke-linejoin="round"'
     : 'fill="#F3EDDC" fill-opacity=".55" stroke="'+INKT+'" stroke-opacity=".55" stroke-width="1.2" stroke-linejoin="round"';
   let g = '<svg viewBox="0 0 180 300">';
   /* steel met ring en beursje */
@@ -4474,10 +4476,10 @@ function plaatZwam(d){
   g += '<path d="M40 276h100" '+ink(.3)+' stroke-width="1.4"/>';
   return g + '</svg>';
 }
-function plaatWier(d){
+function plaatWier(d, tint){
   const ink = (o=1) => 'fill="none" stroke="'+INKT+'" stroke-opacity="'+o+'" stroke-linecap="round" stroke-linejoin="round"';
   const vlak = k => d.has(k)
-    ? 'fill="'+DEELKLEUR[k][0]+'" fill-opacity=".88" stroke="'+INKT+'" stroke-opacity=".85" stroke-width="1.5" stroke-linejoin="round"'
+    ? 'fill="'+(tint||DEELKLEUR[k][0])+'" fill-opacity=".88" stroke="'+INKT+'" stroke-opacity=".85" stroke-width="1.5" stroke-linejoin="round"'
     : 'fill="#F3EDDC" fill-opacity=".55" stroke="'+INKT+'" stroke-opacity=".55" stroke-width="1.2" stroke-linejoin="round"';
   let g = '<svg viewBox="0 0 180 300">';
   g += '<g '+vlak("thallus")+'>'+
@@ -4489,6 +4491,44 @@ function plaatWier(d){
    '<path d="M78 272c-8 6-13 12-15 21M102 272c8 6 13 12 15 21M90 268v26"/></g>';
   return g + '</svg>';
 }
+/* Welke delen noemt de waarschuwingstekst met zoveel woorden? Alleen om
+   "vooral" te kunnen zeggen — nooit om de rest veilig te verklaren. */
+function genoemdeGifDelen(sp){
+  const t = ((sp.let||"")+" "+(sp.herken||"")).toLowerCase();
+  const uit = [];
+  const kijk = [
+    ["vrucht", /\bbes|\bbessen|\bvrucht|\bzaad|\bpit\b|\bpeul/],
+    ["wortel",  /\bwortel|\bknol|\bbol\b/],
+    ["blad",    /\bblad|\bbladeren|\bscheut|\brozet/],
+    ["bloem",   /\bbloem|\bbloesem|\bknop|\bnectar|stuifmeel/],
+    ["stengel", /\bstengel|\bsteel/],
+    ["bast",    /\bbast|\bsap\b|\bmelksap/]
+  ];
+  kijk.forEach(([k, re])=>{ if(re.test(t)) uit.push(DEELKLEUR[k][1].toLowerCase()); });
+  return uit;
+}
+/* Bij een giftige soort is de vraag niet wat je plukt maar wat je vergiftigt.
+   Alles staat rood: er wordt nooit een deel als veilig aangemerkt, ook niet
+   wanneer de tekst er maar één noemt. Een half gelezen plaat mag niet de
+   indruk wekken dat de rest kan. */
+function gifTekening(sp){
+  const rood = "#A8443A";
+  let svgs, volgorde, bij;
+  if(sp.grp === "zwam"){
+    svgs = plaatZwam(new Set(["hoed","steel"]), rood); volgorde = ["hoed","steel"];
+    bij = "Ga uit van het hele vruchtlichaam";
+  } else {
+    const alles = new Set(["blad","bloem","vrucht","wortel","stengel","bast"]);
+    svgs = plaatPlant(alles, rood); volgorde = [...alles];
+    bij = "Ga uit van de hele plant";
+  }
+  const lg = volgorde.map(x=>
+    '<div><i style="background:'+rood+'"></i><span>'+DEELKLEUR[x][1]+'</span></div>').join("");
+  const genoemd = genoemdeGifDelen(sp);
+  return '<div class="plaat gif"><div class="binnen">'+svgs+'<div class="lg">'+lg+'</div></div>'+
+    '<div class="bij">'+esc(bij)+(genoemd.length?' \u00b7 in de tekst genoemd: '+esc(genoemd.join(", ")):"")+'</div></div>';
+}
+
 function gebruiksTekening(sp){
   const d = welkeDelen(sp);
   let svgs, volgorde, bij;
@@ -4863,7 +4903,11 @@ async function specSheet(k, terugPin){
        eigenFotoTegels(eigenFotos)+
        '<div data-wacht style="font-size:13px;color:var(--inkt-2);padding:6px 0">Ophalen…</div></div></div>';
 
-  h += '<div class="sec">'+sech("Wat je gebruikt","",'hand')+gebruiksTekening(s)+'</div>';
+  /* Bij gif geen plukkaart: die zette "Blad en scheut" aan omdat welkeDelen
+     bij een leeg delen-veld terugvalt op blad, en dat leest als eetbaar. */
+  h += dood
+    ? '<div class="sec">'+sech("Wat er giftig is","",'fles')+gifTekening(s)+'</div>'
+    : '<div class="sec">'+sech("Wat je gebruikt","",'hand')+gebruiksTekening(s)+'</div>';
 
   const fam = famVan(s);
   if(fam) h += '<div class="sec">'+sech("Familie","",'boek')+
@@ -4899,9 +4943,21 @@ async function specSheet(k, terugPin){
 
   h += '<div class="row"><button class="btn sec2" data-act="ontdek">Toon op kaart via GBIF</button>'+
        '<button class="btn sec2" id="oefenSoort">Herkenning oefenen</button></div>'+
+       '<div class="row"><button class="btn sec2" id="gbifPagina">Soortenpagina op GBIF</button></div>'+
        '<div class="row"><button class="btn sec2" data-act="close">Sluiten</button></div>'+FLOURISH;
   showSheet(h);
 
+  /* Naar de bron zelf: de GBIF-soortenpagina heeft de verspreidingskaart, de
+     synoniemen en alle waarnemingen die de app hier samenvat. De sleutel staat
+     meestal al in de kas; anders halen we hem alsnog op. */
+  const gp = document.getElementById("gbifPagina");
+  if(gp) gp.onclick = async ()=>{
+    gp.disabled = true; gp.textContent = "Zoeken\u2026";
+    const tk = await taxonKey(k);
+    gp.disabled = false; gp.textContent = "Soortenpagina op GBIF";
+    if(tk) window.open("https://www.gbif.org/species/"+tk, "_blank", "noopener");
+    else toast("GBIF kent deze soort niet onder \u201c"+s.la+"\u201d");
+  };
   bodyEl.querySelectorAll("[data-rk]").forEach(b=> b.onclick=()=> receptSheet(b.dataset.rk));
   bodyEl.querySelectorAll("[data-kw]").forEach(b=> b.onclick=()=> kwaalSheet(b.dataset.kw));
   bodyEl.querySelectorAll("[data-dbl]").forEach(b=> b.onclick=()=> specSheet(b.dataset.dbl, terugPin));
