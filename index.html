@@ -374,6 +374,9 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .qtext{font-family:var(--slab);font-size:24px;font-weight:600;line-height:1.22;margin:0 0 6px;
   font-variation-settings:'WONK' 1,'SOFT' 50;letter-spacing:-.3px}
 .qtext em{font-style:italic;color:var(--mos)}
+.qmeld{display:block;margin:11px 0 0;padding:8px 12px;border-radius:10px;font-size:12px;
+  background:rgba(228,231,214,.07);border:1px solid var(--line);color:var(--kalk-2)}
+.qmeld:disabled{opacity:.6}
 .qcredit{font-family:var(--mono);font-size:9px;letter-spacing:.05em;color:var(--kalk-2);
   text-align:center;margin:-8px 0 13px;opacity:.7}
 .tipvak{margin:14px 0 4px;min-height:2px}
@@ -1026,7 +1029,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.25.0";
+const APP_VERSION = "0.25.1";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -3181,6 +3184,7 @@ const S = {
   spook:null, ontdekVol:null, concept:null, thuis:lsGet("thuis",null), afsluiten:false,
   eigen:lsGet("eigenrecepten",[]),
   gevuld:new Set(), vulBezig:false, vulTimer:null, vulGemeld:false,
+  fotoWeg:lsGet("fotoweg",[]),   /* foto's die jij als verkeerd hebt gemeld */
   taxa:lsGet("taxa",{})   /* soortsleutel -> gbif taxonKey */
 };
 
@@ -3453,11 +3457,53 @@ async function vulKaart(stil){
    waarnemingen uit de maanden waarin de soort er echt staat, en alleen om
    waarnemingen die een mens in het veld deed. Levert dat te weinig op, dan
    pas vallen we terug op de rest, met het buitenseizoen achteraan. */
-function beeldenUit(r){
+/* =======================================================================
+   ONDERWERPCONTROLE OP FOTO'S
+   Zowel GBIF als Commons koppelen beeld aan een record of een zoekterm, niet
+   aan wat er daadwerkelijk op de foto staat. Een oesterzwam op een vlierstam
+   is een waarneming van Sambucus nigra met een foto van Pleurotus, en dan
+   staat er bij de vraag "welke soort staat hier?" een paddenstoel terwijl
+   "Gewone vlier" het goede antwoord is.
+   Waar een titel of beschrijving meekomt, kijken we of die een ándere soort
+   noemt dan de bedoelde. Zo ja: foto niet gebruiken. Liever geen beeld dan
+   verkeerd beeld — een vraag zonder foto valt vanzelf af. */
+const ZWAMWOORD = /(zwam|paddenstoel|paddestoel|mushroom|toadstool|fungus|fungi|boleet|inktzwam|russula|amanita|pleurotus|polypore|agaric)/i;
+const NAAM_INDEX = SPECIES.map(x=>({
+  nl: x.nl.toLowerCase(),
+  gesl: String(x.la||"").split(" ")[0].toLowerCase()
+}));
+/* Losse woordvergelijking: "els" mag niet aanslaan binnenin "elsewhere", en
+   korte namen laten we helemaal met rust omdat die te vaak toevallig raak
+   zijn in een Engelse of Duitse bestandsnaam. */
+function noemtWoord(t, woord){
+  if(!woord || woord.length < 5) return false;
+  const veilig = woord.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp("(^|[^a-z\u00e0-\u00ff])" + veilig + "([^a-z\u00e0-\u00ff]|$)", "i").test(t);
+}
+function vreemdOnderwerp(tekst, sp){
+  const t = String(tekst||"").toLowerCase();
+  if(!t || !sp) return false;
+  /* Een zwam op een boom of tussen kruid: de foto gaat over de zwam. */
+  if(sp.grp !== "zwam" && ZWAMWOORD.test(t)) return true;
+  const eigenGesl = String(sp.la||"").split(" ")[0].toLowerCase();
+  const eigenNl   = String(sp.nl||"").toLowerCase();
+  return NAAM_INDEX.some(x=>{
+    if(x.gesl === eigenGesl || x.nl === eigenNl) return false;
+    /* Namen die in elkaar zitten zijn geen ander onderwerp: Valse hanenkam
+       bevat Hanenkam, Zwarte komijn bevat Komijn. Zonder deze uitzondering
+       keurt de poort de soort op zijn eigen naam af. */
+    if(noemtWoord(eigenNl, x.nl) || noemtWoord(x.nl, eigenNl)) return false;
+    return noemtWoord(t, x.gesl) || noemtWoord(t, x.nl);
+  });
+}
+
+function beeldenUit(r, sp){
   const uit = [];
   (r.results||[]).forEach(o=>{
     (o.media||[]).forEach(m=>{
       if(m.type!=="StillImage" || !m.identifier) return;
+      const bijschrift = [m.title, m.description, o.occurrenceRemarks].filter(Boolean).join(" ");
+      if(vreemdOnderwerp(bijschrift, sp)) return;
       uit.push({url:m.identifier, maker:m.rightsHolder||m.creator||"onbekend",
         maand:o.month||null,
         lic:(m.license||"").replace(/^http.*creativecommons\.org\/licenses\//,"CC ").replace(/\/$/,"").toUpperCase()});
@@ -3491,7 +3537,8 @@ async function inatBeeld(la){
   }catch(e){ return []; }
 }
 
-async function commonsBeeld(la){
+async function commonsBeeld(sp){
+  const la = sp && sp.la ? sp.la : String(sp||"");
   try{
     const q = "action=query&generator=search&gsrsearch="+encodeURIComponent("filetype:bitmap "+la)+
       "&gsrnamespace=6&gsrlimit=6&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=640&format=json&origin=*";
@@ -3499,9 +3546,22 @@ async function commonsBeeld(la){
     const d = await r.json();
     const pag = ((d.query||{}).pages)||{};
     const kaal = t => String(t||"").replace(/<[^>]*>/g,"").trim();
+    /* Commons zoekt op vrije tekst, dus "Sambucus nigra" vindt ook een foto
+       van een zwam die op een vlier groeit. De bestandsnaam is hier de enige
+       aanwijzing die we hebben, en die is meestal beschrijvend: eisen dat de
+       bedoelde soort erin staat en geen andere. */
+    const doel = String(la).toLowerCase().split(" ");
+    const gesl = doel[0], soortnaam = doel[1] || "";
     return Object.values(pag).map(pg=>{
       const ii = (pg.imageinfo||[])[0]; if(!ii) return null;
       const md = ii.extmetadata||{};
+      const titel = [pg.title, kaal((md.ObjectName||{}).value),
+                     kaal((md.ImageDescription||{}).value)].filter(Boolean).join(" ");
+      if(vreemdOnderwerp(titel, sp && sp.la ? sp : null)) return null;
+      const laag = titel.toLowerCase();
+      const raak = noemtWoord(laag, gesl) || noemtWoord(laag, soortnaam) ||
+                   (sp && sp.nl ? noemtWoord(laag, sp.nl.toLowerCase()) : false);
+      if(!raak) return null;
       return {url: ii.thumburl || ii.url,
         maker: kaal((md.Artist||{}).value) || "Wikimedia Commons",
         lic: kaal((md.LicenseShortName||{}).value),
@@ -3525,9 +3585,9 @@ async function soortBeeld(k){
     const basis = "occurrence/search?taxonKey="+tk+"&mediaType=StillImage"+
                   "&basisOfRecord=HUMAN_OBSERVATION&limit=30";
     try{
-      if(mnd) uit = beeldenUit(await gbif(basis + "&month=" + mnd.join(",")));
+      if(mnd) uit = beeldenUit(await gbif(basis + "&month=" + mnd.join(",")), sp);
       if(uit.length < 3){
-        const extra = beeldenUit(await gbif(basis)).filter(b=> !uit.some(x=>x.url===b.url));
+        const extra = beeldenUit(await gbif(basis), sp).filter(b=> !uit.some(x=>x.url===b.url));
         uit = uit.concat(mnd
           ? extra.filter(b=> !b.maand || mnd.includes(b.maand))
                  .concat(extra.filter(b=> b.maand && !mnd.includes(b.maand)))
@@ -3541,11 +3601,13 @@ async function soortBeeld(k){
     const extra = (await inatBeeld(sp.la)).filter(b=> !uit.some(x=>x.url===b.url));
     uit = uit.concat(extra);
   }
+  /* Zelf gemelde missers gaan er hier uit, ook als ze nog in de dagcache van
+     GBIF zitten. */
   if(uit.length < 3 && sp.la){
-    const extra = (await commonsBeeld(sp.la)).filter(b=> !uit.some(x=>x.url===b.url));
+    const extra = (await commonsBeeld(sp)).filter(b=> !uit.some(x=>x.url===b.url));
     uit = uit.concat(extra);
   }
-  return uit.slice(0,8);
+  return uit.filter(b=> !S.fotoWeg.includes(b.url)).slice(0,8);
 }
 
 /* =======================================================================
@@ -5848,6 +5910,16 @@ function qWaarvoor(s){
    bronvermelding maar een voorwaarde van de licentie. */
 const FOTO_KAS = {};      /* soortsleutel -> lijst met beelden, per sessie */
 
+function blokkeerFoto(url){
+  if(!url || S.fotoWeg.includes(url)) return;
+  S.fotoWeg.push(url);
+  /* Niet eindeloos laten groeien; de laatste driehonderd is ruim zat. */
+  if(S.fotoWeg.length > 300) S.fotoWeg = S.fotoWeg.slice(-300);
+  lsSet("fotoweg", S.fotoWeg);
+  Object.keys(FOTO_KAS).forEach(k=>{
+    if(Array.isArray(FOTO_KAS[k])) FOTO_KAS[k] = FOTO_KAS[k].filter(b=> b.url !== url);
+  });
+}
 async function beeldVoor(k){
   if(FOTO_KAS[k] !== undefined) return FOTO_KAS[k];
   try{
@@ -5885,7 +5957,15 @@ async function qBeeld(k){
   if(!b.length) return null;
   const pool = zelfdeWereld(s);
   if(pool.length < 3) return null;
-  const beeld = b[Math.floor(Math.random()*Math.min(b.length, 5))];
+  /* Voor de vraag telt alleen beeld waarvan het onderwerp vaststaat.
+     iNaturalist-soortfoto's zijn gekozen om de soort te tonen, GBIF-media
+     horen bij een nagekeken waarneming; de Commons-zoekresultaten zijn de
+     zwakste schakel en gaan daarom achteraan. */
+  const rang = x => x.bron === "iNaturalist" ? 0 : x.bron === "Wikimedia Commons" ? 2 : 1;
+  const gesorteerd = b.slice().sort((x,y)=> rang(x) - rang(y));
+  const zeker = gesorteerd.filter(x=> rang(x) < 2);
+  const bron = zeker.length ? zeker : gesorteerd;
+  const beeld = bron[Math.floor(Math.random()*Math.min(bron.length, 5))];
   const credit = [beeld.maker, beeld.lic].filter(Boolean).join(" · ");
   const risico = s.tags.includes("giftig") || (s.dubbel && s.dubbel.length);
   return {kind:"Herkenning", risk:risico, img:beeld.url, credit:credit,
@@ -6101,7 +6181,16 @@ async function check(){
   if(ok) QZ.goed++;
   const fb=document.getElementById("qFb");
   fb.className="qfb on "+(ok?"good":"bad");
-  fb.innerHTML='<b>'+(ok?"Goed":"Niet helemaal")+'</b>'+esc(q.uitleg);
+  fb.innerHTML='<b>'+(ok?"Goed":"Niet helemaal")+'</b>'+esc(q.uitleg)+
+    (q.img?'<button class="qmeld" id="qMeld">Foto klopt niet</button>':'');
+  /* Geen filter vangt alles: wat er toch doorheen komt, kun je hier zelf
+     wegsturen. De foto verdwijnt meteen en komt nooit meer terug. */
+  const meld = document.getElementById("qMeld");
+  if(meld) meld.onclick = ()=>{
+    blokkeerFoto(q.img);
+    meld.textContent = "Dank \u2014 deze foto komt niet meer terug";
+    meld.disabled = true;
+  };
   const nx=document.getElementById("qNext");
   nx.className="qbtn"; nx.disabled=false;
   nx.textContent = QZ.i===QZ.list.length-1 ? "Afronden" : "Verder";
