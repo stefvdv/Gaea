@@ -16,6 +16,15 @@ try{
     ["nivNu",      ()=>nivNu().nm],
     /* Het herbarium is de naslag bij de vragen: elke soort waarover iets
        gevraagd wordt, moet er te vinden zijn. */
+    /* De naslag na een vraag moet voor elke soort iets te lezen geven. */
+    ["naslagkaart", ()=>{
+      let fout = 0, mager = 0;
+      SPECIES.forEach(sp=>{
+        try{ const h = qInfoHtml(sp); if(!h || h.length < 60) mager++; }
+        catch(e){ fout++; }
+      });
+      return fout || mager ? fout+" fout, "+mager+" te mager" : SPECIES.length+" soorten, alle met inhoud";
+    }],
     ["herbarium compleet", ()=>{
       const in_h = new Set(SPECIES.map(x=>x.k));
       let mis = 0;

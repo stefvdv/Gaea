@@ -374,6 +374,29 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .qtext{font-family:var(--slab);font-size:24px;font-weight:600;line-height:1.22;margin:0 0 6px;
   font-variation-settings:'WONK' 1,'SOFT' 50;letter-spacing:-.3px}
 .qtext em{font-style:italic;color:var(--mos)}
+/* Naslag bij een vraag. Ligt boven de quiz (500) maar onder de loep (700),
+   zodat je een foto in de kaart alsnog kunt uitvergroten. */
+.qinfo{position:fixed;inset:0;z-index:640;display:none;align-items:flex-end;justify-content:center;
+  background:rgba(8,13,10,.66)}
+.qinfo.on{display:flex}
+.qinfo-kaart{position:relative;width:min(560px,100%);max-height:86vh;overflow:auto;
+  background:var(--perkament);color:var(--inkt);border-radius:20px 20px 0 0;
+  border:1px solid rgba(201,162,39,.45);border-bottom:none;
+  padding:18px 16px calc(var(--safe-b) + 20px);box-shadow:0 -10px 34px rgba(0,0,0,.55)}
+.qinfo-x{position:absolute;right:12px;top:12px;width:34px;height:34px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(44,42,31,.09);border:1px solid rgba(44,42,31,.18);
+  color:var(--inkt)}
+.qinfo-body h2{margin:2px 42px 2px 0;font-family:var(--slab);font-size:22px;line-height:1.2}
+.qinfo-body .la{font-style:italic;color:var(--inkt-2);font-size:14px;margin-bottom:9px}
+.qinfo-body .blok{margin-top:13px}
+.qinfo-body .kop{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--inkt-2);margin-bottom:4px}
+.qinfo-body .tekst{font-size:14.5px;line-height:1.55}
+.qinfo-body .warn{margin-top:13px}
+.qinfo-knop{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
+  margin:11px 0 0 8px;border-radius:50%;vertical-align:middle;
+  background:rgba(228,231,214,.09);border:1px solid var(--goud);color:var(--goud);
+  font-family:var(--slab);font-size:16px;font-weight:700;font-style:italic}
 .qmeld{display:block;margin:11px 0 0;padding:8px 12px;border-radius:10px;font-size:12px;
   background:rgba(228,231,214,.07);border:1px solid var(--line);color:var(--kalk-2)}
 .qmeld:disabled{opacity:.6}
@@ -1023,13 +1046,20 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
   </div>
 </div>
 
+<div class="qinfo" id="qInfo" aria-hidden="true">
+  <div class="qinfo-kaart" role="dialog" aria-modal="true" aria-labelledby="qInfoTitel">
+    <button class="qinfo-x" id="qInfoX" aria-label="Sluiten"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="qinfo-body" id="qInfoBody"></div>
+  </div>
+</div>
+
 <input type="file" id="filePick" accept="image/*" multiple hidden>
 <input type="file" id="jsonPick" accept="application/json,.json" hidden>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.26.0";
+const APP_VERSION = "0.26.1";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -5978,6 +6008,52 @@ function qWaarvoor(s){
    bronvermelding maar een voorwaarde van de licentie. */
 const FOTO_KAS = {};      /* soortsleutel -> lijst met beelden, per sessie */
 
+/* =======================================================================
+   NASLAG BIJ EEN VRAAG
+   Na het antwoord kun je doorlezen over de soort zonder de ronde kwijt te
+   raken. Eigen laag boven de quiz: de quiz blijft gewoon staan, sluiten
+   raakt alleen deze kaart. De terugknop sluit hem ook, en wel v\u00f3\u00f3r de
+   quiz aan de beurt komt.
+   ======================================================================= */
+const qInfoEl = document.getElementById("qInfo");
+function qInfoHtml(sp){
+  let h = '<h2>'+esc(sp.nl)+'</h2><div class="la">'+esc(sp.la)+'</div>'+
+    '<div class="tagrow">'+tagsHtml(sp.tags, sp.grp)+
+    (sp.mnd && sp.mnd.length ? '<span style="margin-left:2px">'+bandHtml(sp.mnd,true)+'</span>' : '')+'</div>';
+  const dood = sp.tags.includes("giftig");
+  if(sp.dubbel && sp.dubbel.length)
+    h += '<div class="warn'+(dood?' dood':'')+'"><b>Verwarbaar met</b>'+dubbelHtml(sp.dubbel)+'</div>';
+  if(sp.let)
+    h += '<div class="warn'+(dood?' dood':' oker')+'"><b>Let op</b>'+esc(sp.let)+'</div>';
+  const blok = (kop, tekst)=> tekst
+    ? '<div class="blok"><div class="kop">'+esc(kop)+'</div><div class="tekst">'+esc(tekst)+'</div></div>' : "";
+  h += blok("Veldkenmerken", sp.herken);
+  h += blok(dood ? "Wat er giftig is" : "Wat je gebruikt",
+            dood ? "Ga uit van de hele plant." : (sp.delen && sp.delen !== "\u2014" ? sp.delen : ""));
+  h += blok("Hoe je het inzet", sp.med);
+  if(sp.kwalen && sp.kwalen.length)
+    h += blok("Waarvoor", sp.kwalen.map(x=>(KWAAL_BY_K[x]||{}).nm).filter(Boolean).join(", "));
+  const st = STOF[sp.k];
+  if(st) h += blok("Werkzame stof", st.stof + " \u00b7 " + st.grp + ". " + st.uitleg);
+  const fam = famVan(sp);
+  if(fam) h += blok("Familie", famLabel(fam));
+  return h;
+}
+function qInfoOpen(k){
+  const sp = SPEC_BY_K[k]; if(!sp) return;
+  document.getElementById("qInfoBody").innerHTML = qInfoHtml(sp);
+  qInfoEl.classList.add("on");
+  qInfoEl.setAttribute("aria-hidden","false");
+  qInfoEl.querySelector(".qinfo-kaart").scrollTop = 0;
+}
+function qInfoSluit(){
+  qInfoEl.classList.remove("on");
+  qInfoEl.setAttribute("aria-hidden","true");
+}
+const qInfoOpenIs = ()=> qInfoEl.classList.contains("on");
+document.getElementById("qInfoX").onclick = qInfoSluit;
+qInfoEl.addEventListener("click", e=>{ if(e.target === qInfoEl) qInfoSluit(); });
+
 function blokkeerFoto(url){
   if(!url || S.fotoWeg.includes(url)) return;
   S.fotoWeg.push(url);
@@ -6254,7 +6330,11 @@ async function check(){
   const fb=document.getElementById("qFb");
   fb.className="qfb on "+(ok?"good":"bad");
   fb.innerHTML='<b>'+(ok?"Goed":"Niet helemaal")+'</b>'+esc(q.uitleg)+
-    (q.img?'<button class="qmeld" id="qMeld">Foto klopt niet</button>':'');
+    (q.img?'<button class="qmeld" id="qMeld">Foto klopt niet</button>':'')+
+    (q.key && SPEC_BY_K[q.key]
+      ? '<button class="qinfo-knop" id="qInfoBtn" aria-label="Meer over deze soort" title="Meer over deze soort">i</button>' : '');
+  const ib = document.getElementById("qInfoBtn");
+  if(ib) ib.onclick = ()=> qInfoOpen(q.key);
   /* Geen filter vangt alles: wat er toch doorheen komt, kun je hier zelf
      wegsturen. De foto verdwijnt meteen en komt nooit meer terug. */
   const meld = document.getElementById("qMeld");
@@ -6528,6 +6608,7 @@ window.addEventListener("popstate",()=>{
   if(afsluitOpen){ afsluitOpen = false; closeSheet(); history.pushState({},""); return; }
   if(aselEl) aselSluit();
   else if(loepEl.classList.contains("on")) sluitLoep();
+  else if(qInfoOpenIs()) qInfoSluit();
   else if(quizEl.classList.contains("on")){ quizEl.classList.remove("on"); renderLeer(); }
   else if(S.spook) wisSpook();
   else if(sheetEl.classList.contains("on")) closeSheet();
