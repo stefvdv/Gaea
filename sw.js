@@ -1,5 +1,5 @@
 /* Gaea service worker — VERSION altijd gelijk aan APP_VERSION in index.html */
-const VERSION = "0.26.1";
+const VERSION = "0.28.0";
 const SHELL = "wildpluk-shell-v" + VERSION;
 const LIB   = "wildpluk-lib-v" + VERSION;
 const TILES = "wildpluk-tiles";          /* niet versiegebonden */
@@ -58,6 +58,9 @@ self.addEventListener("fetch", e => {
   if (url.pathname.startsWith("/wiki/") || /(^|\.)wikimedia\.org$/.test(url.hostname)
       || /(^|\.)wikipedia\.org$/.test(url.hostname)) return;
   if (/(^|\.)staticflickr\.com$/.test(url.hostname)) return;
+  /* Omgekeerd geocoderen voor de plaatsnaam bij een vondst: ook verse data,
+     en het antwoord hangt aan coördinaten die nooit twee keer hetzelfde zijn. */
+  if (/(^|\.)openstreetmap\.org$/.test(url.hostname)) return;
 
   /* kaarttegels: cache-first, zo werkt een eerder bezocht gebied offline */
   if (isTile(url)) {

@@ -376,6 +376,15 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .qtext em{font-style:italic;color:var(--mos)}
 /* Naslag bij een vraag. Ligt boven de quiz (500) maar onder de loep (700),
    zodat je een foto in de kaart alsnog kunt uitvergroten. */
+/* Themakiezer: horizontaal schuivende rij chips onder de niveaukeuze. */
+.themarij{display:flex;gap:7px;overflow-x:auto;padding:0 12px 14px;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none}
+.themarij::-webkit-scrollbar{display:none}
+.themarij button{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;
+  padding:8px 12px;border-radius:999px;font-size:12.5px;white-space:nowrap;
+  background:rgba(228,231,214,.06);border:1px solid var(--line);color:var(--kalk-2)}
+.themarij button.on{background:rgba(94,122,68,.22);border-color:var(--mos);color:#fff;font-weight:600}
+.themarij button .n{font-family:var(--mono);font-size:10px;opacity:.75}
 .qinfo{position:fixed;inset:0;z-index:640;display:none;align-items:flex-end;justify-content:center;
   background:rgba(8,13,10,.66)}
 .qinfo.on{display:flex}
@@ -388,6 +397,12 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   color:var(--inkt)}
 .qinfo-body h2{margin:2px 42px 2px 0;font-family:var(--slab);font-size:22px;line-height:1.2}
 .qinfo-body .la{font-style:italic;color:var(--inkt-2);font-size:14px;margin-bottom:9px}
+.qinfo-foto{margin:10px 0 2px;border-radius:14px;overflow:hidden;background:var(--perkament-2);
+  position:relative}
+.qinfo-foto img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.qinfo-foto .bron{position:absolute;left:0;right:0;bottom:0;padding:5px 8px;font-family:var(--mono);
+  font-size:9px;letter-spacing:.05em;color:#F1E9D6;background:linear-gradient(transparent,rgba(20,26,16,.8))}
+.qinfo-foto .wacht{padding:22px 12px;text-align:center;font-size:13px;color:var(--inkt-2)}
 .qinfo-body .blok{margin-top:13px}
 .qinfo-body .kop{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--inkt-2);margin-bottom:4px}
@@ -1059,7 +1074,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.26.1";
+const APP_VERSION = "0.28.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -1643,6 +1658,145 @@ const EMA_MAP = {
    fytochemie — de stof die ertoe doet als je met de plant werkt, plus de
    groep waar hij bij hoort.
    ======================================================================= */
+/* =======================================================================
+   NAAMSOORSPRONG
+   Waar een naam vandaan komt maakt hem onthoudbaar: wie weet dat
+   Tussilago hoestverdrijver betekent, vergeet klein hoefblad niet meer.
+   Nog niet compleet — alleen wat met redelijke zekerheid te zeggen is.
+   ======================================================================= */
+const ETYM = {
+ daslook:             {t:"<i>ursinum</i> betekent ‘van de beer’. In het Nederlands werd het de das — beide dieren zouden de bollen opgraven."},
+ lookzonderlook:      {t:"<i>Alliaria</i> betekent ‘lookachtig’. De plant ruikt naar look maar hoort bij de kruisbloemigen, vandaar look-zónder-look."},
+ zevenblad:           {t:"<i>Aegopodium</i> is Grieks voor geitenvoetje, naar de bladvorm; <i>podagraria</i> verwijst naar podagra, jicht, waartegen het gebruikt werd."},
+ brandnetel:          {t:"<i>Urtica</i> komt van <i>urere</i>, branden. <i>Dioica</i> betekent tweehuizig: mannelijke en vrouwelijke bloemen staan op aparte planten."},
+ vogelmuur:           {t:"<i>Stellaria</i> komt van <i>stella</i>, ster, naar de stervormige bloemetjes. Vogels zijn dol op de zaden."},
+ speenkruid:          {t:"<i>Ficaria</i> komt van <i>ficus</i>, vijg: de wortelknolletjes lijken op vijgjes of spenen. <i>Verna</i> betekent ‘van de lente’."},
+ hondsdraf:           {t:"<i>Hederacea</i> betekent klimopachtig, naar het blad. ‘Honds’ in plantennamen betekende van oudsher: minderwaardig, niet de echte."},
+ veldzuring:          {t:"<i>Acetosa</i> komt van <i>acetum</i>, azijn — naar de zure smaak van het oxaalzuur in het blad."},
+ kleefkruid:          {t:"<i>Aparine</i> gaat terug op Grieks voor vastgrijpen. <i>Galium</i> komt van <i>gala</i>, melk: verwanten werden gebruikt om melk te stremmen."},
+ herderstasje:        {t:"<i>Bursa pastoris</i> is letterlijk herderstas, naar de driehoekige hauwtjes die op een oude reistas lijken."},
+ weegbree:            {t:"<i>Plantago</i> komt van <i>planta</i>, voetzool. <i>Lanceolata</i> betekent lancetvormig. Weegbree groeit langs de weg en heeft breed blad."},
+ madeliefje:          {t:"<i>Bellis</i> komt van <i>bellus</i>, mooi; <i>perennis</i> betekent overblijvend — het bloeit vrijwel het hele jaar."},
+ paardenbloem:        {t:"<i>Officinale</i> betekent ‘van de apotheek’, naar de <i>officina</i>, de werkruimte waar men medicijnen bereidde."},
+ kleinhoefblad:       {t:"<i>Tussilago</i> is samengesteld uit <i>tussis</i> (hoest) en <i>agere</i> (verdrijven): hoestverdrijver."},
+ klit:                {t:"<i>Lappa</i> betekent klit; <i>Arctium</i> komt van <i>arktos</i>, beer, naar de ruige vruchthoofdjes."},
+ duizendblad:         {t:"<i>Achillea</i> verwijst naar Achilles, die het als wondkruid zou hebben gebruikt; <i>millefolium</i> is duizendblad, naar het fijn verdeelde blad."},
+ brunel:              {t:"De naam gaat terug op het Duitse ‘die Bräune’, een keelontsteking waartegen de plant werd ingezet."},
+ bijvoet:             {t:"<i>Artemisia</i> verwijst naar de godin Artemis. De Nederlandse naam wordt in verband gebracht met het dragen bij de voet, tegen vermoeidheid op reis."},
+ boerenwormkruid:     {t:"Het kruid werd tegen ingewandswormen gebruikt — vandaar wormkruid. <i>Vulgare</i> betekent gewoon of algemeen."},
+ heermoes:            {t:"<i>Equisetum</i> komt van <i>equus</i> (paard) en <i>seta</i> (borstel): paardenstaart. <i>Arvense</i> betekent ‘van de akker’."},
+ sintjanskruid:       {t:"Het bloeit rond Sint-Jan, 24 juni. <i>Perforatum</i> slaat op de doorschijnende klierpuntjes die tegen het licht op gaatjes lijken."},
+ kamille:             {t:"<i>Chamomilla</i> komt van <i>chamai</i> (op de grond) en <i>melon</i> (appel), naar de appelgeur. <i>Matricaria</i> gaat terug op <i>matrix</i>, baarmoeder."},
+ moerasspirea:        {t:"<i>Ulmaria</i> betekent iepachtig, naar het blad. Uit deze plant en uit wilg werd salicylzuur geïsoleerd — aspirine is naar de oude naam <i>Spiraea</i> genoemd."},
+ valeriaan:           {t:"<i>Valeriana</i> gaat terug op <i>valere</i>: gezond zijn, sterk zijn."},
+ marjolein:           {t:"<i>Origanum</i> komt van <i>oros</i> (berg) en <i>ganos</i> (sieraad): sieraad van de berg."},
+ melisse:             {t:"<i>Melissa</i> is Grieks voor honingbij. Bijen zijn er dol op; imkers wreven er hun korven mee in."},
+ watermunt:           {t:"<i>Mentha</i> gaat terug op de nimf Minthe, die volgens de mythe in een kruid werd veranderd. <i>Aquatica</i>: van het water."},
+ waterkers:           {t:"<i>Nasturtium</i> komt van <i>nasus tortus</i>, ‘gedraaide neus’ — naar het gezicht dat je trekt bij de scherpe smaak."},
+ kaasjeskruid:        {t:"De platte vruchtjes lijken op kaasjes, vandaar de Nederlandse naam. <i>Malva</i> gaat terug op <i>malakos</i>, zacht, naar de slijmstoffen."},
+ heemst:              {t:"<i>Althaea</i> komt van Grieks <i>althaino</i>: genezen."},
+ smeerwortel:         {t:"<i>Symphytum</i> komt van <i>symphyo</i>, samengroeien — de wortel werd bij botbreuken gebruikt. Ook de oude naam beenwel wijst daarop."},
+ stinkendegouwe:      {t:"<i>Chelidonium</i> komt van <i>chelidon</i>, zwaluw: de plant zou bloeien wanneer de zwaluwen terugkomen."},
+ zeekraal:            {t:"<i>Salicornia</i> is samengesteld uit <i>sal</i> (zout) en <i>cornu</i> (hoorn), naar de gehoornde, vlezige stengeltjes op zilte grond."},
+ postelein:           {t:"<i>Oleracea</i> betekent ‘als groente gebruikt’ — een uitgang die in veel keukengewassen terugkomt."},
+ agrimonie:           {t:"<i>Eupatoria</i> verwijst naar Mithridates Eupator, een koning uit Pontus die als kruidenkenner bekendstond."},
+ engelwortel:         {t:"<i>Archangelica</i> verwijst naar de aartsengel: de plant zou tegen de pest beschermen en werd tijdens epidemieën gekauwd."},
+ hop:                 {t:"<i>Lupulus</i> betekent wolfje. Plinius vergeleek de manier waarop hop andere planten overwoekert met een wolf."},
+ vlier:               {t:"<i>Nigra</i> betekent zwart, naar de rijpe bessen. <i>Sambucus</i> wordt in verband gebracht met de sambuca, een oud snaarinstrument van vlierhout."},
+ sleedoorn:           {t:"<i>Spinosa</i> betekent doornig. De Nederlandse naam komt van de slee, de wrange vrucht die pas na vorst te eten is."},
+ meidoorn:            {t:"<i>Crataegus</i> komt van <i>kratos</i>, kracht, naar het harde hout; <i>monogyna</i> betekent één stijl — en dus één pit."},
+ hondsroos:           {t:"<i>Canina</i> betekent ‘van de hond’: de wortel zou tegen een beet van een dolle hond helpen."},
+ rimpelroos:          {t:"<i>Rugosa</i> betekent gerimpeld, naar het diep geaderde, bobbelige blad."},
+ framboos:            {t:"<i>Idaeus</i> verwijst naar de berg Ida op Kreta, waar de plant volgens Plinius vandaan zou komen."},
+ bosbes:              {t:"<i>Myrtillus</i> betekent kleine mirte, naar de gelijkenis van het blad."},
+ duindoorn:           {t:"<i>Hippophae</i> komt van <i>hippos</i> (paard) en <i>phaos</i> (glans): paarden zouden er een glanzende vacht van krijgen."},
+ lijsterbes:          {t:"<i>Aucuparia</i> komt van <i>aucupari</i>, vogels vangen — de bessen dienden als lokaas. Ook de Nederlandse naam wijst op de lijster."},
+ hazelaar:            {t:"<i>Avellana</i> verwijst naar Avella in Campanië, in de oudheid bekend om zijn hazelnoten."},
+ walnoot:             {t:"<i>Juglans</i> komt van <i>Jovis glans</i>: eikel van Jupiter. <i>Regia</i> betekent koninklijk."},
+ beuk:                {t:"<i>Sylvatica</i> betekent ‘van het bos’. <i>Fagus</i> hangt samen met Grieks <i>phagein</i>, eten — naar de eetbare nootjes."},
+ eik:                 {t:"<i>Robur</i> betekent kracht en hardheid; hetzelfde woord staat aan de basis van ‘robuust’."},
+ berk:                {t:"<i>Pendula</i> betekent hangend, naar de slanke, afhangende twijgen."},
+ douglas:             {t:"<i>Menziesii</i> eert Archibald Menzies, die de boom beschreef; <i>Pseudotsuga</i> betekent valse tsuga — hij lijkt op een hemlockspar zonder het te zijn."},
+ scheerling:          {t:"<i>Conium</i> gaat terug op <i>koneion</i>, het gif waarmee Socrates werd terechtgesteld. <i>Maculatum</i> betekent gevlekt, naar de paarse vlekken op de stengel."},
+ wolfskers:           {t:"<i>Atropa</i> verwijst naar Atropos, de schikgodin die de levensdraad doorknipt. <i>Belladonna</i> betekent mooie vrouw: druppels in de ogen verwijdden de pupil."},
+ monnikskap:          {t:"<i>Napellus</i> betekent klein raapje, naar de vorm van de wortelknol. De Nederlandse naam komt van de helmvormige bovenste bloemslip."},
+ vingerhoedskruid:    {t:"<i>Digitalis</i> komt van <i>digitus</i>, vinger — de bloemen passen als een vingerhoed om een vingertop."},
+ doornappel:          {t:"<i>Stramonium</i> is van onzekere herkomst; de Nederlandse naam beschrijft de stekelige vruchtdoos precies."},
+ bilzekruid:          {t:"<i>Hyoscyamus</i> komt van <i>hys</i> (varken) en <i>kyamos</i> (boon): varkensboon."},
+ taxus:               {t:"<i>Baccata</i> betekent ‘met bessen’ — al is het rode omhulsel botanisch geen bes maar een zaadrok."},
+ koningskaars:        {t:"De stevige bloeistengel werd in vet of hars gedoopt en als toorts gebruikt. <i>Verbascum</i> gaat mogelijk terug op <i>barbascum</i>, naar de baardharige beharing."},
+ sleutelbloem:        {t:"<i>Primula veris</i> betekent letterlijk ‘eerste van de lente’. De hangende bloemtros werd gezien als de sleutelbos van Petrus."},
+ maartsviooltje:      {t:"<i>Odorata</i> betekent geurend — dit is het viooltje waar de parfumerie op teerde."},
+ klimop:              {t:"<i>Helix</i> betekent windend of spiraalvormig, naar de manier waarop de plant omhoogklimt."},
+ jeneverbes:          {t:"De drank is naar de bes genoemd, niet andersom: jenever gaat via het Frans terug op <i>Juniperus</i>."},
+ wilg:                {t:"<i>Alba</i> betekent wit, naar de viltige onderkant van het blad. Uit wilgenbast komt salicine, de stof achter de latere aspirine."},
+ vliegenzwam:         {t:"<i>Muscaria</i> komt van <i>musca</i>, vlieg: stukjes hoed in melk werden gebruikt om vliegen te doden."},
+ groeneknolamaniet:   {t:"<i>Phalloides</i> betekent fallusvormig, naar het jonge vruchtlichaam dat nog in het eivormige omhulsel zit."},
+ eekhoorntjesbrood:   {t:"<i>Edulis</i> betekent eetbaar. De Nederlandse naam speelt op de eekhoorn die voorraden aanlegt."},
+ cantharel:           {t:"<i>Cibarius</i> betekent ‘voor spijs’; <i>Cantharellus</i> komt van <i>kantharos</i>, een drinkbeker, naar de trechtervorm."},
+ judasoor:            {t:"De zwam groeit vooral op vlier, de boom waaraan Judas zich volgens de overlevering verhing. <i>Auricula</i> betekent oortje."},
+ oesterzwam:          {t:"<i>Ostreatus</i> betekent oestervormig; <i>Pleurotus</i> komt van <i>pleuron</i>, zijkant, naar de steel die opzij staat."},
+ weidekringzwam:      {t:"<i>Marasmius</i> komt van <i>marasmos</i>, uitdroging: de hoedjes drogen in en leven bij regen weer op. <i>Oreades</i> zijn de bergnimfen — naar de heksenkringen."},
+ kluifzwam:           {t:"<i>Esculenta</i> betekent eetbaar. Dat is een historische vergissing die in de naam is blijven staan."},
+ parelamaniet:        {t:"<i>Rubescens</i> betekent ‘rood aanlopend’: het vlees kleurt roze tot roodbruin bij kneuzing of vraat."},
+ tonderzwam:          {t:"<i>Fomes</i> en <i>fomentarius</i> betekenen tondel: de vlezige laag onder de korst werd geprepareerd tot vuurmaakmateriaal."},
+ elfenbankje:         {t:"<i>Versicolor</i> betekent veelkleurig, naar de gekleurde zones op de hoed."},
+ kaleinktzwam:        {t:"<i>Atramentaria</i> komt van <i>atramentum</i>, inkt: de hoed lost bij het rijpen op tot een zwarte drab die als inkt is gebruikt."},
+};
+
+/* =======================================================================
+   VOLKSGEBRUIK
+   Wat mensen met een soort déden, buiten keuken en apotheek om: vezel,
+   verf, vuur, bier, bijgeloof. Overlevering, geen voorschrift.
+   ======================================================================= */
+const VOLKS = {
+ duizendblad:         {t:"Op het slagveld als wondkruid gebruikt — vandaar oude namen als soldatenkruid en timmermanskruid."},
+ boerenwormkruid:     {t:"Tegen ingewandswormen ingezet en tussen linnengoed gelegd tegen motten."},
+ tonderzwam:          {t:"Geprepareerd tot tondel voor het vuurslag. De ijsmummie Ötzi droeg er stukken van bij zich."},
+ vlier:               {t:"De vlier bij het huis gold als beschermboom. Wie hem wilde snoeien, vroeg eerst de vlier om toestemming."},
+ sintjanskruid:       {t:"Geplukt in de Sint-Jansnacht en in huis gehangen tegen onheil. De oude apothekersnaam was <i>fuga daemonum</i>: duivelsvlucht."},
+ bijvoet:             {t:"Als midzomerkruid gedragen en in de schoen gelegd tegen vermoeidheid op lange voettochten."},
+ kalmoes:             {t:"Als geurkruid over de vloer van kerken en zalen gestrooid; de gekneusde bladeren geven een zoete geur af."},
+ gagel:               {t:"Voor de opkomst van hop het bitter in gruit, het kruidenmengsel waarmee bier werd gebrouwen."},
+ hop:                 {t:"Verdrong vanaf de late middeleeuwen de gruitkruiden in het bier, omdat hop het langer houdbaar maakt."},
+ lisdodde:            {t:"Het zaadpluis diende als vulling voor kussens en later voor reddingsvesten."},
+ koningskaars:        {t:"De in vet gedoopte bloeistengel brandde als toorts; het viltige blad werd als lampenpit gebruikt."},
+ heermoes:            {t:"Bekend als schaafstro: door het kiezelzuur schuurt het tin, hout en vloeren."},
+ brandnetel:          {t:"De bastvezel werd tot neteldoek gesponnen. In de Eerste Wereldoorlog zijn er zelfs uniformen van geweven."},
+ smeerwortel:         {t:"Bij botbreuken op verband gesmeerd, vandaar de oude naam beenwel: wat het been doet groeien."},
+ eik:                 {t:"Eikels werden geroosterd als koffievervanger in schaarse tijden, en varkens gingen het bos in om te akeren."},
+ linde:               {t:"De dorpslinde was eeuwenlang de plek waar recht werd gesproken en waar men na de kerk bijeenkwam."},
+ taxus:               {t:"Het taaie, veerkrachtige hout was het materiaal voor de Engelse longbow."},
+ wilg:                {t:"Teenwilg leverde het vlechtwerk voor manden en visfuiken; de bittere bast werd bij koorts gekauwd."},
+ meidoorn:            {t:"Als veekerende haag geplant — haagdoorn — en als bloeiende meitak in huis gehaald."},
+ hulst:               {t:"Groen in de winter en daarom een vaste kersttak; het harde witte hout werd voor zweepstelen gebruikt."},
+ klimop:              {t:"Een klimoptak boven de deur was het teken van een herberg waar wijn geschonken werd."},
+ weegbree:            {t:"Het blad werd in het veld op wonden en insectenbeten gelegd — het pleisterkruid van de wandelaar."},
+ paardenbloem:        {t:"De gebrande wortel deed dienst als koffiesurrogaat, net als cichorei."},
+ cichorei:            {t:"De gebrande wortel werd op grote schaal als koffievervanger verwerkt en is dat in sommige streken gebleven."},
+ klit:                {t:"De weerhaakjes van de klitten brachten George de Mestral op het idee voor klittenband."},
+ zeekraal:            {t:"De as van zoutplanten leverde soda voor glas- en zeepmakerij."},
+ berkenzwam:          {t:"Reepjes van de zwam dienden als aanzetriem om scheermessen op scherp te brengen."},
+ reuzenbovist:        {t:"In plakken gebakken gegeten; het sponzige binnenste is ook als bloedstelpend verband gebruikt."},
+ vliegenzwam:         {t:"Stukjes hoed in een schotel melk trokken vliegen aan en doodden ze — vandaar de naam."},
+ hazelaar:            {t:"De gevorkte hazelaartak was het gereedschap van de wichelroedeloper."},
+ lijsterbes:          {t:"De bessen dienden als lokaas bij lijsterstrikken; een tak boven de staldeur moest heksen weren."},
+ moerasspirea:        {t:"Als strooikruid over de vloer gelegd om de zoete geur; ook wel bruidsbedstro genoemd."},
+ braam:               {t:"Onder een gewortelde braamboog door kruipen gold als genezend ritueel bij kinderziekten."},
+ kamille:             {t:"Naast het gebruik bij vrouwenklachten was een aftreksel de spoeling om blond haar op te halen."},
+ heemst:              {t:"De slijmerige wortel werd kinderen te kauwen gegeven bij het tanden krijgen. De marshmallow dankt er zijn naam aan."},
+ kaasjeskruid:        {t:"Kinderen aten de platte vruchtjes en noemden ze kaasjes — de naam van de plant komt er rechtstreeks vandaan."},
+ zilverschoon:        {t:"Het zilverige blad werd in de schoen gelegd tegen schuren op lange tochten."},
+ tormentil:           {t:"De rode wortelstok werd gebruikt om leer te looien en om jenever te kleuren."},
+ hondsdraf:           {t:"Vóór hop een van de kruiden waarmee bier op smaak en houdbaar werd gemaakt."},
+ beuk:                {t:"Uit beukennootjes werd olie geslagen voor lampen en de keuken; de perskoek ging naar het vee."},
+ jeneverbes:          {t:"De bessen gaven jenever zijn smaak; takken werden verbrand om vlees te roken en stallen te ontsmetten."},
+ walnoot:             {t:"De groene bolster leverde een bruine verf voor hout, haar en wol."},
+ bosbes:              {t:"Het sap diende als paars-blauwe verfstof voor wol en linnen."},
+ stinkendegouwe:      {t:"Het oranje melksap werd op wratten gestreken — de plant heet daarom ook wel stinkende gouwe of wrattenkruid."},
+ judasoor:            {t:"In de Chinese keuken al eeuwen een vaste zwam; in Europa vooral bekend om de naam en de vindplaats op vlier."},
+};
+
 const STOF = {
  brandnetel:      {stof:"Histamine en mierenzuur", grp:"aminen", uitleg:"In de brandharen. Verhitting of kneuzen breekt ze af; daarom prikt gekookte netel niet."},
  sintjanskruid:   {stof:"Hypericine en hyperforine", grp:"naftodianthronen", uitleg:"Hyperforine jaagt leverenzymen aan en verzwakt daardoor onder meer de pil en bloedverdunners."},
@@ -3209,8 +3363,10 @@ const S = {
     lsSet("filter",f); return f;
   })(),
   scr:"map", open:null, urls:new Map(),
-  leer:lsGet("leer",{streak:0,laatst:null,totaal:0,doel:10,niveau:"herkennen"}),
-  specView:"nu", kastView:"alles", kastMode:"kast", recView:"alles",
+  leer:lsGet("leer",{streak:0,laatst:null,totaal:0,doel:10,niveau:"herkennen",
+    thema:{herkennen:"alles",gebruik:"alles",namen:"alles"}}),
+  /* Het herbarium is een naslagwerk; dat hoort compleet open te gaan. */
+  specView:"alle", kastView:"alles", kastMode:"kast", recView:"alles",
   spook:null, ontdekVol:null, concept:null, thuis:lsGet("thuis",null), afsluiten:false,
   eigen:lsGet("eigenrecepten",[]),
   gevuld:new Set(), vulBezig:false, vulTimer:null, vulGemeld:false,
@@ -3884,7 +4040,12 @@ function startGps(){
       S.meMarker.setLatLng([S.pos.lat,S.pos.lng]);
       S.meCircle.setLatLng([S.pos.lat,S.pos.lng]).setRadius(S.pos.acc);
     }
-    if(S.follow) S.map.setView([S.pos.lat,S.pos.lng], Math.max(S.map.getZoom(),17), {animate:true});
+    /* Vroeger schoof de kaart mee met elke GPS-tik. Elke verschuiving is een
+       moveend, en dus een nieuwe GBIF-ronde: de kaart stond permanent te
+       verversen en kwam nooit af. De stip loopt nu mee, het beeld niet. De
+       kaart springt alleen terug als je zelf helemaal uit beeld gelopen bent. */
+    if(S.follow && !S.map.getBounds().pad(-0.15).contains([S.pos.lat,S.pos.lng]))
+      S.map.setView([S.pos.lat,S.pos.lng], S.map.getZoom(), {animate:true});
   }, err=>{
     toast(err.code===1 ? "Locatie geweigerd. Zet toestemming aan in je browser." : "Geen GPS-fix. Probeer buiten opnieuw.");
     setFollow(false);
@@ -4618,7 +4779,7 @@ async function openSheet(id){
     (sp?'<div data-wacht style="font-size:13px;color:var(--inkt-2);padding:6px 0">Ophalen…</div>':'')+'</div></div>';
 
   h += '<div class="sec">'+sech("Veldgegevens",'<button data-act="edit">Bewerken</button>','pin')+
-    kv("Plek", pin.plek||"—")+kv("Standplaats", pin.habitat||"—")+kv("Hoeveelheid", pin.hoev||"—")+
+    kv("Plek", pin.plek || pin.plaats || "—")+kv("Coördinaten", coordTekst(pin.lat,pin.lng))+kv("Standplaats", pin.habitat||"—")+kv("Hoeveelheid", pin.hoev||"—")+
     kv("Toegang",(TOEGANG.find(t=>t[0]===pin.toegang)||["","—"])[1])+
     kv("Zekerheid", pin.zeker==="zeker"?"Zeker gedetermineerd":"Nog te bevestigen")+
     '<div class="kv"><span>Coördinaten</span><span class="coords">'+pin.lat.toFixed(5)+", "+pin.lng.toFixed(5)+'</span></div></div>';
@@ -4775,6 +4936,44 @@ function harvestForm(pinId){
     pin.gewijzigd = new Date().toISOString();
     await dbPut("pins",pin); toast("Oogst genoteerd"); openSheet(pinId);
   };
+}
+/* =======================================================================
+   WAAR JE STOND
+   Een vondst zonder plaatsnaam is later moeilijk terug te vinden. Nominatim
+   geeft straat en plaats terug; dat vragen we \u00e9\u00e9n keer per vondst en bewaren
+   we bij de pin. Lukt het niet \u2014 offline, of buiten het bereik \u2014 dan blijven
+   de co\u00f6rdinaten over, en die zijn altijd beter dan niets.
+   ======================================================================= */
+const coordTekst = (lat,lng)=> lat.toFixed(5)+", "+lng.toFixed(5);
+async function zoekPlaats(lat,lng){
+  try{
+    const url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=17&addressdetails=1"+
+      "&lat="+lat+"&lon="+lng;
+    const r = await fetch(url, {headers:{"Accept":"application/json"}});
+    if(!r.ok) return null;
+    const d = await r.json();
+    const a = d.address || {};
+    /* Van fijn naar grof: een natuurgebied of straat zegt meer dan de gemeente. */
+    const fijn = a.nature_reserve || a.forest || a.park || a.wood || a.leisure ||
+                 a.road || a.pedestrian || a.footway || a.hamlet || a.neighbourhood || a.suburb;
+    const grof = a.city || a.town || a.village || a.municipality || a.county;
+    const uit = [fijn, grof].filter(Boolean).filter((x,i,arr)=> arr.indexOf(x)===i);
+    return uit.length ? uit.join(", ") : (d.name || null);
+  }catch(e){ return null; }
+}
+/* De plaatsnaam van een vondst zoals hij op het kaartje hoort te staan. */
+function pinPlek(p){
+  return p.plek || p.plaats || coordTekst(p.lat, p.lng);
+}
+/* Haalt de naam op als hij nog ontbreekt en bewaart hem bij de vondst. */
+async function vulPlaats(pin){
+  if(!pin || pin.plaats || pin.plaatsGezocht) return;
+  pin.plaatsGezocht = true;
+  const nm = await zoekPlaats(pin.lat, pin.lng);
+  if(!nm) return;
+  pin.plaats = nm;
+  try{ await dbPut("pins", pin); }catch(e){}
+  if(S.scr === "list") renderList();
 }
 function leegPin(lat,lng,acc){
   return {id:uid("pin_"),lat,lng,acc:acc||null,spec:null,naam:"",latijn:"",plek:"",habitat:"",hoev:"",
@@ -5208,7 +5407,7 @@ async function renderList(){
         :'<span class="dot d-'+pinKlass(p)+'" style="width:13px;height:13px"></span>')+'</div>'+
       '<div class="body"><div class="nm">'+esc(pinName(p))+'</div>'+
       (pinLatin(p)?'<div class="la">'+esc(pinLatin(p))+'</div>':'')+
-      '<div class="meta">'+esc(p.plek||"geen plek")+' · '+esc(shortd(p.gemaakt))+
+      '<div class="meta">'+esc(pinPlek(p))+' · '+esc(shortd(p.gemaakt))+
       (p.oogst&&p.oogst.length?' · '+p.oogst.length+'× geoogst':'')+'</div>'+
       (sp?bandHtml(sp.mnd):'')+'</div><span class="dot d-'+pinKlass(p)+'"></span></button>';
   }).join("");
@@ -5217,6 +5416,15 @@ async function renderList(){
     go("map"); S.map.setView([p.lat,p.lng],Math.max(S.map.getZoom(),17)); openSheet(p.id);
   });
   hydratePhotos(body);
+  /* Ontbrekende plaatsnamen alsnog ophalen. Nominatim vraagt om hooguit \u00e9\u00e9n
+     verzoek per seconde, dus netjes op een rij achter elkaar. */
+  (async ()=>{
+    for(const p of S.pins){
+      if(p.plaats || p.plaatsGezocht) continue;
+      await vulPlaats(p);
+      await new Promise(r=> setTimeout(r, 1100));
+    }
+  })();
 }
 document.getElementById("qList").oninput = renderList;
 
@@ -5316,7 +5524,7 @@ function renderSpec(){
   if(v==="nu" && mijn.length){
     h += '<p class="grouphd">Jouw plekken, nu</p>' + mijn.map(p=>'<button class="rec" data-id="'+p.id+'">'+
       '<div class="th">'+(p.fotos&&p.fotos.length?'<img data-ph="'+p.fotos[p.fotos.length-1]+'" alt="">':'<span class="dot d-'+pinKlass(p)+'" style="width:13px;height:13px"></span>')+'</div>'+
-      '<div class="body"><div class="nm">'+esc(pinName(p))+'</div><div class="meta">'+esc(p.plek||"geen plek")+'</div>'+
+      '<div class="body"><div class="nm">'+esc(pinName(p))+'</div><div class="meta">'+esc(pinPlek(p))+'</div>'+
       bandHtml(SPEC_BY_K[p.spec].mnd)+'</div><span class="dot d-'+pinKlass(p)+'"></span></button>').join("")+
       '<p class="grouphd">Wat er deze maand nog meer is</p>';
   }
@@ -5744,15 +5952,79 @@ const NIVEAUS = {
     opties:4,
     pool:()=> SPECIES.filter(x=> (x.kwalen && x.kwalen.length) || x.med ||
       x.tags.includes("eetbaar") || x.tags.includes("giftig")),
-    vragen:["waarvoor","deel","maand","let","recept","brouwsel","med"], beeldDeel:0.15
+    vragen:["waarvoor","deel","maand","let","recept","brouwsel","med","volks","extractie"], beeldDeel:0.15
   },
   namen: {
     nm:"Namen & stoffen",
     uitleg:"Wetenschappelijke namen en de stoffen waar de werking in zit",
     opties:4, pool:()=> SPECIES,
-    vragen:["latijn","nl","stof","stofgroep"], beeldDeel:0.15, zwaar:true
+    vragen:["latijn","nl","stof","stofgroep","etym"], beeldDeel:0.15, zwaar:true
   }
 };
+/* =======================================================================
+   THEMA'S
+   Een niveau zegt w\u00e1t voor soort vraag je krijgt; een thema zegt waarover.
+   Zonder thema kwam bijna alles op het gif uit \u2014 de vijver is voor 23%
+   giftig maar de weging duwde die soorten naar de kop van elke ronde.
+   `pool` snoeit de soortenvijver, `vragen` beperkt de vraagsoorten.
+   ======================================================================= */
+const plant = s => s.grp !== "zwam";
+const zwam  = s => s.grp === "zwam";
+const heeft = t => s => s.tags.includes(t);
+const en = (...f) => s => f.every(g=> g(s));
+const THEMAS = {
+  herkennen: [
+    {k:"alles",    nm:"Alles"},
+    {k:"medplant", nm:"Medicinale planten",     pool:en(plant, heeft("medicinaal"))},
+    {k:"eetplant", nm:"Eetbare planten",        pool:en(plant, heeft("eetbaar"))},
+    {k:"gifplant", nm:"Giftige planten",        pool:en(plant, heeft("giftig"))},
+    {k:"medzwam",  nm:"Medicinale zwammen",     pool:en(zwam, heeft("medicinaal"))},
+    {k:"eetzwam",  nm:"Eetbare zwammen",        pool:en(zwam, heeft("eetbaar"))},
+    {k:"gifzwam",  nm:"Giftige zwammen",        pool:en(zwam, heeft("giftig"))},
+    {k:"verwar",   nm:"Verwarringsgevaar",      pool:s=> s.dubbel && s.dubbel.length,
+     vragen:["verwar","herken"], beeldDeel:0.5}
+  ],
+  gebruik: [
+    {k:"alles",     nm:"Alles"},
+    {k:"extractie", nm:"Extractie",       vragen:["extractie","brouwsel"],
+     pool:s=> alleRecepten().some(r=> (r.soorten||[]).includes(s.k) && r.maaksel)},
+    {k:"recept",    nm:"Recepten",        vragen:["recept"],
+     pool:s=> alleRecepten().some(r=> (r.soorten||[]).includes(s.k))},
+    {k:"kwaal",     nm:"Kwaal en kruid",  vragen:["waarvoor","med"],
+     pool:s=> (s.kwalen && s.kwalen.length) || !!s.med},
+    {k:"volks",     nm:"Volksgebruiken",  vragen:["volks"], pool:s=> !!VOLKS[s.k]},
+    {k:"eetbaar",   nm:"Eetbaar bereiden",vragen:["deel","recept","med"], pool:heeft("eetbaar")},
+    {k:"oogst",     nm:"Oogstseizoen",    vragen:["maand"], pool:s=> s.mnd && s.mnd.length}
+  ],
+  namen: [
+    {k:"alles",     nm:"Alles"},
+    {k:"stof",      nm:"Werkzame stoffen",         vragen:["stof","stofgroep"], pool:s=> !!STOF[s.k]},
+    {k:"latijn",    nm:"Wetenschappelijke namen",  vragen:["latijn","nl"]},
+    {k:"oorsprong", nm:"Waar de naam vandaan komt",vragen:["etym"], pool:s=> !!ETYM[s.k]}
+  ]
+};
+function themaNu(){
+  const lijst = THEMAS[S.leer.niveau] || [];
+  const gekozen = (S.leer.thema || {})[S.leer.niveau];
+  return lijst.find(t=> t.k === gekozen) || lijst[0] || {k:"alles", nm:"Alles"};
+}
+/* De vijver van het niveau, gesnoeid door het thema. Levert het thema te
+   weinig soorten voor een ronde, dan valt hij terug op het hele niveau:
+   liever een ruimere ronde dan een lege. */
+function themaPool(){
+  const basis = nivNu().pool();
+  const t = themaNu();
+  if(!t.pool) return basis;
+  const uit = basis.filter(t.pool);
+  return uit.length >= 4 ? uit : basis;
+}
+function themaVragen(){ return themaNu().vragen || nivNu().vragen; }
+function themaBeeldDeel(){
+  const t = themaNu();
+  return t.beeldDeel !== undefined ? t.beeldDeel
+       : (nivNu().beeldDeel !== undefined ? nivNu().beeldDeel : 0.5);
+}
+
 function eigenSoorten(){ return new Set(S.pins.map(p=>p.spec).filter(Boolean)); }
 function nivNu(){ return NIVEAUS[S.leer.niveau] || NIVEAUS.herkennen; }
 
@@ -5775,9 +6047,12 @@ const dueKeys = ()=> SPECIES.filter(s=>{ const r=S.srs[s.k]; return !r || r.due<
 function leerGewicht(k){
   let w=0; const s=SPEC_BY_K[k];
   if(S.pins.some(p=>p.spec===k)) w+=10;
-  if(s.tags.includes("giftig")) w+=4;
-  if(s.grp==="zwam") w+=2;
-  if(s.dubbel&&s.dubbel.length) w+=3;
+  /* Gif kreeg hier +4 en verwarbaarheid +3, en omdat giftige soorten bijna
+     altijd allebei hebben, dreven ze naar de kop van elke ronde: de vijver is
+     voor 23% giftig maar de vragen waren het bijna allemaal. Een klein duwtje
+     volstaat; wat je fout doet weegt zwaarder dan wat gevaarlijk is. */
+  if(s.tags.includes("giftig")) w+=1;
+  if(s.dubbel&&s.dubbel.length) w+=1;
   const r=S.srs[k]; if(r && r.fout>r.goed) w+=6;
   return w;
 }
@@ -5794,7 +6069,7 @@ function balanceer(keys){
   keys.forEach(k => ((SPEC_BY_K[k]||{}).grp === "zwam" ? zwam : rest).push(k));
   let uit = keys;
   if(zwam.length > max){
-    const vijver = nivNu().pool().filter(x=> x.grp !== "zwam").map(x=>x.k);
+    const vijver = themaPool().filter(x=> x.grp !== "zwam").map(x=>x.k);
     const aanvul = shuffle(vijver.filter(k=> !rest.includes(k)));
     uit = rest.concat(zwam.slice(0, max));
     while(uit.length < keys.length && aanvul.length) uit.push(aanvul.pop());
@@ -5819,7 +6094,7 @@ function balanceer(keys){
        over kwalen en bereiding. */
     const maxLet = Math.max(1, Math.floor(uit.length / 8));
     if(let_.length > maxLet){
-      const aanvul = shuffle(nivNu().pool().map(x=>x.k)
+      const aanvul = shuffle(themaPool().map(x=>x.k)
         .filter(k=> !alleenLet(k) && !vol.includes(k)));
       uit = vol.concat(let_.slice(0, maxLet));
       while(uit.length < keys.length && aanvul.length) uit.push(aanvul.pop());
@@ -5835,7 +6110,13 @@ function renderLeer(){
   let h='<p class="grouphd">Waarover</p><div class="seg" id="leerNiv" style="margin:0 12px 14px">'+
     Object.entries(NIVEAUS).map(([k,v])=>'<button data-v="'+k+'"'+
       (S.leer.niveau===k?' class="on"':'')+'>'+esc(v.nm)+'</button>').join("")+'</div>'+
-    '<p class="sub" style="margin:-6px 14px 14px">'+esc(nivNu().uitleg)+'</p>'+
+    '<p class="sub" style="margin:-6px 14px 10px">'+esc(nivNu().uitleg)+'</p>'+
+    '<div class="themarij" id="leerThema">'+
+    (THEMAS[S.leer.niveau]||[]).map(t=>{
+      const n = t.pool ? nivNu().pool().filter(t.pool).length : nivNu().pool().length;
+      return '<button data-t="'+t.k+'"'+(themaNu().k===t.k?' class="on"':'')+'>'+
+        esc(t.nm)+'<span class="n">'+n+'</span></button>';
+    }).join("")+'</div>'+
     '<div class="streak">'+KAARTHOEK+
     '<div><div class="big">'+S.leer.streak+'</div><div class="cap">Dagen op rij</div></div>'+
     '<div><div class="big">'+geleerd+'</div><div class="cap">Soorten zitten erin</div></div>'+
@@ -5863,6 +6144,12 @@ function renderLeer(){
     }).join("");
   }
   document.getElementById("leerBody").innerHTML=h;
+  const th = document.getElementById("leerThema");
+  if(th) th.querySelectorAll("button").forEach(b=> b.onclick=()=>{
+    S.leer.thema = S.leer.thema || {};
+    S.leer.thema[S.leer.niveau] = b.dataset.t;
+    lsSet("leer", S.leer); renderLeer();
+  });
   const niv = document.getElementById("leerNiv");
   if(niv) niv.querySelectorAll("button").forEach(b=> b.onclick=()=>{
     S.leer.niveau = b.dataset.v; lsSet("leer", S.leer); renderLeer();
@@ -5970,6 +6257,41 @@ function qMed(s){
     opts:shuffle([s.med,...w]).map(esc), aTxt:esc(s.med), uitleg:s.med,
     tip:"Denk aan het deel dat je oogst en wat daarvan te maken valt."};
 }
+/* Waar de naam vandaan komt. */
+function qEtym(s){
+  const eigen = ETYM[s.k]; if(!eigen) return null;
+  const n = nivNu().opties - 1;
+  const w = unieke(shuffle(Object.keys(ETYM).filter(k=> k!==s.k).map(k=>ETYM[k].t)), eigen.t, n);
+  if(w.length < n) return null;
+  return {kind:"Naam",risk:false,q:"Waar komt de naam <em>"+esc(s.nl)+"</em> \u2014 <i>"+esc(s.la)+"</i> \u2014 vandaan?",
+    opts:shuffle([eigen.t,...w]), aTxt:eigen.t, uitleg:eigen.t,
+    tip:"Kijk naar de wetenschappelijke naam: die beschrijft vaak een kenmerk of een gebruik."};
+}
+/* Wat mensen ermee deden, buiten keuken en apotheek om. */
+function qVolks(s){
+  const eigen = VOLKS[s.k]; if(!eigen) return null;
+  const n = nivNu().opties - 1;
+  const w = unieke(shuffle(Object.keys(VOLKS).filter(k=> k!==s.k).map(k=>VOLKS[k].t)), eigen.t, n);
+  if(w.length < n) return null;
+  return {kind:"Gebruik",risk:false,q:"Waar werd <em>"+esc(s.nl)+"</em> vroeger voor gebruikt?",
+    opts:shuffle([eigen.t,...w]), aTxt:eigen.t, uitleg:eigen.t,
+    tip:"Denk aan vezel, verf, vuur, bier of bijgeloof \u2014 niet aan de keuken."};
+}
+/* Hoe je een kruid wegzet: de vuistregel per bereidingsvorm. */
+function qExtractie(s){
+  const rec = alleRecepten().filter(r=> (r.soorten||[]).includes(s.k) && r.maaksel);
+  if(!rec.length) return null;
+  const mk = MAAKSELS.find(m=> m.k === rec[0].maaksel);
+  if(!mk || !mk.hint) return null;
+  const n = nivNu().opties - 1;
+  const w = unieke(shuffle(MAAKSELS.filter(m=> m.k!==mk.k && m.hint).map(m=>m.hint)), mk.hint, n);
+  if(w.length < n) return null;
+  return {kind:"Bereiding",risk:false,
+    q:"Van <em>"+esc(s.nl)+"</em> maak je een "+esc(mk.nm.toLowerCase())+". Wat is daarbij de vuistregel?",
+    opts:shuffle([mk.hint,...w]).map(esc), aTxt:esc(mk.hint),
+    uitleg:mk.nm+": "+mk.hint+". Rijpt in "+mk.rijp+" dagen, houdbaar ongeveer "+Math.round(mk.houd/30)+" maanden.",
+    tip:"Denk aan het oplosmiddel: alcohol, azijn, honing, olie of zout."};
+}
 function qHerken(s){
   const n = nivNu().opties - 1;
   const w = unieke(zelfdeWereld(s).filter(x=>x.herken&&x.herken.length>40).map(x=>x.herken), s.herken, n);
@@ -6018,6 +6340,7 @@ const FOTO_KAS = {};      /* soortsleutel -> lijst met beelden, per sessie */
 const qInfoEl = document.getElementById("qInfo");
 function qInfoHtml(sp){
   let h = '<h2>'+esc(sp.nl)+'</h2><div class="la">'+esc(sp.la)+'</div>'+
+    '<div class="qinfo-foto" id="qInfoFoto"><div class="wacht">Foto ophalen\u2026</div></div>'+
     '<div class="tagrow">'+tagsHtml(sp.tags, sp.grp)+
     (sp.mnd && sp.mnd.length ? '<span style="margin-left:2px">'+bandHtml(sp.mnd,true)+'</span>' : '')+'</div>';
   const dood = sp.tags.includes("giftig");
@@ -6042,6 +6365,22 @@ function qInfoHtml(sp){
 function qInfoOpen(k){
   const sp = SPEC_BY_K[k]; if(!sp) return;
   document.getElementById("qInfoBody").innerHTML = qInfoHtml(sp);
+  /* Beeld erbij: bij een naslag over een soort wil je hem ook z\u00eden. Komt uit
+     dezelfde kas als de quizfoto's, dus meestal staat hij er meteen. Het
+     soorttoken voorkomt dat een laat antwoord in een andere kaart landt. */
+  const vak = document.getElementById("qInfoFoto");
+  if(vak){
+    vak.dataset.soort = k;
+    soortBeeld(k).then(b=>{
+      if(vak.dataset.soort !== k) return;
+      if(!b.length){ vak.remove(); return; }
+      const f = b[0];
+      vak.innerHTML = '<img src="'+esc(f.url)+'" alt="" loading="lazy">'+
+        '<div class="bron">'+esc(f.maker)+(f.lic?' \u00b7 '+esc(f.lic):'')+'</div>';
+      vak.querySelector("img").onclick = ()=>
+        openLoep(f.url, [f.maker, f.lic].filter(Boolean).join(" \u00b7 "));
+    }).catch(()=> vak.remove());
+  }
   qInfoEl.classList.add("on");
   qInfoEl.setAttribute("aria-hidden","false");
   qInfoEl.querySelector(".qinfo-kaart").scrollTop = 0;
@@ -6175,7 +6514,7 @@ function qBrouwsel(s){
 
 const GEN_NAAM = new Map();
 function makeQuestion(k){
-  const s=SPEC_BY_K[k], toegestaan=new Set(nivNu().vragen);
+  const s=SPEC_BY_K[k], toegestaan=new Set(themaVragen());
   let gens=[];
   if(STOF[k]) gens.push(qStof, qStofgroep);
   /* Vaker erin = vaker aan de beurt. Op Gebruik horen kwaal en bereiding
@@ -6183,6 +6522,9 @@ function makeQuestion(k){
      hoofdmoot, dus die blijft er maar één keer in. */
   gens.push(qRecept, qRecept, qRecept, qBrouwsel, qBrouwsel, qBrouwsel);
   if(s.med) gens.push(qMed, qMed);
+  if(ETYM[k]) gens.push(qEtym);
+  if(VOLKS[k]) gens.push(qVolks);
+  gens.push(qExtractie);
   if(s.kwalen && s.kwalen.length) gens.push(qWaarvoor, qWaarvoor, qWaarvoor);
   if(s.dubbel&&s.dubbel.length){ gens.push(qDubbel,qDubbel); }
   /* De waarschuwingsvraag alleen waar de waarschuwing de les ís: bij gif.
@@ -6194,6 +6536,12 @@ function makeQuestion(k){
   if(s.delen&&s.delen!=="—") gens.push(qDeel, qDeel);
   if(s.mnd.length) gens.push(qMaand);
   const gefilterd = gens.filter(g=> !GEN_NAAM.has(g) || toegestaan.has(GEN_NAAM.get(g)));
+  /* Bij een gekozen thema is de vraagsoort de bedoeling van de oefening: dan
+     liever deze soort overslaan dan terugvallen op iets anders. Zonder deze
+     regel lekte het thema Extractie voor driekwart vol met naamvragen. */
+  if(themaNu().vragen) return gefilterd.length
+    ? (function(){ for(const g of shuffle(gefilterd)){ const q=g(s); if(q) return Object.assign(q,{key:k}); } return null; })()
+    : null;
   gens = gefilterd.length ? gefilterd : gens;
   for(const g of shuffle(gens)){ const q=g(s); if(q) return Object.assign(q,{key:k}); }
   const val = qLatijn(s) || qNL(s) || qHerken(s);
@@ -6204,14 +6552,14 @@ function makeQuestion(k){
 [[qNL,"nl"],[qLatijn,"latijn"],[qDeel,"deel"],[qMaand,"maand"],[qLet,"let"],
  [qHerken,"herken"],[qDubbel,"verwar"],[qWaarvoor,"waarvoor"],
  [qStof,"stof"],[qStofgroep,"stofgroep"],[qRecept,"recept"],[qBrouwsel,"brouwsel"],
- [qMed,"med"]]
+ [qMed,"med"],[qEtym,"etym"],[qVolks,"volks"],[qExtractie,"extractie"]]
   .forEach(([g,nm])=>{ if(typeof g === "function") GEN_NAAM.set(g,nm); });
 
 const QZ={list:[],i:0,goed:0,cur:null,sel:-1,done:false};
 async function startQuiz(){
   /* De soortenvijver hangt af van het niveau: makkelijk blijft bij bekende
      en ongevaarlijke soorten, moeilijk zoekt juist het giftige werk op. */
-  const vijver = new Set(nivNu().pool().map(x=>x.k));
+  const vijver = new Set(themaPool().map(x=>x.k));
   let due = dueKeys().filter(k=> vijver.has(k));
   if(due.length < 4) due = [...vijver];
   const n=Math.min(S.leer.doel,Math.max(due.length,4));
@@ -6229,7 +6577,7 @@ async function startQuiz(){
     if(sm) sm.innerHTML = '<span class="laad">'+svg(0, SYM.varen)+' Ronde klaarzetten\u2026</span>';
   }
 
-  const beeldKans = nivNu().beeldDeel !== undefined ? nivNu().beeldDeel : 0.5;
+  const beeldKans = themaBeeldDeel();
   const alleenBeeld = beeldKans >= 1;
 
   if(alleenBeeld){
@@ -6260,6 +6608,15 @@ async function startQuiz(){
       }
       if(!q) q=makeQuestion(keys[i]);
       if(q) QZ.list.push(q);
+    }
+    /* Bij een strak thema levert niet elke soort een vraag op. Aanvullen uit
+       dezelfde vijver tot de ronde vol is, anders krijg je er drie. */
+    if(QZ.list.length < keys.length){
+      const rest = shuffle(themaPool().map(x=>x.k).filter(k=> !keys.includes(k)));
+      for(const k of rest){
+        if(QZ.list.length >= keys.length) break;
+        const q = makeQuestion(k); if(q) QZ.list.push(q);
+      }
     }
   }
 
