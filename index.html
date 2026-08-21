@@ -169,6 +169,15 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .zoekveld input{flex:1;padding-left:36px}
 .zoekveld .loepje{position:absolute;left:12px;top:50%;margin-top:-8px;color:var(--kalk-2);
   pointer-events:none;display:flex}
+/* Camera rechts in het veld: hetzelfde als de knop op de kaart, alleen
+   binnen de zoekbalk. Het invoerveld houdt ruimte vrij aan die kant. */
+.zoekveld input{padding-right:44px}
+.zoekveld .scanknop{position:absolute;right:5px;top:50%;margin-top:-17px;
+  width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 38% 32%, #F0DFA8 0%, #C9A227 55%, #8A6E22 100%);
+  border:1px solid rgba(120,94,28,.85);color:#3E3212;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5), 0 1px 4px rgba(0,0,0,.5)}
+.zoekveld .scanknop:active{transform:scale(.93)}
 .tabsrow{display:flex;gap:7px;padding:0 12px 12px;overflow-x:auto;scrollbar-width:none}
 .tabsrow button{flex:0 0 auto;padding:7px 13px;border-radius:999px;font-size:13px;font-weight:600;
   background:var(--schors);border:1px solid var(--line);color:var(--kalk-2);white-space:nowrap}
@@ -974,7 +983,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
   <div class="kop" id="kop-list"><div class="rij"><h1 style="margin:0">Vondsten</h1></div></div>
   <p class="sub" id="listSub">—</p>
   <div class="knoopregel" data-orn="pin"></div>
-  <div class="searchbar"><div class="zoekveld"><span class="loepje"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8 21 21" stroke-linecap="round"/></svg></span><input id="qList" placeholder="Zoek op soort, plek of notitie"></div></div>
+  <div class="searchbar"><div class="zoekveld"><span class="loepje"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8 21 21" stroke-linecap="round"/></svg></span><input id="qList" placeholder="Zoek op soort, plek of notitie"><button class="scanknop" data-scan aria-label="Foto herkennen"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 8.6A2.6 2.6 0 0 1 5.6 6h1.6l1.1-2h6.4l1.1 2h1.6A2.6 2.6 0 0 1 20 8.6v8.8A2.6 2.6 0 0 1 17.4 20H5.6A2.6 2.6 0 0 1 3 17.4Z"/><circle cx="11.5" cy="13" r="3.4"/></svg></button></div></div>
   <div id="listBody"></div>
 </section>
 
@@ -1020,7 +1029,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
     <button data-v="waarvoor">Kwaal</button>
     <button data-v="alle" class="on">Alles</button>
   </div>
-  <div class="searchbar"><div class="zoekveld"><span class="loepje"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8 21 21" stroke-linecap="round"/></svg></span><input id="qSpec" placeholder="Zoek naam, familie of gebruik"></div></div>
+  <div class="searchbar"><div class="zoekveld"><span class="loepje"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8 21 21" stroke-linecap="round"/></svg></span><input id="qSpec" placeholder="Zoek naam, familie of gebruik"><button class="scanknop" data-scan aria-label="Foto herkennen"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 8.6A2.6 2.6 0 0 1 5.6 6h1.6l1.1-2h6.4l1.1 2h1.6A2.6 2.6 0 0 1 20 8.6v8.8A2.6 2.6 0 0 1 17.4 20H5.6A2.6 2.6 0 0 1 3 17.4Z"/><circle cx="11.5" cy="13" r="3.4"/></svg></button></div></div>
   <div class="fltrij">
     <select id="fltKwaal"><option value="">Alle kwalen</option></select>
     <select id="fltMnd"><option value="">Alle maanden</option></select>
@@ -1111,7 +1120,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.41.1";
+const APP_VERSION = "0.42.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -8376,6 +8385,10 @@ scanPick.addEventListener("change", ()=>{
   if(f) scanStart(f);
 });
 document.getElementById("btnScan").onclick = ()=> scanPick.click();
+/* Dezelfde knop staat ook in de zoekbalken van Vondsten en Herbarium. */
+document.querySelectorAll("[data-scan]").forEach(b=> b.onclick = e=>{
+  e.preventDefault(); scanPick.click();
+});
 
 const qInfoEl = document.getElementById("qInfo");
 function qInfoHtml(sp){
