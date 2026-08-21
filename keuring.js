@@ -51,6 +51,14 @@ try{
        nooit. Twee van zulke weesregels zaten in de stoffenlichting. */
     /* Een soortenkaart met maar twee of drie secties is te mager om iets aan
        te hebben in het veld. Deze telling houdt bij hoe gevuld ze zijn. */
+    /* Een giftige soort zonder dubbelgangerlijst is de gevaarlijkste lege plek
+       in de app: juist daar gaat het in het veld mis. */
+    ["gif met dubbelgangers", ()=>{
+      const gif = SPECIES.filter(s=> s.tags.includes("giftig"));
+      const leeg = gif.filter(s=> !s.dubbel || !s.dubbel.length);
+      return leeg.length ? leeg.length+" ZONDER: "+leeg.map(s=>s.nl).slice(0,8).join(", ")
+        : gif.length+" giftige soorten, alle met dubbelgangers";
+    }],
     ["soortenkaarten gevuld", ()=>{
       const metRecept = new Set();
       alleRecepten().forEach(r=> (r.soorten||[]).forEach(k=> metRecept.add(k)));
