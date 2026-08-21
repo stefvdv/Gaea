@@ -299,6 +299,10 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .hv button{margin-left:auto;color:var(--meekrap);font-size:12px}
 
 .row{display:flex;gap:8px;padding:16px 18px 0}
+/* Vier gelijke vierkanten onderaan het soortenblad. */
+.knopvak{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:16px 18px 0}
+.knopvak .btn{aspect-ratio:1/1;height:auto;padding:8px;display:flex;align-items:center;
+  justify-content:center;text-align:center;line-height:1.25;font-size:14px;white-space:normal}
 .btn{flex:1;padding:13px;border-radius:12px;font-weight:700;font-size:14.5px;text-align:center;
   background:var(--mos-d);color:#F4F7EA}
 .btn.sec2{background:rgba(44,42,31,.07);color:var(--inkt);border:1px solid rgba(44,42,31,.18)}
@@ -873,7 +877,11 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .dblink:active{opacity:.6}
 /* Meerdere foto's per soort, als raster in plaats van een strook: op een
    soortenblad wil je vergelijken, niet scrollen. */
-.strip.fotoraster{display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow:visible}
+/* De strip is normaal een horizontale schuifrij en steekt met negatieve
+   marges buiten de sectie uit. Als raster hoort hij juist binnen het kader
+   te blijven, anders loopt de omlijsting halverwege de foto’s dood. */
+.strip.fotoraster{display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow:visible;
+  margin:0;padding:2px 0}
 .strip.fotoraster .ph{width:auto;flex:none;aspect-ratio:1/1}
 .strip.fotoraster .ph img{width:100%;height:100%;object-fit:cover}
 .herinner{margin:0 12px 14px;padding:13px 15px;border-radius:15px;
@@ -1120,7 +1128,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.42.0";
+const APP_VERSION = "0.43.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -7072,10 +7080,13 @@ async function specSheet(k, terugPin){
         '<span>'+esc(shortd(p.gemaakt))+'</span><span>'+esc(p.plek||"—")+' ›</span></button>').join("")+'</div>';
   }
 
-  h += '<div class="row"><button class="btn sec2" data-act="ontdek">Toon op kaart via GBIF</button>'+
-       '<button class="btn sec2" id="oefenSoort">Herkenning oefenen</button></div>'+
-       '<div class="row"><button class="btn sec2" id="gbifPagina">Soortenpagina op GBIF</button></div>'+
-       '<div class="row"><button class="btn sec2" data-act="close">Sluiten</button></div>'+FLOURISH;
+  /* Vier gelijke vierkanten in plaats van drie rijen van ongelijke breedte:
+     de tekst bepaalde eerder de vorm, nu de vorm de tekst. */
+  h += '<div class="knopvak">'+
+       '<button class="btn sec2" data-act="ontdek">Toon op<br>kaart</button>'+
+       '<button class="btn sec2" id="oefenSoort">Herkenning<br>oefenen</button>'+
+       '<button class="btn sec2" id="gbifPagina">Soortenpagina<br>op GBIF</button>'+
+       '<button class="btn sec2" data-act="close">Sluiten</button></div>'+FLOURISH;
   showSheet(h);
 
   /* Naar de bron zelf: de GBIF-soortenpagina heeft de verspreidingskaart, de
@@ -8253,6 +8264,20 @@ const FOTO_KAS = {};      /* soortsleutel -> lijst met beelden, per sessie */
    geen automatische suggestie \u2014 daar sturen we naar de kenmerken, omdat
    ring, beker en sporenkleur op een foto vaak niet eens te zien zijn.
    ======================================================================= */
+/* Een ingevulde zoekbalk is een filter op wat je ziet. De terugknop hoort
+   dat filter op te heffen voordat hij het scherm verlaat — anders sta je
+   terug op de kaart met de zoekopdracht nog actief. */
+function zoekLeeg(){
+  const veld = S.scr === "list" ? document.getElementById("qList")
+             : S.scr === "spec" ? document.getElementById("qSpec")
+             : S.scr === "kast" ? document.getElementById("qKast") : null;
+  if(!veld || !veld.value) return false;
+  veld.value = "";
+  veld.blur();
+  veld.dispatchEvent(new Event("input", {bubbles:true}));
+  return true;
+}
+
 const scanEl = document.getElementById("scanBlad");
 const scanOpenIs = ()=> scanEl.classList.contains("on");
 function scanSluit(){ scanEl.classList.remove("on"); scanEl.setAttribute("aria-hidden","true"); }
@@ -9025,6 +9050,7 @@ window.addEventListener("popstate",()=>{
   if(afsluitOpen){ afsluitOpen = false; closeSheet(); history.pushState({},""); return; }
   if(aselEl) aselSluit();
   else if(scanOpenIs()) scanSluit();
+  else if(zoekLeeg()) { /* eerst de zoekopdracht opheffen, dan pas weg */ }
   else if(loepEl.classList.contains("on")) sluitLoep();
   else if(qInfoOpenIs()) qInfoSluit();
   else if(quizEl.classList.contains("on")){ quizEl.classList.remove("on"); renderLeer(); }

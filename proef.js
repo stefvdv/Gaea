@@ -22,6 +22,7 @@ function El(tag){
     insertAdjacentHTML(){}, setAttribute(k,v){this.attrs[k]=v},
     getAttribute(k){return this.attrs[k]}, removeAttribute(k){delete this.attrs[k]},
     addEventListener(){}, removeEventListener(){}, focus(){}, blur(){}, click(){},
+    dispatchEvent(){ return true },
     scrollIntoView(){}, getBoundingClientRect(){return {left:0,top:0,width:360,height:640}},
     querySelector(){return El("div")}, querySelectorAll(){return []},
     closest(){return null}, remove(){}, contains(){return false},
@@ -44,6 +45,7 @@ doc.head = El("head");
 doc.createElement = t=>El(t);
 doc.createElementNS = (ns,t)=>El(t);
 doc.createTextNode = t=>({textContent:t});
+global.MutationObserver = class{ observe(){} disconnect(){} takeRecords(){return []} };
 doc.getElementById = id => { doc._byId = doc._byId||{}; return doc._byId[id] || (doc._byId[id]=El("div")); };
 doc.querySelector = ()=>El("div");
 doc.querySelectorAll = ()=>[];
