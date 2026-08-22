@@ -1133,7 +1133,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.53.0";
+const APP_VERSION = "0.54.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -6751,7 +6751,11 @@ loepEl.addEventListener("click", e=>{ if(e.target === loepEl) sluitLoep(); });
    Elke laag meldt zichzelf aan met navDuw en ruimt zichzelf op met zijn
    eigen sluitfunctie. De terugknop pakt simpelweg de bovenste. */
 const NAV = [];
-function navDuw(laag, naam, sluit){ NAV.push({laag, naam, sluit}); }
+function navDuw(laag, naam, sluit){
+  NAV.push({laag, naam, sluit});
+  /* Deze aanroep komt uit een tikafhandelaar, dus de stap telt mee. */
+  history.pushState({gaea: naam}, "");
+}
 /* Een laag die zichzelf al sluit (kruisje, veegweg) haalt zijn eigen
    vermelding weg, zodat de stapel niet vervuilt. */
 function navWeg(naam){
@@ -7879,6 +7883,11 @@ function go(scr){
   /* Een schermwissel is een sprong naar laag 2: alles wat daarboven open
      stond is niet meer zichtbaar en hoort dus ook niet meer op de stapel. */
   if(typeof NAV !== "undefined") NAV.length = 0;
+  /* Elk scherm buiten de kaart is zelf een laag, zodat de terugknop je eerst
+     naar de kaart brengt en pas daarna de afsluitvraag toont. De stap ontstaat
+     tijdens de tik op de navigatiebalk en telt dus mee. */
+  if(typeof navDuw === "function" && !navBezig && scr !== "map")
+    navDuw(2, "scherm", ()=> go("map"));
   if(typeof wisSpook === "function") wisSpook();
   document.body.classList.toggle("opkaart", scr === "map");
   S.scr = scr;
@@ -9664,7 +9673,11 @@ function vraagAfsluiten(){
     'gewoon op dit toestel staan.</div>'+
     '<div class="row"><button class="btn" id="afsluitNee">Blijven</button>'+
     '<button class="btn sec2" id="afsluitJa">Afsluiten</button></div>');
-  document.getElementById("afsluitNee").onclick = ()=>{ afsluitOpen = false; closeSheet(); };
+  document.getElementById("afsluitNee").onclick = ()=>{
+    afsluitOpen = false; closeSheet();
+    /* Deze tik telt, dus hier mag de reserve terug. */
+    reserveGezet = false; reserveZetten();
+  };
   document.getElementById("afsluitJa").onclick = ()=>{
     afsluitOpen = false; closeSheet();
     /* De historie is \u00e9\u00e9n stap diep omdat we hem zelf vasthouden. Die stap
@@ -9679,10 +9692,7 @@ function vraagAfsluiten(){
        je zonder omweg de app uit. De vlag hoort terug zodra blijkt dat er
        niets is gesloten. */
     S.afsluiten = true;
-    /* Alle vastgehouden stappen in \u00e9\u00e9n keer loslaten, anders blijft de app
-       hangen op de speling die we juist hebben ingebouwd. */
-    history.go(-(bodemNu || 1));
-    bodemNu = 0;
+    history.back();
     setTimeout(()=>{ try{ window.close(); }catch(e){} }, 250);
     setTimeout(()=>{
       if(document.visibilityState === "hidden") return;   /* wel echt weg */
@@ -9709,17 +9719,18 @@ function terugStap(){
   else { vraagAfsluiten(); return "vraagafsluiten"; }
   return "stap";
 }
-/* Eén enkele geschiedenisstap is te krap gebleken. Alles wat er buiten de
-   app om een stap uit de historie haalt \u2014 een snelle dubbele terugdruk, een
-   herstart uit de achtergrond, de gebaarnavigatie van Android \u2014 laat de app
-   dan meteen door de bodem zakken. We houden er nu drie vast en vullen na
-   elke terugdruk bij tot dat aantal. De ladder eindigt zo altijd bij de
-   kaart en bij de afsluitvraag, nooit bij een leeg venster. */
-const BODEM = 3;
-let bodemNu = 0;
-function bodemVullen(){
-  while(bodemNu < BODEM){ bodemNu++; history.pushState({gaea: bodemNu}, ""); }
-}
+/* Waarom de vorige aanpak niet werkte
+   ------------------------------------
+   Chrome beschermt de terugknop tegen sites die hem gijzelen: een
+   geschiedenisstap die wordt aangemaakt zonder dat de gebruiker iets heeft
+   aangeraakt, wordt bij het terugnavigeren overgeslagen. Al onze sentinels
+   ontstonden precies zo \u2014 bij het opstarten en binnen de popstate-afhandeling,
+   allebei zonder aanraking. Chrome sprong er dwars doorheen en de app viel weg.
+
+   Daarom maken we een stap nu aan op het moment dat je ergens op tikt: bij het
+   openen van een laag en bij het wisselen van scherm. Die stappen ontstaan
+   tijdens een echte aanraking en worden dus niet overgeslagen. De terugknop
+   consumeert er telkens \u00e9\u00e9n en sluit de bijbehorende laag. */
 
 function popstateAfhandeling(){
   /* De app houdt \u00e9\u00e9n geschiedenisstap vast als sentinel. Die werd hiervoor
@@ -9730,8 +9741,6 @@ function popstateAfhandeling(){
      meer om op terug te vallen. De sentinel gaat er nu als allereerste weer
      in, v\u00f3\u00f3r er ook maar iets wordt gesloten. */
   if(S.afsluiten) return;              /* de gebruiker wil echt weg */
-  bodemNu = Math.max(0, bodemNu - 1);   /* deze druk heeft er \u00e9\u00e9n verbruikt */
-  bodemVullen();                        /* en direct weer aanvullen */
   try{
     terugStap();
   }catch(e){
@@ -9739,7 +9748,17 @@ function popstateAfhandeling(){
   }
 }
 window.addEventListener("popstate", popstateAfhandeling);
-bodemVullen();
+/* E\u00e9n stap in reserve, aangemaakt bij de eerste aanraking van de sessie.
+   Daarv\u00f3\u00f3r zou Chrome hem toch overslaan. Die reserve vangt de terugdruk
+   op de kaart op, zodat we de afsluitvraag kunnen tonen. */
+let reserveGezet = false;
+function reserveZetten(){
+  if(reserveGezet) return;
+  reserveGezet = true;
+  history.pushState({gaea: "bodem"}, "");
+}
+["pointerdown","keydown"].forEach(t=>
+  document.addEventListener(t, reserveZetten, {once:true, capture:true}));
 
 (async function boot(){
   toonSplash();

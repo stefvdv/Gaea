@@ -237,34 +237,39 @@ try{
       return terug > zet ? "de vlag gaat terug als het venster niet sluit"
         : "VLAG BLIJFT STAAN: de terugknop wordt hierna genegeerd";
     }],
-    ["bodem eerst aanvullen", ()=>{
-      const bron = popstateAfhandeling.toString();
-      const iVul = bron.indexOf("bodemVullen()");
-      const iWerk = bron.indexOf("terugStap()");
-      if(iVul < 0 || iWerk < 0) return "handler niet herkenbaar";
-      return iVul < iWerk ? "de geschiedenis wordt aangevuld v\u00f3\u00f3r er iets sluit"
-        : "VOLGORDE FOUT: er wordt gesloten voordat de geschiedenis is aangevuld";
+    /* Chrome slaat geschiedenisstappen over die zonder aanraking zijn
+       aangemaakt. Elke laag moet zijn stap dus zelf aanmaken op het moment dat
+       de gebruiker hem opent \u2014 in navDuw, niet in de terugafhandeling. */
+    ["stap ontstaat bij het openen", ()=>{
+      const duw = navDuw.toString();
+      const pop = popstateAfhandeling.toString();
+      if(!/pushState/.test(duw))
+        return "navDuw MAAKT GEEN STAP: Chrome slaat de terugknop dan over";
+      if(/pushState/.test(pop))
+        return "popstate MAAKT EEN STAP: die wordt zonder aanraking aangemaakt en overgeslagen";
+      return "lagen maken hun eigen stap, de terugafhandeling niet";
     }],
     ["terugweg compleet", ()=>{
       NAV.length = 0; S.afsluiten = false; afsluitOpen = false; S.spook = null;
+      go("map"); NAV.length = 0;
       go("spec");
       specSheet("daslook"); specSheet("lelietje");
       const weg = [];
       for(let i = 0; i < 4; i++) weg.push(terugStap() + "(" + S.scr + ")");
       afsluitOpen = false; closeSheet(); go("map");
-      const verwacht = "ladder(spec) > ladder(spec) > naar kaart(map) > vraagafsluiten(map)";
+      const verwacht = "ladder(spec) > ladder(spec) > ladder(map) > vraagafsluiten(map)";
       return weg.join(" > ") === verwacht ? "soort > soort > herbarium > kaart > afsluiten"
         : "WEG FOUT: " + weg.join(" > ");
     }],
     /* Een fout in \u00e9\u00e9n laag mag de terugknop niet laten instorten. */
     ["terugknop overleeft fouten", ()=>{
-      NAV.length = 0; afsluitOpen = false;
+      go("map"); NAV.length = 0; afsluitOpen = false;
       go("spec");
       navDuw(3, "kapot", ()=>{ throw new Error("stuk"); });
       const eerste = terugStap();
       const tweede = terugStap();
-      afsluitOpen = false; closeSheet(); go("map");
-      return (eerste === "ladder" && tweede === "naar kaart" && !NAV.length)
+      afsluitOpen = false; closeSheet(); go("map"); NAV.length = 0;
+      return (eerste === "ladder" && tweede === "ladder" && !NAV.length)
         ? "kapotte laag wordt overgeslagen, de ladder loopt door"
         : "LADDER BLIJFT HANGEN: " + eerste + ", " + tweede;
     }],
