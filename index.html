@@ -1133,7 +1133,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.54.0";
+const APP_VERSION = "0.55.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -9663,51 +9663,27 @@ document.getElementById("verLbl2").textContent="v"+APP_VERSION;
    niets open, dan is de volgende druk een afsluitpoging — en die vraagt eerst.
    Zonder die vraag gooi je jezelf eruit terwijl je alleen een blad wilde
    sluiten, en dat was in Admirals & Commanders precies de klacht. */
-let afsluitOpen = false;
 function vraagAfsluiten(){
-  if(afsluitOpen) return;
-  afsluitOpen = true;
-  showSheet('<div class="label">'+VINE+'<div class="acc"><span>Afsluiten</span><span></span></div>'+
-    '<h2>Gaea sluiten?</h2></div>'+
-    '<div class="prose" style="margin:2px 18px 4px">Je vondsten, brouwsels en voortgang blijven '+
-    'gewoon op dit toestel staan.</div>'+
-    '<div class="row"><button class="btn" id="afsluitNee">Blijven</button>'+
-    '<button class="btn sec2" id="afsluitJa">Afsluiten</button></div>');
-  document.getElementById("afsluitNee").onclick = ()=>{
-    afsluitOpen = false; closeSheet();
-    /* Deze tik telt, dus hier mag de reserve terug. */
-    reserveGezet = false; reserveZetten();
-  };
-  document.getElementById("afsluitJa").onclick = ()=>{
-    afsluitOpen = false; closeSheet();
-    /* De historie is \u00e9\u00e9n stap diep omdat we hem zelf vasthouden. Die stap
-       loslaten en teruggaan brengt je waar je vandaan kwam, of sluit het
-       venster als de app zo geopend is.
+  /* Een geïnstalleerde app mag zichzelf niet sluiten: window.close() weigert
+     en history.back() heeft nergens heen te gaan. Een knop "Afsluiten" belooft
+     dus iets wat niet kan. In plaats daarvan de manier die Android zelf
+     gebruikt: nog een keer terug.
 
-       Maar een ge\u00efnstalleerde PWA mag zichzelf niet sluiten: window.close()
-       weigert, en history.back() heeft nergens heen te gaan. De app bleef dan
-       gewoon open terwijl S.afsluiten op true bleef staan \u2014 en vanaf dat
-       moment sloeg elke terugdruk de sentinel over. E\u00e9n keer op Afsluiten
-       tikken maakte de terugknop dus blijvend stuk: de volgende druk gooide
-       je zonder omweg de app uit. De vlag hoort terug zodra blijkt dat er
-       niets is gesloten. */
-    S.afsluiten = true;
-    history.back();
-    setTimeout(()=>{ try{ window.close(); }catch(e){} }, 250);
-    setTimeout(()=>{
-      if(document.visibilityState === "hidden") return;   /* wel echt weg */
-      S.afsluiten = false;
-      history.pushState({}, "");
-      toast("Deze weergave mag zichzelf niet sluiten");
-    }, 700);
-  };
+     De reserve is door deze terugdruk net verbruikt, dus komt er meteen een
+     tweede druk, dan valt de app vanzelf dicht. Blijft die uit, dan wapenen we
+     opnieuw bij de eerstvolgende aanraking — eerder mag niet, want een stap
+     die zonder aanraking ontstaat wordt door de browser overgeslagen. */
+  toast("Nog een keer terug om Gaea te sluiten");
+  setTimeout(()=>{
+    reserveGezet = false;
+    ["pointerdown","keydown"].forEach(t=>
+      document.addEventListener(t, reserveZetten, {once:true, capture:true}));
+  }, 2500);
 }
 
 /* De keten als aparte functie, zodat de keuring hem stap voor stap kan
    doorlopen zonder een echte terugknop. */
 function terugStap(){
-  if(S.afsluiten) return "afsluiten";
-  if(afsluitOpen){ afsluitOpen = false; closeSheet(); return "afsluitdialoog"; }
   /* Volgorde: eerst wat buiten de ladder valt en altijd voorrang heeft,
      dan de stapel van boven naar beneden, dan de navigatielaag, dan de
      kaart als bodem. */
@@ -9740,7 +9716,6 @@ function popstateAfhandeling(){
      app af. Vandaar dat de afsluitvraag zelden verscheen: er was al niets
      meer om op terug te vallen. De sentinel gaat er nu als allereerste weer
      in, v\u00f3\u00f3r er ook maar iets wordt gesloten. */
-  if(S.afsluiten) return;              /* de gebruiker wil echt weg */
   try{
     terugStap();
   }catch(e){

@@ -229,13 +229,17 @@ try{
     /* Een ge\u00efnstalleerde PWA mag zichzelf niet sluiten. Blijft de afsluitvlag
        dan staan, dan slaat elke volgende terugdruk de sentinel over en valt
        de app zonder omweg weg. De vlag moet dus hersteld worden. */
-    ["afsluitvlag wordt hersteld", ()=>{
+    /* Een ge\u00efnstalleerde app mag zichzelf niet sluiten. Een knop die dat
+       belooft doet niets; de terugdruk moet het werk doen. */
+    ["afsluiten via de terugknop", ()=>{
       const bron = vraagAfsluiten.toString();
-      const zet = bron.indexOf("S.afsluiten = true");
-      const terug = bron.indexOf("S.afsluiten = false");
-      if(zet < 0) return "afsluitvlag niet gevonden";
-      return terug > zet ? "de vlag gaat terug als het venster niet sluit"
-        : "VLAG BLIJFT STAAN: de terugknop wordt hierna genegeerd";
+      /* Let op: alleen op code toetsen, niet op woorden uit het commentaar. */
+      const code = bron.replace(/\/\*[\s\S]*?\*\//g, "");
+      if(/window\.close\s*\(|S\.afsluiten\s*=/.test(code))
+        return "BELOOFT SLUITEN: dat weigert een ge\u00efnstalleerde app";
+      if(!/reserveGezet/.test(bron))
+        return "de reserve wordt niet opnieuw gewapend";
+      return "tweede terugdruk sluit, daarna wordt opnieuw gewapend";
     }],
     /* Chrome slaat geschiedenisstappen over die zonder aanraking zijn
        aangemaakt. Elke laag moet zijn stap dus zelf aanmaken op het moment dat
@@ -250,25 +254,25 @@ try{
       return "lagen maken hun eigen stap, de terugafhandeling niet";
     }],
     ["terugweg compleet", ()=>{
-      NAV.length = 0; S.afsluiten = false; afsluitOpen = false; S.spook = null;
+      NAV.length = 0; S.spook = null;
       go("map"); NAV.length = 0;
       go("spec");
       specSheet("daslook"); specSheet("lelietje");
       const weg = [];
       for(let i = 0; i < 4; i++) weg.push(terugStap() + "(" + S.scr + ")");
-      afsluitOpen = false; closeSheet(); go("map");
+      closeSheet(); go("map"); NAV.length = 0;
       const verwacht = "ladder(spec) > ladder(spec) > ladder(map) > vraagafsluiten(map)";
       return weg.join(" > ") === verwacht ? "soort > soort > herbarium > kaart > afsluiten"
         : "WEG FOUT: " + weg.join(" > ");
     }],
     /* Een fout in \u00e9\u00e9n laag mag de terugknop niet laten instorten. */
     ["terugknop overleeft fouten", ()=>{
-      go("map"); NAV.length = 0; afsluitOpen = false;
+      go("map"); NAV.length = 0;
       go("spec");
       navDuw(3, "kapot", ()=>{ throw new Error("stuk"); });
       const eerste = terugStap();
       const tweede = terugStap();
-      afsluitOpen = false; closeSheet(); go("map"); NAV.length = 0;
+      closeSheet(); go("map"); NAV.length = 0;
       return (eerste === "ladder" && tweede === "ladder" && !NAV.length)
         ? "kapotte laag wordt overgeslagen, de ladder loopt door"
         : "LADDER BLIJFT HANGEN: " + eerste + ", " + tweede;
