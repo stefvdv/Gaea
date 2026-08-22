@@ -209,6 +209,17 @@ try{
     /* De sentinel moet er als eerste weer in, v\u00f3\u00f3r er iets wordt gesloten.
        Stond hij erna, dan viel een tweede snelle terugdruk in een lege
        geschiedenis en sloot de app af in plaats van de afsluitvraag te tonen. */
+    /* Een ge\u00efnstalleerde PWA mag zichzelf niet sluiten. Blijft de afsluitvlag
+       dan staan, dan slaat elke volgende terugdruk de sentinel over en valt
+       de app zonder omweg weg. De vlag moet dus hersteld worden. */
+    ["afsluitvlag wordt hersteld", ()=>{
+      const bron = vraagAfsluiten.toString();
+      const zet = bron.indexOf("S.afsluiten = true");
+      const terug = bron.indexOf("S.afsluiten = false");
+      if(zet < 0) return "afsluitvlag niet gevonden";
+      return terug > zet ? "de vlag gaat terug als het venster niet sluit"
+        : "VLAG BLIJFT STAAN: de terugknop wordt hierna genegeerd";
+    }],
     ["sentinel eerst", ()=>{
       const bron = popstateAfhandeling.toString();
       const iPush = bron.indexOf("pushState");
