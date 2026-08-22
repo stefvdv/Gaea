@@ -1133,7 +1133,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.52.0";
+const APP_VERSION = "0.53.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -2347,6 +2347,21 @@ const STOF = {
    scherm langs de sloot.
    ======================================================================= */
 const FAM_VAN_GESLACHT = {
+ /* Verwarlichting 3. */
+ Sempervivum:"Crassulaceae", Cymbalaria:"Plantaginaceae", Sinapis:"Brassicaceae", Silene:"Caryophyllaceae",
+ Clinopodium:"Lamiaceae", Galium:"Rubiaceae", Scabiosa:"Caprifoliaceae",
+ Campanula:"Campanulaceae", Antirrhinum:"Plantaginaceae", Delphinium:"Ranunculaceae",
+ Hyacinthoides:"Asparagaceae", Sphagnum:"Sphagnaceae", Festuca:"Poaceae",
+ Jacobaea:"Asteraceae", Solidago:"Asteraceae", Impatiens:"Balsaminaceae",
+ Geranium:"Geraniaceae", Persicaria:"Polygonaceae", Vicia:"Fabaceae",
+ Polygonatum:"Asparagaceae", Drosera:"Droseraceae", Vinca:"Apocynaceae",
+ Myosotis:"Boraginaceae", Populus:"Salicaceae", Quercus:"Fagaceae",
+ Helianthus:"Asteraceae", Brassica:"Brassicaceae", Ribes:"Grossulariaceae",
+ /* Verwarlichting 2. */
+ Ribes:"Grossulariaceae", Crepis:"Asteraceae", Pulicaria:"Asteraceae",
+ Cruciata:"Rubiaceae", Nymphoides:"Menyanthaceae", Nigella:"Ranunculaceae",
+ Potentilla:"Rosaceae", Duchesnea:"Rosaceae", Helleborus:"Ranunculaceae",
+ Chamaecyparis:"Cupressaceae", Chaenomeles:"Rosaceae", Sherardia:"Rubiaceae", Calocybe:"Lyophyllaceae", Dacrymyces:"Dacrymycetaceae",
  /* Verwarlichting. */
  Anchusa:"Boraginaceae", Consolida:"Ranunculaceae", Leucojum:"Amaryllidaceae",
  Arctostaphylos:"Ericaceae", Crambe:"Brassicaceae", Tripleurospermum:"Asteraceae",
@@ -2649,9 +2664,18 @@ const KWALEN_MAP = {
  koninginnekruid:["verkoudheid"],
  groothoefblad:["kramp","hoest"],
  tandzaad:["diarree","huid"],
+ huislook:["huid","brandwond"],
+ bergsteentijm:["hoest","spijsvertering"],
+ geelwalstro:["plassen","huid"],
+ veenmos:["wond"],
+ lateguldenroede:["plassen","nier"],
+ grauweabeel:["gewricht","kneuzing"],
+ heelblaadjes:["diarree","spijsvertering"],
+ kruisbladwalstro:["wond","huid"],
+ canadapopulier:["gewricht","huid"],
  grotepimpernel:["diarree","bloeding"],
  ossentong:["wond","hoest"],
- beredruif:["plassen"],
+ berendruif:["plassen"],
  penningkruid:["wond","hoest"],
  canadeseguldenroede:["plassen","nier"],
  witteabeel:["gewricht","kneuzing"],
@@ -4124,7 +4148,7 @@ const SPECIES_TUIN1 = [
  herken:"Laag, sterk vertakt eenjarig plantje met fijn geveerd, donkergroen blad en dichte oranje tot roodbruine bloemhoofdjes. Gekneusd blad heeft een scherpe, harsige geur die veel mensen onaangenaam vinden.",
  let:"Alleen de lintbloemen; het groen is te sterk. Smaak citrusachtig tot bitter, per ras verschillend \u2014 proef er eerst één. Wordt tussen groenten geplant tegen aaltjes.",
  dubbel:["Goudsbloem (eetbaar; enkelvoudig blad, zachtere smaak)","Kamille (witte lintbloemen)"]},
-{k:"lampionplant",nl:"Ananaskers",la:"Physalis peruviana",grp:"tuin",tags:["eetbaar"],delen:"Rijpe vrucht",mnd:[8,9,10],
+{k:"ananaskers",nl:"Ananaskers",la:"Physalis peruviana",grp:"tuin",tags:["eetbaar"],delen:"Rijpe vrucht",mnd:[8,9,10],
  herken:"Zachtbehaarde plant met hartvormig blad en knikkende, geelbruin getekende klokbloemen. De vrucht rijpt in een papierachtige, opgeblazen kelk die van groen naar strogeel verkleurt; de bes daarbinnen is oranjegeel en zoetzuur.",
  let:"Alleen wanneer de kelk droog en papierachtig is en de bes diep oranje. Onrijpe groene vruchten en alle groene delen bevatten solanine, net als bij aardappel. Niet verwarren met de sierlampionplant, waarvan de vruchten wel eetbaar maar veel bitterder zijn.",
  dubbel:["Lampionplant (Physalis alkekengi; felrode kelk, groene delen giftig)","Zwarte nachtschade (giftig; zwarte bessen zonder kelk)","Bitterzoet (giftig; rode bessen, paarse bloem)"]},
@@ -4588,11 +4612,6 @@ const SPECIES_VERWAR = [
  herken:"Bloeit in februari en maart met \u00e9\u00e9n knikkende, breed klokvormige witte bloem waarvan alle zes de slippen even lang zijn en elk een groen puntje dragen. Breed gootvormig blad uit een bol.",
  let:"Bevat galanthamine en lycorine; braken en darmkrampen, ernstiger bij de bol. De bol lijkt op een kleine ui en staat vaak in tuinen waar ook daslook groeit.",
  dubbel:["Sneeuwklokje (giftig; drie lange en drie korte slippen)","Daslook (eetbaar; knoflookgeur, plat blad)","Wilde hyacint (giftig; blauwe klokjes)"]},
-{k:"beredruif",nl:"Beredruif",la:"Arctostaphylos uva-ursi",grp:"boom",tags:["medicinaal"],delen:"Blad",mnd:[5,6,7,8,9],
- herken:"Kruipend altijdgroen dwergstruikje met kleine, dikke, omgekeerd eivormige leerachtige blaadjes met een gave rand en een net van ingezonken nerven aan de onderkant. Roze urnvormige bloempjes, daarna melige rode bessen.",
- let:"Blad als blaasthee, maar hooguit een week aaneen en niet meer dan vijf keer per jaar; langdurig gebruik belast de lever. Niet tijdens zwangerschap of bij kinderen. In Nederland uiterst zeldzaam en beschermd.",
- dubbel:["Rode bosbes (eetbaar; blad met donkere stippen aan de onderkant)","Kraaihei (naaldvormig blad, zwarte bessen)","Bosbes (bladverliezend, blauwe bessen)"],
- med:"Arbutine wordt in de blaas omgezet in een licht ontsmettende stof; het klassieke Europese middel bij blaasontsteking."},
 {k:"penningkruid",nl:"Penningkruid",la:"Lysimachia nummularia",grp:"kruid",tags:["medicinaal"],delen:"Bloeiend kruid",mnd:[6,7,8],
  herken:"Kruipende stengels die op de knopen wortelen, met tegenoverstaande, vrijwel ronde blaadjes als muntjes, en grote dooiergele bloemen in de bladoksels. Op natte, beschaduwde grond.",
  let:"Bitter en samentrekkend, geen keukenplant. Woekert stevig in tuinen.",
@@ -4685,7 +4704,304 @@ const SPECIES_VERWAR = [
  dubbel:["Pruikzwam (eetbaar; \u00e9\u00e9n bal met lange afhangende stekels)","Witte koraalzwam (geen stekels, op de grond)","Gele koraalzwam (laxerend, geel)"]}
 ];
 
-SPECIES.push(...SPECIES_EXTRA, ...SPECIES_TUIN, ...SPECIES_VIER, ...SPECIES_VIJF, ...SPECIES_ZWAM1, ...SPECIES_ZWAM2, ...SPECIES_ZWAM3, ...SPECIES_ZWAM4, ...SPECIES_BOOM1, ...SPECIES_TUIN1, ...SPECIES_KRUID1, ...SPECIES_KRUID2, ...SPECIES_KRUID3, ...SPECIES_VERWAR);
+/* =======================================================================
+   ELFDE LICHTING — de laatste losse dubbelgangers
+   Hiermee bestaat elke soort die ergens als verwarbaar wordt genoemd ook
+   zelf in de gids, met een eigen kaart en eigen vragen.
+   ======================================================================= */
+const SPECIES_VERWAR2 = [
+{k:"aalbes",nl:"Aalbes",la:"Ribes rubrum",grp:"boom",tags:["eetbaar"],delen:"Vrucht",mnd:[6,7],
+ herken:"Struik zonder doorns met handvormig drie- tot vijflobbig blad en hangende trossen doorschijnend rode bessen, elk met een klein bruin kroontje van verdroogde kelkslippen aan de onderkant. Dat kroontje is het kenmerk.",
+ let:"Rijp zuur en sappig, uitstekend voor gelei. Verwar de trossen niet met de rode bessen van giftige struiken \u2014 die hangen niet in trossen en missen het kroontje.",
+ dubbel:["Zwarte bes (eetbaar; blad geurt sterk bij wrijven, zwarte bessen)","Wilde kamperfoelie (giftig; bessen in bosjes, geen tros, windende liaan)","Gelderse roos (giftig rauw; gelobd blad maar bessen in platte schermen)"]},
+{k:"kleinstreepzaad",nl:"Klein streepzaad",la:"Crepis capillaris",grp:"kruid",tags:["eetbaar"],delen:"Jong blad",mnd:[4,5,6],
+ herken:"Rozet van veerdelig, glanzend en vrijwel kaal blad, en een vertakte stengel met veel kleine gele bloemhoofdjes. Wit melksap. Anders dan biggenkruid is de stengel bebladerd en niet borstelig behaard.",
+ let:"Jong blad mild bitter, bruikbaar in salade; ouder wordt het taai. Zeer algemeen in bermen en gazons.",
+ dubbel:["Gewoon biggenkruid (eetbaar; ruw behaard blad, kale vertakte stengel)","Paardenbloem (\u00e9\u00e9n bloem per holle steel, blad grover getand)","Klein kruiskruid (giftig; geen melksap, geen lintbloemen)"]},
+{k:"heelblaadjes",nl:"Heelblaadjes",la:"Pulicaria dysenterica",grp:"kruid",tags:["medicinaal"],delen:"Bloeiend kruid",mnd:[7,8,9],
+ herken:"Grijsviltig behaarde plant met stengelomvattende, golvende bladeren en gele bloemhoofdjes met zeer smalle, uitstaande lintbloemen als een kleine zonnestraal. Op natte, kleiige bermen en slootkanten.",
+ let:"Bitter en aromatisch, geen keukenkruid. Groeit vaak in dichte plekken op natte grond.",
+ dubbel:["Boerenwormkruid (giftig; platte gele knopen zonder lintbloemen)","Jakobskruiskruid (giftig; kaler blad, bredere lintbloemen)","Canadese guldenroede (bloemen in een pluim)"],
+ med:"De soortnaam verwijst naar het oude gebruik bij dysenterie; traditioneel samentrekkend bij darmklachten."},
+{k:"kruisbladwalstro",nl:"Kruisbladwalstro",la:"Cruciata laevipes",grp:"kruid",tags:["medicinaal"],delen:"Bloeiend kruid",mnd:[5,6],
+ herken:"Vierkante stengel met kransen van vier zachtbehaarde, geelgroene blaadjes in een kruis, en kleine honinggele bloempjes in de bladoksels die naar honing ruiken. Bosranden en hagen op kalkrijke grond.",
+ let:"Zacht en onschadelijk maar zonder smaak; vooral een herkenningssoort tussen de walstro's.",
+ dubbel:["Geel walstro (bloemen in een dichte pluim aan de top, blad naaldvormig)","Kleefkruid (eetbaar jong; haakjes die blijven plakken, kransen van zes tot acht)","Blauw walstro (blauwe bloempjes, kransen van vier)"],
+ med:"Traditioneel als wondkruid op de huid gelegd, in dezelfde hoek als kleefkruid."},
+{k:"blauwwalstro",nl:"Blauw walstro",la:"Sherardia arvensis",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Klein en liggend, met kransen van vier tot zes stijve, spits toelopende blaadjes en piepkleine lilablauwe bloempjes in een kopje omgeven door een krans schutblaadjes. Op kalkrijke akkers.",
+ let:"Te klein en zonder gebruik. De blauwe bloemkleur is uniek onder de walstro-achtigen hier.",
+ dubbel:["Kruisbladwalstro (gele bloempjes in de bladoksels)","Kleefkruid (eetbaar jong; witte bloempjes, kleefharen)"]},
+{k:"watergentiaan",nl:"Watergentiaan",la:"Nymphoides peltata",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Kleine ronde drijfbladeren met een diepe spleet, als miniatuur waterlelieblad, en daarboven felgele bloemen van vijf kroonbladen met een gefranjerde rand. In stilstaand en traag stromend water.",
+ let:"Niet eetbaar en in Nederland beschermd. De gefranjerde bloemrand scheidt hem van de gele plomp.",
+ dubbel:["Gele plomp (giftig; grote leerachtige bladeren, flesvormige bloem)","Witte waterlelie (giftig; witte bloem, veel groter blad)"]},
+{k:"juffertje",nl:"Juffertje-in-het-groen",la:"Nigella damascena",grp:"tuin",tags:[],delen:"—",mnd:[],
+ herken:"Draadvormig fijn verdeeld blad dat als een groene sluier om de lichtblauwe bloem staat, en daarna een opgeblazen bolvormige zaaddoos met lange hoorntjes. Zaait zichzelf uit in tuinen.",
+ let:"Niet te verwarren met zwarte komijn: dat is een andere soort uit hetzelfde geslacht. De zaden van dit sierjuffertje horen niet in de keuken.",
+ dubbel:["Zwarte komijn (Nigella sativa; eetbaar zaad, bleke bloem zonder sluier)","Akelei (giftig; gelobd blad, gespoorde bloemen)"]},
+{k:"schijnaardbei",nl:"Indische schijnaardbei",la:"Duchesnea indica",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Als een aardbeiplant met drietallig blad en uitlopers, maar met gele bloemen in plaats van witte, en de vrucht staat rechtop en wijst omhoog in plaats van te hangen. Smaakloos en waterig.",
+ let:"Niet giftig maar volkomen smaakloos; een teleurstelling, geen gevaar. Gele bloem betekent geen aardbei.",
+ dubbel:["Bosaardbei (eetbaar; witte bloemen, hangende geurige vrucht)","Zilverschoon (geveerd zilverig blad, geen vrucht)"]},
+{k:"puntwederik",nl:"Puntwederik",la:"Lysimachia punctata",grp:"tuin",tags:[],delen:"—",mnd:[],
+ herken:"Rechtopstaande stengel met kransen van drie tot vier bladeren en in de bladoksels dichte kransen van dooiergele bloemen met een fijn behaarde rand. Verwilderde tuinplant langs slootkanten.",
+ let:"Geen gebruik in de keuken. Woekert stevig en verdringt inheemse oeverplanten.",
+ dubbel:["Wederik (bloemen in een eindstandige pluim)","Penningkruid (kruipend, ronde blaadjes)"]},
+{k:"stinkendnieskruid",nl:"Stinkend nieskruid",la:"Helleborus foetidus",grp:"tuin",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Wintergroene struikachtige plant met diep handvormig gedeeld donkergroen blad en knikkende, bolvormige groene bloemklokjes met een purperen randje. Ruikt bij kneuzen onaangenaam.",
+ let:"Alle delen bevatten hartglycosiden en prikkelen de huid; werd als niesmiddel gebruikt en dat liep geregeld verkeerd af.",
+ dubbel:["Kerstroos (giftig; witte schotelvormige bloemen)","Bosanemoon (giftig; witte bloem, geen wintergroen blad)"]},
+{k:"schijncipres",nl:"Schijncipres",la:"Chamaecyparis lawsoniana",grp:"boom",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Kegelvormige naaldboom met platte schubtakjes die aan de onderkant een fijne witte tekening dragen als een X of een vlinder. Kleine ronde kegeltjes van hooguit een centimeter. Ruikt naar peterselie bij wrijven.",
+ let:"Bevat dezelfde soort terpenen als de levensboom; niet voor thee of tinctuur. De algemeenste heg naast buxus en thuja.",
+ dubbel:["Westerse levensboom (giftig; kegeltjes langwerpig, geur naar appel)","Jeneverbes (echte naalden in kransen van drie)"]},
+{k:"japansesierkwee",nl:"Japanse sierkwee",la:"Chaenomeles japonica",grp:"boom",tags:["eetbaar"],delen:"Vrucht",mnd:[9,10],
+ herken:"Lage doornige struik die in maart bloeit met oranjerode bloemen op kale takken, daarna kleine ronde geelgroene appeltjes met een sterke geur. Veel in oude tuinen en plantsoenen.",
+ let:"Rauw keihard en zuur; koken. Rijk aan pectine, dus goed voor gelei, net als de kweepeer. Pitten weggooien.",
+ dubbel:["Kweepeer (grotere peervormige vrucht, viltig behaard)","Meidoorn (eetbaar; kleine rode bessen, ander blad)"]},
+{k:"wittemoerbei",nl:"Witte moerbei",la:"Morus alba",grp:"boom",tags:["eetbaar"],delen:"Vrucht, blad",mnd:[7,8],
+ herken:"Glanzend, vaak onregelmatig gelobd blad dat gladder aanvoelt dan bij de zwarte moerbei, en vruchten die wit tot lichtroze of paars blijven en flauwzoet smaken. De voedselplant van de zijderups.",
+ let:"Eetbaar maar veel flauwer dan de zwarte moerbei; vlekt minder. Onrijp geeft maagklachten.",
+ dubbel:["Zwarte moerbei (eetbaar; donkerpaarse vruchten, ruw blad, sterk vlekkend)","Braam (struik met stekels)"]},
+{k:"canadapopulier",nl:"Canadapopulier",la:"Populus x canadensis",grp:"boom",tags:["medicinaal"],delen:"Knop",mnd:[3,4],
+ herken:"Kruising van zwarte en Amerikaanse populier: driehoekig blad met een doorschijnende hoornachtige rand en aan de voet van de bladschijf twee kliertjes. De meest geplante populier langs Nederlandse wegen.",
+ let:"Knoppen minder geurig dan die van de zwarte populier maar bruikbaar in zalf. Niet bij aspirineovergevoeligheid.",
+ dubbel:["Zwarte populier (knoppen sterker balsemgeurig, bast diep gegroefd)","Ratelpopulier (rond blad, trilt)"],
+ med:"Zelfde gebruik als zwarte populier: knoppen in zalf bij gewrichtspijn en kloven."},
+{k:"zurekers",nl:"Zure kers",la:"Prunus cerasus",grp:"boom",tags:["eetbaar"],delen:"Vrucht",mnd:[6,7],
+ herken:"Kleinere boom dan de zoete kers, vaak struikvormig met opslag, met kleiner en steviger blad en helderrode, zure vruchten aan korte stelen. Bast met horizontale lenticellen.",
+ let:"Te zuur om zo te eten maar uitstekend voor jam, siroop en likeur. De pitten bevatten blauwzuurverbindingen \u2014 niet kraken.",
+ dubbel:["Zoete kers (eetbaar; donkerder, zoet, lange stelen)","Gewone vogelkers (kleine zwarte bessen in trossen)"]},
+{k:"rodekamperfoelie",nl:"Rode kamperfoelie",la:"Lonicera xylosteum",grp:"boom",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Rechtopstaande struik, geen liaan, met zachtbehaard tegenoverstaand blad en tweelingbloemen die geelwit zijn en later twee gepaarde, glanzend rode bessen vormen die aan de voet vergroeid zijn.",
+ let:"De bessen geven braken en diarree; ze staan op ooghoogte in tuinen en heggen en trekken kinderen aan.",
+ dubbel:["Wilde kamperfoelie (giftig; windende liaan, lange geurende bloemen)","Aalbes (eetbaar; bessen in hangende trossen, gelobd blad)"]},
+{k:"wijnstok",nl:"Wijnstok",la:"Vitis vinifera",grp:"boom",tags:["eetbaar"],delen:"Vrucht, blad",mnd:[5,6,9,10],
+ herken:"Klimmende houtige liaan met enkelvoudig, handvormig gelobd blad en ranken die tegenover een blad staan, zonder zuignapjes. Trossen groene tot blauwe bessen.",
+ let:"Jong blad geblancheerd om te vullen, rijpe druiven vers. De ranken hechten zich door te winden, niet met plakschijfjes \u2014 dat is het verschil met wilde wingerd, waarvan de bessen giftig zijn.",
+ dubbel:["Wilde wingerd (giftig; vijftallig blad, ranken met zuignapjes)","Hop (eetbare scheut; ruw blad, hoppebellen)"]},
+{k:"zonnebloem",nl:"Zonnebloem",la:"Helianthus annuus",grp:"tuin",tags:["eetbaar"],delen:"Zaad, knop",mnd:[8,9,10],
+ herken:"Tot drie meter hoog met ruw behaarde stengel, groot hartvormig blad en \u00e9\u00e9n reusachtig bloemhoofd met gele lintbloemen om een bruine schijf die zich met de zon meedraait zolang hij nog niet bloeit.",
+ let:"Zaad geroosterd of rauw; ongeopende knoppen als artisjok gekookt. Het schilletje van het zaad is onverteerbaar.",
+ dubbel:["Aardpeer (eetbare knol; kleinere hoofdjes, veel per plant)","Griekse alant (smalle draadvormige lintbloemen)"]},
+{k:"courgette",nl:"Courgette",la:"Cucurbita pepo",grp:"tuin",tags:["eetbaar"],delen:"Vrucht, bloem",mnd:[7,8,9],
+ herken:"Ruwe stekelige stengel met groot handvormig gelobd blad, vaak met zilveren vlekken, en langwerpige groene of gele vruchten met een geribde, harde vruchtsteel. Grote gele klokbloemen.",
+ let:"Proef altijd een rauw stukje van een zelfgeteelde of gekregen courgette: bitter betekent cucurbitacine, en dat geeft ernstige darmklachten. Bittere vruchten weggooien, ook gekookt.",
+ dubbel:["Sierkalebassen (bitter, cucurbitacine, niet eetbaar)","Pompoen (eetbaar; ronde vrucht, ronde kurkachtige steel)"]},
+{k:"lampionplant",nl:"Lampionplant",la:"Physalis alkekengi",grp:"tuin",tags:["giftig"],delen:"—",mnd:[],
+ herken:"De opvallend feloranje tot rode, papierachtige lampion om de vrucht is onmiskenbaar; blad breed eivormig, bloemen onopvallend wit. Woekert met uitlopers in tuinen.",
+ let:"Blad en stengel bevatten solanine-achtige stoffen; de rijpe bes zelf wordt in sommige streken gegeten maar is bitter en vaak slecht verdragen. Onrijp en groen zeker niet.",
+ dubbel:["Ananaskers (eetbaar; strogele kelk, zoetzure oranje bes)","Bitterzoet (giftig; rode bessen zonder kelk)"]},
+{k:"geleanemoon",nl:"Gele anemoon",la:"Anemone ranunculoides",grp:"kruid",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Als de bosanemoon maar met heldergele bloemen en met de krans van drie diep ingesneden bladeren vrijwel zonder steel. In oud loofbos op rijke grond, vaak tussen de witte bosanemonen.",
+ let:"Protoanemonine, net als bosanemoon en boterbloem: blaren op de huid en een brandende mond.",
+ dubbel:["Bosanemoon (giftig; witte bloem, gesteelde bladkrans)","Speenkruid (giftig rauw; glanzend hartvormig blad, acht tot twaalf kroonbladen)"]},
+{k:"blaartrekkendeboterbloem",nl:"Blaartrekkende boterbloem",la:"Ranunculus sceleratus",grp:"kruid",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Dikke holle stengel, glanzend en vlezig handvormig gedeeld blad, en opvallend kleine bleekgele bloemen met een sterk verlengde, cilindrische vruchtbodem. Op modderige oevers en droogvallende slikken.",
+ let:"De sterkste protoanemonine-bron van onze flora: het sap trekt binnen minuten blaren. De soortnaam <i>sceleratus</i> betekent misdadig.",
+ dubbel:["Scherpe boterbloem (giftig; grotere glanzende bloemen, droge grond)","Dotterbloem (giftig; grote niervormige bladeren)"]},
+{k:"zwarttandzaad",nl:"Zwart tandzaad",la:"Bidens frondosa",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Als het veerdelig tandzaad maar met blad dat in drie tot vijf gesteelde deelblaadjes is verdeeld, en met opvallende bladachtige omwindselblaadjes onder het hoofdje. Zaden met twee weerhaken.",
+ let:"Geen keukenkruid. Invasieve exoot langs oevers, die het inheemse tandzaad verdringt.",
+ dubbel:["Veerdelig tandzaad (blad ongesteeld ingesneden, minder omwindselblaadjes)","Kruiskruiden (giftig; gele lintbloemen)"]},
+{k:"voorjaarspronkridder",nl:"Voorjaarspronkridder",la:"Calocybe gambosa",grp:"zwam",tags:["eetbaar"],delen:"Hoed",mnd:[4,5,6],
+ herken:"Stevige, romig witte tot lichtokere hoed met een ingerolde rand, dichte witte plaatjes en een dikke witte steel. Sterke, doordringende meelgeur. In heksenkringen op kalkrijk grasland en bosranden, in het voorjaar.",
+ let:"Goede voorjaarszwam, maar het seizoen valt samen met dat van giftige vezelkoppen en satijnzwammen. Meelgeur plus witte sporenprint plus heksenkring moeten alle drie kloppen.",
+ dubbel:["Grote satijnzwam (giftig; roze sporen, plaatjes niet zo dicht)","Vezelkoppen (giftig; spermatische geur, bruine sporen)","Molenaar (eetbaar; aflopende plaatjes, roze sporen)"]},
+{k:"tijgerridderzwam",nl:"Tijgerridderzwam",la:"Tricholoma pardinum",grp:"zwam",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Forse grijze hoed die opbreekt in donkere, dakpansgewijze schubben als een tijgervel, met dikke witte plaatjes en een stevige witte steel. Meelgeur. Op kalkrijke grond, in Nederland zeldzaam.",
+ let:"Een van de heftigste maag- en darmvergiftigingen onder de plaatjeszwammen, met klachten die dagen aanhouden. De meelgeur maakt hem verraderlijk: die hoort ook bij eetbare ridderzwammen.",
+ dubbel:["Grauwe ridderzwam (eetbaar; grijs met radiale vezels, geen schubben)","Zeepridderzwam (giftig; zeepgeur)","Voorjaarspronkridder (eetbaar; wit, voorjaar)"]},
+{k:"goudvliesbundelzwam",nl:"Goudvliesbundelzwam",la:"Pholiota aurivella",grp:"zwam",tags:[],delen:"—",mnd:[],
+ herken:"Bundels op levende beuk en wilg, hoog aan de stam: goudgele kleverige hoed met platte, donkere, aanliggende schubben die bij regen afspoelen. Plaatjes roestbruin wordend.",
+ let:"Niet eetbaar; taai en maagprikkelend. Onderscheidt zich van de schubbige bundelzwam door de kleverige hoed met platte in plaats van opstaande schubben.",
+ dubbel:["Schubbige bundelzwam (giftig; droge hoed met opstaande schubben)","Echte honingzwam (eetbaar mits gekookt; witte sporen, ring)"]},
+{k:"elfenschermpje",nl:"Gewoon elfenschermpje",la:"Mycena galericulata",grp:"zwam",tags:[],delen:"—",mnd:[],
+ herken:"Grijsbruin, klokvormig hoedje met duidelijke radiale groeven op een taaie, glanzende steel, in bundels op loofhoutstronken. Plaatjes wit en later vleeskleurig, met dwarsaders ertussen.",
+ let:"Te dun en taai om te eten. Een van de algemeenste mycena's en een goed ijkpunt voor het geslacht.",
+ dubbel:["Grote bloedsteelmycena (donkerrood sap bij breken)","Saffraanmycena (oranje sap)","Bundelmosklokje (dodelijk; ring, roestbruine sporen)"]},
+{k:"wittesatijnvezelkop",nl:"Witte satijnvezelkop",la:"Inocybe geophylla var. lilacina",grp:"zwam",tags:["giftig"],delen:"—",mnd:[],
+ herken:"De lilagrijze vorm van de witte vezelkop: zijdeglanzende, spits gebulte hoed in lila tot grijsviolet, plaatjes leembruin verkleurend, met dezelfde doordringende spermatische geur.",
+ let:"Muscarine, net als alle vezelkoppen. De lila kleur laat hem op een amethistzwam lijken, en die is wel eetbaar \u2014 kijk naar de plaatjes: bruin worden betekent vezelkop.",
+ dubbel:["Amethistzwam (eetbaar; plaatjes blijven paars, geen spermageur)","Witte vezelkop (giftig; zuiver wit)","Paarse schijnridderzwam (eetbaar; veel forser)"]},
+{k:"grotebekerzwam",nl:"Grote bekerzwam",la:"Peziza badia",grp:"zwam",tags:[],delen:"—",mnd:[],
+ herken:"Brede, olijfbruine tot roodbruine bekers zonder steel, vanbinnen donkerder dan vanbuiten, tot acht centimeter breed, op kale zandige bospaden. Broos en waterig.",
+ let:"Rauw geeft hij maagklachten en de bekerzwammen zijn onderling niet betrouwbaar te scheiden. Laat het geslacht staan.",
+ dubbel:["Blazende bekerzwam (bleker, op mest en compost)","Grote oranje bekerzwam (eetbaar; feloranje, vlak)"]},
+{k:"houtknotszwam",nl:"Houtknotszwam",la:"Xylaria polymorpha",grp:"zwam",tags:[],delen:"—",mnd:[],
+ herken:"Dikke, zwarte, knotsvormige knuppels van vijf tot tien centimeter uit dode loofhoutstronken, vaak in groepjes \u2014 de naam dodemansvingers is niet overdreven. Vanbinnen zuiver wit en hard.",
+ let:"Houtig en oneetbaar. Blijft een heel jaar staan en is daarmee een goede winterse herkenningssoort.",
+ dubbel:["Geweizwam (dun, vertakt, wit bepoederde top)","Kogelhoutskoolzwam (harde zwarte bollen)"]},
+{k:"eikensponszwam",nl:"Eikensponszwam",la:"Sparassis brevipes",grp:"zwam",tags:["eetbaar"],delen:"Vruchtlichaam",mnd:[8,9,10],
+ herken:"Als de gekroesde sponszwam maar met bredere, plattere en minder gekrulde lobben, romig tot okerkleurig, aan de voet van eik in plaats van den. Zeldzaam.",
+ let:"Eetbaar en goed, maar zeldzaam en in Nederland beschermenswaardig. Grondig spoelen: er zit altijd strooisel tussen de lobben.",
+ dubbel:["Sponszwam (eetbaar; sterk gekruld, bij den)","Eikhaas (waaiers op vertakte stelen)"]},
+{k:"gelezwavelporiezwam",nl:"Gele zwavelporiezwam",la:"Albatrellus citrinus",grp:"zwam",tags:[],delen:"—",mnd:[],
+ herken:"Als de schaapszwam maar met een citroengele tot zwavelgele tint over hoed en poriën, en met bitter vlees. Bij oude fijnspar op kalkrijke grond.",
+ let:"Te bitter om te gebruiken. De gele zweem en de bittere smaak scheiden hem van de eetbare schaapszwam.",
+ dubbel:["Schaapszwam (eetbaar; roomwit, nootachtig, mild)","Zwavelzwam (eetbaar jong; feloranje, op loofhout)"]},
+{k:"oranjedruppelzwam",nl:"Oranje druppelzwam",la:"Dacrymyces stillatus",grp:"zwam",tags:[],delen:"—",mnd:[],
+ herken:"Kleine, oranjegele gelatineuze druppels van hooguit een halve centimeter op dood naaldhout, vaak met tientallen tegelijk in rijen langs een balk of tak. Droogt in tot oranje korstjes.",
+ let:"Onschadelijk maar veel te klein om iets mee te doen. Een goede oefening in geleiachtige zwammen.",
+ dubbel:["Gele trilzwam (veel groter, gekronkeld, op loofhout)","Geel hoorntje (gevorkte hoorntjes, taai)"]},
+{k:"gelehersenzwam",nl:"Gele hersenzwam",la:"Tremella encephala",grp:"zwam",tags:[],delen:"—",mnd:[],
+ herken:"Bleekroze tot witgele gelatineuze kwabben op dood naaldhout, met een harde witte kern vanbinnen als je hem doorsnijdt \u2014 die kern is de korstzwam waarop hij parasiteert.",
+ let:"Onschadelijk en smaakloos. De harde kern is het onderscheid met de gele trilzwam, die geheel gelatineus is.",
+ dubbel:["Gele trilzwam (dooiergeel, geheel gelatineus, op loofhout)","Oranje druppelzwam (klein, oranje)"]},
+{k:"keizersamaniet",nl:"Keizersamaniet",la:"Amanita caesarea",grp:"zwam",tags:["eetbaar"],delen:"Hoed",mnd:[8,9,10],
+ herken:"Oranjerode hoed met een geribde rand, en \u2014 anders dan bij de vliegenzwam \u2014 dooiergele plaatjes, een gele ring en een gele steel, met een dikke witte beker aan de voet. In Zuid-Europa, in Nederland vrijwel afwezig.",
+ let:"In Itali\u00eb hooggewaardeerd, maar hier zeldzaam tot afwezig: een oranje amaniet in Nederland is vrijwel zeker een vliegenzwam. De kleur van de plaatjes beslist \u2014 wit betekent laten staan.",
+ dubbel:["Vliegenzwam (giftig; witte plaatjes, witte ring, witte vlokken op de hoed)","Panteramaniet (dodelijk; bruin met witte vlokken)"]}
+];
+
+/* =======================================================================
+   TWAALFDE LICHTING — sluitstuk
+   Elke naam die ergens in een dubbelgangerlijst staat, bestaat hierna ook
+   als eigen soort met eigen kaart en eigen vragen.
+   ======================================================================= */
+const SPECIES_SLUIT = [
+{k:"blaassilene",nl:"Blaassilene",la:"Silene vulgaris",grp:"kruid",tags:["eetbaar"],delen:"Jong blad, scheut",mnd:[4,5,6],
+ herken:"Blauwgroen, kaal en glad blad op een kale stengel, en witte bloemen met diep gespleten kroonbladen op een sterk opgeblazen, geruite kelk die als een blaasje om de bloem staat. Dat blaasje is onmiskenbaar.",
+ let:"Jonge scheuten en blad smaken naar doperwt en zijn in Spanje en Itali\u00eb een klassieke wilde groente. Bevat saponinen: niet in grote hoeveelheid rauw.",
+ dubbel:["Avondkoekoeksbloem (behaard, kelk niet geruit)","Dagkoekoeksbloem (roze bloemen, behaard)"]},
+{k:"muurleeuwenbek",nl:"Muurleeuwenbek",la:"Cymbalaria muralis",grp:"kruid",tags:["eetbaar"],delen:"Blad, bloem",mnd:[5,6,7,8,9],
+ herken:"Kruipende, dunne roodachtige stengels over oude muren, met kleine ronde, klimopachtig gelobde blaadjes en piepkleine lilablauwe leeuwenbekjes met een gele vlek. Na de bloei draait de steel zich naar de muur toe om het zaad in een spleet te duwen.",
+ let:"Blad en bloem zijn mild en eetbaar, in kleine hoeveelheid als garnering. Groeit vaak op oude bepleistering \u2014 kies een schone muur.",
+ dubbel:["Klimop (giftig; houtig, veel groter blad)","Grote leeuwenbek (rechtopstaand, grote bloemen)"]},
+{k:"rodebes",nl:"Rode bes",la:"Ribes rubrum var. domesticum",grp:"tuin",tags:["eetbaar"],delen:"Vrucht",mnd:[6,7],
+ herken:"De gekweekte vorm van de aalbes: grotere, gelijkmatiger trossen doorschijnend rode bessen aan een doornloze struik met handvormig gelobd blad. Elke bes draagt onderaan het bruine kroontje.",
+ let:"Zuur en pectinerijk, de klassieke geleibes. Vogels zijn er eerder bij dan jij.",
+ dubbel:["Aalbes (eetbaar; wilde vorm, kleinere trossen)","Rode kamperfoelie (giftig; gepaarde bessen, geen tros)"]},
+{k:"huislook",nl:"Huislook",la:"Sempervivum tectorum",grp:"tuin",tags:["medicinaal"],delen:"Blad",mnd:[5,6,7,8],
+ herken:"Dichte rozetten van dikke, vlezige, spits toelopende bladeren met een roodbruine punt, die zich met uitlopers vermeerderen tot een tapijt. Op muren, daken en droge stenen.",
+ let:"Het sap uit een doorgesneden blad wordt uitwendig gebruikt, als bij aloë. Inwendig in hoeveelheid braakverwekkend.",
+ dubbel:["Muurpeper (giftig; klein, brandend scherp, geen rozetten)","Hemelsleutel (eetbaar; rechtopstaand, platte roze schermen)"],
+ med:"Bladsap uitwendig bij brandwondjes, insectenbeten en eelt; hetzelfde gebruik als aloë vera."},
+{k:"herik",nl:"Herik",la:"Sinapis arvensis",grp:"kruid",tags:["eetbaar"],delen:"Jong blad, knop",mnd:[4,5,6],
+ herken:"Ruw behaarde stengel met grof gezaagd, niet stengelomvattend blad en felgele kruisbloemen. De hauwen staan schuin af en dragen een lange, kegelvormige snavel aan de top.",
+ let:"Jong blad en knoppen zijn scherp, als mosterdgroen; koken haalt de scherpte eruit. Akkers zijn vrijwel altijd bespoten en particulier bezit.",
+ dubbel:["Koolzaad (eetbaar; blauwgroen, stengelomvattend blad, glad)","Raapzaad (bloemen onder de knoppen, kleiner)","Barbarakruid (eetbaar; glanzend donkergroen blad)"]},
+{k:"raapzaad",nl:"Raapzaad",la:"Brassica rapa",grp:"kruid",tags:["eetbaar"],delen:"Jong blad, knop",mnd:[3,4,5],
+ herken:"Als koolzaad maar kleiner en grasgroen in plaats van blauwgroen, en de open bloemen staan lager dan de nog gesloten knoppen aan de top. Onderblad ruw behaard.",
+ let:"Knoppen als broccoli, blad gekookt. De voorouder van meiraap en paksoi.",
+ dubbel:["Koolzaad (blauwgroen berijpt, bloemen boven de knoppen)","Herik (ruwe stengel, blad niet omvattend)"]},
+{k:"avondkoekoeksbloem",nl:"Avondkoekoeksbloem",la:"Silene latifolia",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Zacht behaarde plant met witte bloemen waarvan elk kroonblad in twee lobben is gespleten, op een opgeblazen, geaderde kelk. De bloemen gaan tegen de avond open en geuren dan sterk voor nachtvlinders.",
+ let:"Bevat saponinen in wortel en zaad; geen keukenplant. Mooie bermplant voor nachtvlinders.",
+ dubbel:["Dagkoekoeksbloem (dieproze, bloeit overdag)","Blaassilene (kelk sterk opgeblazen en geruit)"]},
+{k:"bergsteentijm",nl:"Bergsteentijm",la:"Clinopodium menthifolium",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Blad, bloem",mnd:[7,8,9],
+ herken:"Zacht behaarde vierkante stengel met eivormig, gekarteld blad dat sterk naar munt en tijm ruikt, en losse kransen bleekroze lipbloemen in de bladoksels. Kalkrijke bosranden.",
+ let:"Krachtig kruid, spaarzaam gebruiken. In Nederland zeldzaam en beschermenswaardig \u2014 herken en laat staan.",
+ dubbel:["Borstelkrans (bloemen in dichte bolvormige kransen met borstelharen)","Wilde marjolein (bloemen in schermen aan de top)"],
+ med:"Thee traditioneel bij hoest en een gevoelige maag, als bij marjolein."},
+{k:"geelwalstro",nl:"Geel walstro",la:"Galium verum",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Bloeiend kruid",mnd:[6,7,8],
+ herken:"Kransen van acht tot twaalf naaldvormige blaadjes met omgerolde randen, en dichte pluimen honinggele bloempjes die sterk naar honing geuren. Op droge, schrale graslanden en duinen.",
+ let:"Werd als stremsel voor kaas gebruikt en geeft een gele kleur. In kleine hoeveelheid; het kruid bevat cumarine.",
+ dubbel:["Kruisbladwalstro (kransen van vier, bloemen in de bladoksels)","Kleefkruid (eetbaar jong; kleefharen, witte bloempjes)"],
+ med:"Traditioneel als mild plasmiddel en uitwendig bij huidklachten \u2014 het oude vrouwenmantelkruid van de kaasmakerij."},
+{k:"duifkruid",nl:"Duifkruid",la:"Scabiosa columbaria",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Fijn veerdelig gesneden stengelblad en platte, bleeklila bloemhoofdjes waarvan de randbloemen groter zijn. Anders dan bij beemdkroon zijn er vijf meeldraden per bloempje en draagt de vrucht een kroontje.",
+ let:"Geen gebruik in de keuken. Indicator van schraal kalkgrasland en belangrijke vlinderplant.",
+ dubbel:["Beemdkroon (vier meeldraden, forser, algemener)","Blauwe knoop (bolvormige hoofdjes, gaafrandig blad)"]},
+{k:"rapunzelklokje",nl:"Rapunzelklokje",la:"Campanula rapunculus",grp:"kruid",tags:["eetbaar"],delen:"Wortel, jong blad",mnd:[4,5,10,11],
+ herken:"Slanke, weinig vertakte stengel met smalle bladeren en bleeklila klokjes in een lange, smalle tros. De wortel is spoelvormig verdikt en wit, als een kleine pastinaak.",
+ let:"De wortel is de rapunzel uit het sprookje: rauw in salade of gekookt. In Nederland zeldzaam \u2014 alleen uit eigen tuin.",
+ dubbel:["Grasklokje (eetbaar; knikkende losse klokjes, geen verdikte wortel)","Ruig klokje (behaard, grotere klokken)"]},
+{k:"ruigklokje",nl:"Ruig klokje",la:"Campanula trachelium",grp:"kruid",tags:["eetbaar"],delen:"Jong blad",mnd:[4,5],
+ herken:"Stevige, kantige en ruw behaarde stengel met grof dubbelgezaagd, brandnetelachtig blad en grote blauwviolette klokken in de bladoksels. Bosranden op kalkrijke grond.",
+ let:"Jong blad mild en bruikbaar in salade. In Nederland vrij zeldzaam; spaarzaam plukken.",
+ dubbel:["Grasklokje (fijn, grasachtig blad)","Grote brandnetel (brandharen, geen klokken)"]},
+{k:"leeuwenbek",nl:"Grote leeuwenbek",la:"Antirrhinum majus",grp:"tuin",tags:[],delen:"—",mnd:[],
+ herken:"Rechtopstaande tros van grote, gesloten lipbloemen die als een bek opengaan als je ze zijdelings knijpt, in wit, geel of rood. Blad smal lancetvormig. Verwilderd op muren.",
+ let:"Niet eetbaar en niet giftig van betekenis; puur sierplant. Bevat bitterstoffen.",
+ dubbel:["Vlasbekje (bleekgeel, met lange spoor)","Muurleeuwenbek (klein, kruipend op muren)"]},
+{k:"tuinridderspoor",nl:"Tuinridderspoor",la:"Delphinium elatum",grp:"tuin",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Manshoge, dichte aren van blauwe tot violette gespoorde bloemen boven diep handvormig gedeeld blad. Vaste plant in siertuinen, veel forser dan de wilde ridderspoor.",
+ let:"Bevat delphinine, verwant aan het gif van monnikskap: verdoving, braken en hartritmestoornissen. Al het plantmateriaal is giftig, ook het zaad.",
+ dubbel:["Wilde ridderspoor (giftig; ijl, akkerplant)","Monnikskap (dodelijk; helmvormige bloem)","Akelei (giftig; vijf sporen per bloem)"]},
+{k:"spaansehyacint",nl:"Spaanse hyacint",la:"Hyacinthoides hispanica",grp:"tuin",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Als de wilde hyacint maar met een rechtopstaande tros die niet overhangt, breder blad, bleker blauwe klokjes met wijd uitstaande slippen, en blauwe in plaats van roomkleurige helmknoppen.",
+ let:"Zelfde hartglycosiden als de wilde hyacint. Kruist met de inheemse soort en verdringt die in stinzenbossen.",
+ dubbel:["Wilde hyacint (giftig; overhangende trostop, geurend, roomkleurige helmknoppen)","Daslook (eetbaar; knoflookgeur, plat blad)"]},
+{k:"welriekendesalomonszegel",nl:"Welriekende salomonszegel",la:"Polygonatum odoratum",grp:"kruid",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Als de veelbloemige salomonszegel maar met een duidelijk kantige, geribde stengel en slechts \u00e9\u00e9n of twee klokjes per bladoksel, die zoet geuren. Op kalkrijke, droge bosgrond.",
+ let:"Saponinen in bes en wortelstok: braken en diarree. De kantige stengel is het snelste onderscheid met de veelbloemige.",
+ dubbel:["Veelbloemige salomonszegel (giftig; ronde stengel, twee tot vijf klokjes per oksel)","Daslook (eetbaar; knoflookgeur)"]},
+{k:"kleinezonnedauw",nl:"Kleine zonnedauw",la:"Drosera intermedia",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Als de ronde zonnedauw maar met langwerpige, spatelvormige blaadjes die schuin omhoog staan in plaats van plat op het mos te liggen. Op natte, kale veenbodem.",
+ let:"Streng beschermd, net als alle zonnedauwen. Herken hem en laat hem staan.",
+ dubbel:["Ronde zonnedauw (ronde blaadjes plat op het veenmos)","Veenmos (geen tentakels)"]},
+{k:"veenmos",nl:"Veenmos",la:"Sphagnum palustre",grp:"kruid",tags:["medicinaal"],delen:"—",mnd:[],
+ herken:"Bleekgroen tot roodbruin mos met stervormige kopjes, dat als een spons water vasthoudt en bij uitknijpen tientallen keren zijn eigen gewicht aan vocht loslaat. Vormt hoogveen.",
+ let:"Niet eetbaar. Hoogveen is streng beschermd en groeit millimeters per jaar \u2014 niet oogsten.",
+ dubbel:["Andere mossen (geen stervormige kopjes, houden geen water vast)","Kleine zonnedauw (tentakels met kleefdruppels)"],
+ med:"In beide wereldoorlogen als wondverband gebruikt: het mos is zuur, zuigt sterk en remt bacteriegroei."},
+{k:"boszwenkgras",nl:"Boszwenkgras",la:"Festuca gigantea",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Fors, slap overhangend bosgras met brede, glanzende bladeren en een ijle pluim waarvan de aartjes lange, gebogen naalden dragen. In vochtig loofbos.",
+ let:"Geen gebruik. Staat hier omdat grassen in het voorjaar tussen daslook en wilde hyacint opkomen en dan op bolgewassen lijken.",
+ dubbel:["Daslook (eetbaar; knoflookgeur, breed plat blad)","Wilde hyacint (giftig; blad gootvormig, uit een bol)"]},
+{k:"boskruiskruid",nl:"Boskruiskruid",la:"Senecio sylvaticus",grp:"kruid",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Klierachtig behaard en kleverig, met diep veerdelig blad en kleine gele bloemhoofdjes met korte, teruggekrulde lintbloemen. Op kapvlakten en zandige bosgrond.",
+ let:"Pyrrolizidine-alkalo\u00efden, net als alle kruiskruiden: onherstelbare leverschade bij herhaalde inname.",
+ dubbel:["Klein kruiskruid (giftig; geen lintbloemen, niet kleverig)","Jakobskruiskruid (giftig; grotere hoofdjes)","Akkerkool (eetbaar; melksap, liervormig blad)"]},
+{k:"lateguldenroede",nl:"Late guldenroede",la:"Solidago gigantea",grp:"kruid",tags:["medicinaal"],delen:"Bloeiend kruid",mnd:[8,9],
+ herken:"Als de Canadese guldenroede maar met een kale, vaak blauwberijpte stengel in plaats van een behaarde. Zelfde overhangende pluim van kleine gele hoofdjes.",
+ let:"Invasieve exoot; plukken helpt eerder dan het schaadt. Zelfde gebruik als de andere guldenroeden.",
+ dubbel:["Canadese guldenroede (stengel behaard)","Echte guldenroede (inheems, ijle smalle pluim)"],
+ med:"Als mild plasmiddel bij blaas- en nierklachten, net als de echte guldenroede."},
+{k:"kleinspringzaad",nl:"Klein springzaad",la:"Impatiens parviflora",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Doorschijnende sappige stengel met ovaal gezaagd blad en kleine, bleekgele bloemen met een rechte, korte spoor die recht naar achteren wijst. Massaal in schaduwrijk stadsbos.",
+ let:"Niet eetbaar van betekenis en licht laxerend. Invasieve exoot die de bosbodem bedekt.",
+ dubbel:["Groot springzaad (giftig; grotere gele bloemen met gekromde spoor)","Reuzenbalsemien (roze, tot twee meter)"]},
+{k:"reuzenbalsemien",nl:"Reuzenbalsemien",la:"Impatiens glandulifera",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Tot twee meter hoge, holle en roodachtige stengel met knopen, groot gezaagd blad en grote roze tot purperen helmvormige bloemen. De zaaddozen springen bij aanraking met kracht open.",
+ let:"Bloemen en jonge zaden zijn eetbaar maar de plant verdringt inheemse oevervegetatie volledig. Oogsten en uittrekken helpt.",
+ dubbel:["Klein springzaad (klein, bleekgeel)","Groot springzaad (giftig; geel, inheems)"]},
+{k:"zachteooievaarsbek",nl:"Zachte ooievaarsbek",la:"Geranium molle",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Laag en zacht donzig behaard, met vrijwel ronde, ondiep gelobde blaadjes en kleine roze bloempjes waarvan de kroonbladen diep zijn ingesneden. Op gazons en bermen.",
+ let:"Niet giftig maar zonder gebruik. Zeer algemeen; goed ijkpunt om robertskruid van te scheiden.",
+ dubbel:["Robertskruid (fijn handvormig blad, sterke geur, rode stengels)","Reigersbek (geveerd blad, lange snavelvrucht)"]},
+{k:"zachteduizendknoop",nl:"Zachte duizendknoop",la:"Persicaria mitis",grp:"kruid",tags:["eetbaar"],delen:"Jong blad",mnd:[6,7,8],
+ herken:"Als waterpeper maar met een milde smaak en een tuitje om de knoop dat lange wimperharen draagt. Bloemaren knikkend en groenroze. Op natte, voedselrijke oevers.",
+ let:"Mild en bruikbaar in soep. Proef altijd een puntje: brandt het na, dan is het waterpeper.",
+ dubbel:["Waterpeper (brandend scherp na enkele seconden)","Perzikkruid (blad met donkere vlek, tuitje kort bewimperd)"]},
+{k:"voederwikke",nl:"Voederwikke",la:"Vicia sativa",grp:"kruid",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Klimplant met geveerd blad dat eindigt in een rank, en \u00e9\u00e9n tot twee vrij grote purperrode vlinderbloemen per bladoksel, zittend tegen de stengel. Peulen zwart bij rijpheid.",
+ let:"Zaden bevatten vicine en blauwzuurverbindingen; wikkes zijn geen tuinbonen. Als groenbemester waardevol, als voedsel niet.",
+ dubbel:["Vogelwikke (giftig; dichte eenzijdige trossen blauwpaarse bloemen)","Rolklaver (giftig; gele bloemen, geen ranken)"]},
+{k:"akkervergeetmijnietje",nl:"Akkervergeet-mij-nietje",la:"Myosotis arvensis",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Kleiner en ruwer behaard dan het moerasvergeet-mij-nietje, met kleine hemelsblauwe bloempjes waarvan de kroonrand komvormig blijft in plaats van vlak uit te spreiden. Op akkers en droge bermen.",
+ let:"Geen gebruik; bevat sporen leverbelastende alkalo\u00efden zoals meer ruwbladigen.",
+ dubbel:["Moerasvergeet-mij-nietje (natte grond, grotere vlakke bloempjes)","Ereprijs (bloem met vier ongelijke slippen)"]},
+{k:"grauweabeel",nl:"Grauwe abeel",la:"Populus x canescens",grp:"boom",tags:["medicinaal"],delen:"Bast, knop",mnd:[3,4],
+ herken:"Kruising van witte abeel en ratelpopulier: blad grijsviltig aan de onderkant maar minder wit dan bij de witte abeel, en ronder van vorm. Bast lang glad en grijs met ruitvormige lenticellen.",
+ let:"Zelfde salicine als bij de andere populieren, met dezelfde bezwaren.",
+ dubbel:["Witte abeel (blad sneeuwwit vanonder, dieper gelobd)","Ratelpopulier (blad kaal en rond, trilt)"],
+ med:"Bast en knoppen bij pijn en koorts, uitwendig in zalf."},
+{k:"wintereik",nl:"Wintereik",la:"Quercus petraea",grp:"boom",tags:["eetbaar"],delen:"Eikel",mnd:[9,10],
+ herken:"Blad met een duidelijke steel van meer dan een centimeter en een wigvormige voet zonder oortjes; de eikels zitten juist vrijwel zonder steel direct tegen de tak. Bij de zomereik is het precies andersom.",
+ let:"Eikels alleen na uitlogen: meermaals koken of dagenlang wateren tot het water helder blijft. Anders zijn ze door de looistoffen onverteerbaar.",
+ dubbel:["Zomereik (eetbaar na uitlogen; blad vrijwel ongesteeld met oortjes, eikels aan lange stelen)","Amerikaanse eik (blad met spitse stekelpuntjes)"]},
+{k:"aardpeer",nl:"Aardpeer",la:"Helianthus tuberosus",grp:"tuin",tags:["eetbaar"],delen:"Knol",mnd:[10,11,12,1,2],
+ herken:"Tot drie meter hoge, ruw behaarde stengel met grof, ruw blad en aan de top veel kleine zonnebloemachtige gele hoofdjes, die pas laat in het jaar bloeien. Onder de grond knobbelige knollen.",
+ let:"Knollen na de eerste vorst rooien, dan zijn ze het zoetst. De inuline erin geeft bij veel mensen hevige winderigheid \u2014 begin klein.",
+ dubbel:["Zonnebloem (\u00e9\u00e9n groot hoofd, geen knollen)","Aardappel (heel andere plant, groene delen giftig)"]},
+{k:"scherpegroenerussula",nl:"Scherpe groene russula",la:"Russula aeruginea",grp:"zwam",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Grasgroene tot olijfgroene hoed, vaak met roestvlekjes, met crèmekleurige plaatjes en een witte steel die geel vlekt. Smaak licht tot duidelijk scherp. Onder berk.",
+ let:"Scherpe russula's geven braken en darmklachten. Proef een puntje en spuug uit: brandt het na, dan gaat hij terug. Groene zwammen vragen sowieso extra aandacht wegens de knolamaniet.",
+ dubbel:["Zwartgroene russula (eetbaar; berijpt blauwgrijs, mild)","Groene knolamaniet (dodelijk; ring en beker)","Galrussula (giftig; strogeel, geraniumgeur)"]},
+{k:"wittesatijnzwam",nl:"Witte satijnzwam",la:"Entoloma sericeum",grp:"zwam",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Kleine, donker grijsbruine hoed met een zijdeglans die bij opdrogen sterk verbleekt, plaatjes eerst grijs en later duidelijk roze door de sporen. Sterke meelgeur. In gazons en weiden.",
+ let:"Maag- en darmklachten. Elke kleine paddenstoel in gras met roze sporen en meelgeur laat je staan \u2014 de satijnzwammen zijn onderling lastig en geen ervan is de moeite waard.",
+ dubbel:["Weidekringzwam (eetbaar; taaie steel, witte sporen, plaatjes blijven bleek)","Grote satijnzwam (giftig; veel forser)","Molenaar (eetbaar; aflopende plaatjes, sterke meelgeur)"]},
+{k:"grotemaagdenpalm",nl:"Grote maagdenpalm",la:"Vinca major",grp:"tuin",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Als de kleine maagdenpalm maar met grotere, breed eivormige bladeren met bewimperde randen en blauwviolette bloemen van vier tot vijf centimeter. Bodembedekker in oude tuinen.",
+ let:"Bevat vinca-alkalo\u00efden die op bloeddruk en bloedbeeld werken; niet inwendig gebruiken.",
+ dubbel:["Kleine maagdenpalm (giftig; kleinere gladde blaadjes)","Klimop (giftig; gelobd blad, hechtwortels)"]}
+];
+
+SPECIES.push(...SPECIES_EXTRA, ...SPECIES_TUIN, ...SPECIES_VIER, ...SPECIES_VIJF, ...SPECIES_ZWAM1, ...SPECIES_ZWAM2, ...SPECIES_ZWAM3, ...SPECIES_ZWAM4, ...SPECIES_BOOM1, ...SPECIES_TUIN1, ...SPECIES_KRUID1, ...SPECIES_KRUID2, ...SPECIES_KRUID3, ...SPECIES_VERWAR, ...SPECIES_VERWAR2, ...SPECIES_SLUIT);
 SPECIES.forEach(x=>{
   if(KWALEN_MAP[x.k]) x.kwalen = KWALEN_MAP[x.k];
   if(EMA_MAP[x.k]){ x.emaInfo = EMA_MAP[x.k]; x.ema = true;
@@ -6532,6 +6848,19 @@ function bandHtml(mnd, ink){
 /* Sommige soorten staan in de gids onder een andere Nederlandse naam dan de
    dubbelgangerlijsten gebruiken. Zonder deze tabel bleven ze onzichtbaar voor
    de koppeling — en dus voor de afleiders in de quiz. */
+/* Namen die bewust naar een hele groep verwijzen en dus geen eigen soort
+   zijn. Ze horen wel in de lijst — "laat alle vezelkoppen staan" is precies
+   het juiste advies — maar de keuring moet ze niet als gat aanrekenen. */
+const DUBBEL_GROEP = new Set([
+ "distels","kruiskruiden","vezelkoppen","klavers","melkzwammen","franjehoeden",
+ "grassen","sierkalebassen","echte lelies","voorjaarskrokussen","koraalzwammen",
+ "jonge stuifzwammen","zwarte aardtongen","oranje kogelzwammen","zwarte kluifzwammen",
+ "witte trechterzwammen","kleine wasplaten","kleine vezelkoppen","kegelvormige vezelkoppen",
+ "bruine slijmkop-achtigen","blauwverkleurende vaalhoeden","aardappel of tomaat",
+ "biggenkruid en streepzaad","aalbes en bosbes","schermbloemigen op afstand",
+ "zwarte brandplekken en kankers op berk","geen; de kleur is uniek in europa",
+ "cassia","papaja","vijgenblad","wilde hennep"
+]);
 const DUBBEL_SYN = {
   "hosta":"hartlelie",
   "wilde kaardebol":"grote kaardebol",
@@ -6541,9 +6870,17 @@ const DUBBEL_SYN = {
   "gekroesde zwam":"sponszwam",
   "leverkruid":"koninginnenkruid",
   "kompassla":"wilde sla",
-  "aalbes":"rode bes",
+
   "grote lisdodde":"lisdodde",
-  "zwarte bes":"zwarte bes"
+  "zwarte bes":"zwarte bes",
+  "jonge knolamaniet in het eistadium":"groene knolamaniet",
+  "gewone hengel":"hengel (natt och dag)",
+  "biggenkruid":"gewoon biggenkruid",
+  "echte tonderzwam":"tonderzwam",
+  "andere aardsterren":"gewone aardster",
+  "beredruif":"berendruif",
+  "veelbloemige salomonszegel":"gewone salomonszegel",
+  "grote veelbloemige salomonszegel":"gewone salomonszegel"
 };
 function dubbelSleutel(tekst){
   let kop = String(tekst).split("(")[0].trim().toLowerCase();
@@ -9342,7 +9679,10 @@ function vraagAfsluiten(){
        je zonder omweg de app uit. De vlag hoort terug zodra blijkt dat er
        niets is gesloten. */
     S.afsluiten = true;
-    history.back();
+    /* Alle vastgehouden stappen in \u00e9\u00e9n keer loslaten, anders blijft de app
+       hangen op de speling die we juist hebben ingebouwd. */
+    history.go(-(bodemNu || 1));
+    bodemNu = 0;
     setTimeout(()=>{ try{ window.close(); }catch(e){} }, 250);
     setTimeout(()=>{
       if(document.visibilityState === "hidden") return;   /* wel echt weg */
@@ -9369,6 +9709,18 @@ function terugStap(){
   else { vraagAfsluiten(); return "vraagafsluiten"; }
   return "stap";
 }
+/* Eén enkele geschiedenisstap is te krap gebleken. Alles wat er buiten de
+   app om een stap uit de historie haalt \u2014 een snelle dubbele terugdruk, een
+   herstart uit de achtergrond, de gebaarnavigatie van Android \u2014 laat de app
+   dan meteen door de bodem zakken. We houden er nu drie vast en vullen na
+   elke terugdruk bij tot dat aantal. De ladder eindigt zo altijd bij de
+   kaart en bij de afsluitvraag, nooit bij een leeg venster. */
+const BODEM = 3;
+let bodemNu = 0;
+function bodemVullen(){
+  while(bodemNu < BODEM){ bodemNu++; history.pushState({gaea: bodemNu}, ""); }
+}
+
 function popstateAfhandeling(){
   /* De app houdt \u00e9\u00e9n geschiedenisstap vast als sentinel. Die werd hiervoor
      pas teruggezet nadat de laag was gesloten \u2014 en dat is te laat. Android
@@ -9378,7 +9730,8 @@ function popstateAfhandeling(){
      meer om op terug te vallen. De sentinel gaat er nu als allereerste weer
      in, v\u00f3\u00f3r er ook maar iets wordt gesloten. */
   if(S.afsluiten) return;              /* de gebruiker wil echt weg */
-  history.pushState({}, "");
+  bodemNu = Math.max(0, bodemNu - 1);   /* deze druk heeft er \u00e9\u00e9n verbruikt */
+  bodemVullen();                        /* en direct weer aanvullen */
   try{
     terugStap();
   }catch(e){
@@ -9386,7 +9739,7 @@ function popstateAfhandeling(){
   }
 }
 window.addEventListener("popstate", popstateAfhandeling);
-history.pushState({},"");
+bodemVullen();
 
 (async function boot(){
   toonSplash();

@@ -59,6 +59,20 @@ try{
     /* Elke soort in de gids hoort ook een vraag te kunnen opleveren, in
        minstens \u00e9\u00e9n thema. Een soort die alleen in het herbarium staat en
        nooit gevraagd wordt, leer je nooit. */
+    /* Twee soorten met dezelfde sleutel of dezelfde Latijnse naam betekent dat
+       er \u00e9\u00e9n stilletjes onbereikbaar is: SPEC_BY_K houdt er maar \u00e9\u00e9n over. */
+    ["geen dubbele soorten", ()=>{
+      const tel = (veld)=>{
+        const m = {};
+        SPECIES.forEach(s=> m[s[veld]] = (m[s[veld]] || 0) + 1);
+        return Object.entries(m).filter(([,n])=> n > 1).map(([k])=> k);
+      };
+      const k = tel("k"), la = tel("la"), nl = tel("nl");
+      if(k.length) return "DUBBELE SLEUTEL: " + k.join(", ");
+      if(la.length) return "DUBBELE LATIJNSE NAAM: " + la.join(", ");
+      if(nl.length) return "DUBBELE NEDERLANDSE NAAM: " + nl.join(", ");
+      return SPECIES.length + " soorten, alle sleutels en namen uniek";
+    }],
     ["elke soort komt in vragen", ()=>{
       const bewaardNiv = S.leer.niveau, bewaardTh = JSON.parse(JSON.stringify(S.leer.thema));
       const bereikbaar = new Set();
@@ -68,7 +82,9 @@ try{
           S.leer.thema[niv] = t.k;
           themaPool().forEach(sp=>{
             if(bereikbaar.has(sp.k)) return;
-            for(let i = 0; i < 20; i++) if(makeQuestion(sp.k)){ bereikbaar.add(sp.k); break; }
+            /* Vraagkeuze is deels toeval; \u00e9\u00e9n soort met weinig bruikbare velden
+               heeft meer pogingen nodig voor hij een keer lukt. */
+            for(let i = 0; i < 60; i++) if(makeQuestion(sp.k)){ bereikbaar.add(sp.k); break; }
           });
         });
       });
@@ -81,12 +97,13 @@ try{
        nooit in een vraag terecht. Groepsnamen ("Vezelkoppen", "Distels")
        tellen niet mee: die verwijzen bewust naar een hele groep. */
     ["verwarbare soorten bestaan", ()=>{
-      const groep = /^(andere|jonge|kleine|grote|geen|kegelvormige|scherpe|zwarte|witte|blauwverkleurende|bruine|oranje|schermbloemigen)\b|s$|\u2019s$/i;
+      /* Groepsnamen staan in DUBBEL_GROEP; "Andere X" is per definitie een groep. */
+      const groep = t => DUBBEL_GROEP.has(t.toLowerCase()) || /^andere\b/i.test(t);
       const los = new Set();
       SPECIES.forEach(sp=> (sp.dubbel||[]).forEach(t=>{
         if(dubbelSleutel(t)) return;
         const kop = String(t).split("(")[0].trim();
-        if(!groep.test(kop)) los.add(kop);
+        if(!groep(kop)) los.add(kop);
       }));
       const totaal = SPECIES.reduce((a,s)=> a + (s.dubbel||[]).length, 0);
       return los.size
@@ -220,13 +237,13 @@ try{
       return terug > zet ? "de vlag gaat terug als het venster niet sluit"
         : "VLAG BLIJFT STAAN: de terugknop wordt hierna genegeerd";
     }],
-    ["sentinel eerst", ()=>{
+    ["bodem eerst aanvullen", ()=>{
       const bron = popstateAfhandeling.toString();
-      const iPush = bron.indexOf("pushState");
+      const iVul = bron.indexOf("bodemVullen()");
       const iWerk = bron.indexOf("terugStap()");
-      if(iPush < 0 || iWerk < 0) return "handler niet herkenbaar";
-      return iPush < iWerk ? "geschiedenisstap wordt hersteld v\u00f3\u00f3r het sluiten"
-        : "VOLGORDE FOUT: er wordt gesloten voordat de stap is hersteld";
+      if(iVul < 0 || iWerk < 0) return "handler niet herkenbaar";
+      return iVul < iWerk ? "de geschiedenis wordt aangevuld v\u00f3\u00f3r er iets sluit"
+        : "VOLGORDE FOUT: er wordt gesloten voordat de geschiedenis is aangevuld";
     }],
     ["terugweg compleet", ()=>{
       NAV.length = 0; S.afsluiten = false; afsluitOpen = false; S.spook = null;
