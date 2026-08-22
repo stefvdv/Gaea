@@ -53,6 +53,83 @@ try{
        te hebben in het veld. Deze telling houdt bij hoe gevuld ze zijn. */
     /* Een giftige soort zonder dubbelgangerlijst is de gevaarlijkste lege plek
        in de app: juist daar gaat het in het veld mis. */
+    /* Een vraag met drie willekeurige soorten ernaast traint niets: je herkent
+       de goede aan uitsluiting. De afleiders horen soorten te zijn waarmee je
+       de goede in het veld kunt verwarren. */
+    /* Elke soort in de gids hoort ook een vraag te kunnen opleveren, in
+       minstens \u00e9\u00e9n thema. Een soort die alleen in het herbarium staat en
+       nooit gevraagd wordt, leer je nooit. */
+    ["elke soort komt in vragen", ()=>{
+      const bewaardNiv = S.leer.niveau, bewaardTh = JSON.parse(JSON.stringify(S.leer.thema));
+      const bereikbaar = new Set();
+      Object.keys(THEMAS).forEach(niv=>{
+        S.leer.niveau = niv;
+        THEMAS[niv].forEach(t=>{
+          S.leer.thema[niv] = t.k;
+          themaPool().forEach(sp=>{
+            if(bereikbaar.has(sp.k)) return;
+            for(let i = 0; i < 20; i++) if(makeQuestion(sp.k)){ bereikbaar.add(sp.k); break; }
+          });
+        });
+      });
+      S.leer.niveau = bewaardNiv; S.leer.thema = bewaardTh;
+      const mis = SPECIES.filter(s=> !bereikbaar.has(s.k));
+      return mis.length ? mis.length+" ZONDER VRAAG: "+mis.map(s=>s.nl).slice(0,8).join(", ")
+        : bereikbaar.size+"/"+SPECIES.length+" soorten leveren een vraag op";
+    }],
+    /* Een dubbelganger die zelf geen soort is, kan geen afleider zijn en komt
+       nooit in een vraag terecht. Groepsnamen ("Vezelkoppen", "Distels")
+       tellen niet mee: die verwijzen bewust naar een hele groep. */
+    ["verwarbare soorten bestaan", ()=>{
+      const groep = /^(andere|jonge|kleine|grote|geen|kegelvormige|scherpe|zwarte|witte|blauwverkleurende|bruine|oranje|schermbloemigen)\b|s$|\u2019s$/i;
+      const los = new Set();
+      SPECIES.forEach(sp=> (sp.dubbel||[]).forEach(t=>{
+        if(dubbelSleutel(t)) return;
+        const kop = String(t).split("(")[0].trim();
+        if(!groep.test(kop)) los.add(kop);
+      }));
+      const totaal = SPECIES.reduce((a,s)=> a + (s.dubbel||[]).length, 0);
+      return los.size
+        ? los.size+" verwarbare soorten ontbreken nog: "+[...los].slice(0,8).join(", ")
+        : "alle genoemde dubbelgangers bestaan als soort ("+totaal+" vermeldingen)";
+    }],
+    ["afleiders verwarbaar", ()=>{
+      const metLijst = SPECIES.filter(s=> verwarLijst(s).length);
+      let raak = 0;
+      metLijst.forEach(s=>{
+        const vl = verwarLijst(s);
+        if(afleiders(s, 3).some(x=> vl.includes(x))) raak++;
+      });
+      const pct = Math.round(100 * raak / metLijst.length);
+      return pct < 90 ? "SLECHTS "+pct+"% van de vragen krijgt een dubbelganger als afleider"
+        : raak+"/"+metLijst.length+" soorten met dubbelganger krijgen er ook \u00e9\u00e9n als afleider ("+pct+"%)";
+    }],
+    /* Zes rondes achter elkaar horen niet steeds dezelfde soorten op te
+       leveren; zonder geheugen deden ze dat wel. */
+    ["rondes vari\u00ebren", ()=>{
+      const bewaard = S.leer.recent, bewaardN = S.leer.doel;
+      S.leer.recent = []; S.leer.doel = 10;
+      const rondes = [];
+      for(let r = 0; r < 6; r++){
+        const vijver = new Set(themaPool().map(x=>x.k));
+        let due = dueKeys().filter(k=> vijver.has(k));
+        if(due.length < 4) due = [...vijver];
+        const n = Math.min(S.leer.doel, Math.max(due.length, 4));
+        const vers = due.filter(k=> !S.leer.recent.includes(k));
+        if(vers.length >= n) due = vers;
+        let keys = pickN(due.sort((a,b)=> leerGewicht(b) - leerGewicht(a)).slice(0, Math.max(n*3,24)), n);
+        keys = balanceer(keys);
+        S.leer.recent = [...keys, ...S.leer.recent].slice(0, Math.max(S.leer.doel*4, 40));
+        rondes.push(keys);
+      }
+      let herhaald = 0;
+      for(let i = 1; i < rondes.length; i++)
+        herhaald += rondes[i].filter(k=> rondes[i-1].includes(k)).length;
+      const alle = [].concat(...rondes);
+      S.leer.recent = bewaard; S.leer.doel = bewaardN;
+      return herhaald ? herhaald+" HERHALINGEN tussen opeenvolgende rondes"
+        : new Set(alle).size+" unieke soorten in 6 rondes van 10, geen herhaling tussen opeenvolgende rondes";
+    }],
     ["gif met dubbelgangers", ()=>{
       const gif = SPECIES.filter(s=> s.tags.includes("giftig"));
       const leeg = gif.filter(s=> !s.dubbel || !s.dubbel.length);

@@ -1052,6 +1052,9 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
   <div class="kop" id="kop-set"><div class="rij"><h1 style="margin:0">Instellingen</h1></div></div>
   <p class="sub">Alles staat lokaal op dit toestel. Niets gaat naar een server.</p>
   <div class="knoopregel" data-orn="sleutel"></div>
+  <p class="grouphd">Foto’s</p>
+  <button class="srow" id="setFotoTerug"><div class="t"><b>Weggestuurde foto’s terugzetten</b><span id="setFotoTerugSub">—</span></div><span class="v">↺</span></button>
+
   <p class="grouphd">Kaart</p>
   <button class="srow" id="setOntdek"><div class="t"><b>GBIF-waarnemingen op de kaart</b><span>Kies welke soorten als spookpin verschijnen</span></div><span class="v">\u2197</span></button>
 
@@ -1124,7 +1127,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.44.0";
+const APP_VERSION = "0.46.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -2327,6 +2330,11 @@ const STOF = {
    scherm langs de sloot.
    ======================================================================= */
 const FAM_VAN_GESLACHT = {
+ /* Verwarlichting. */
+ Anchusa:"Boraginaceae", Consolida:"Ranunculaceae", Leucojum:"Amaryllidaceae",
+ Arctostaphylos:"Ericaceae", Crambe:"Brassicaceae", Tripleurospermum:"Asteraceae",
+ Nigella:"Ranunculaceae", Sagittaria:"Alismataceae", Hylotelephium:"Crassulaceae",
+ Pyracantha:"Rosaceae", Solidago:"Asteraceae", Centaurea:"Asteraceae",
  /* Kruidenlichting 3. */
  Echium:"Boraginaceae", Myosotis:"Boraginaceae", Cynoglossum:"Boraginaceae",
  Campanula:"Campanulaceae", Knautia:"Caprifoliaceae", Succisa:"Caprifoliaceae",
@@ -2624,6 +2632,13 @@ const KWALEN_MAP = {
  koninginnekruid:["verkoudheid"],
  groothoefblad:["kramp","hoest"],
  tandzaad:["diarree","huid"],
+ grotepimpernel:["diarree","bloeding"],
+ ossentong:["wond","hoest"],
+ beredruif:["plassen"],
+ penningkruid:["wond","hoest"],
+ canadeseguldenroede:["plassen","nier"],
+ witteabeel:["gewricht","kneuzing"],
+ grauwewilg:["gewricht","verkoudheid"],
  wijnruit:["kramp","menstruatie"],
  dropplant:["hoest","onrust"],
  bergamotplant:["keel","hoest","spijsvertering"],
@@ -4524,7 +4539,132 @@ const SPECIES_KRUID3 = [
  med:"Slijmstoffen verzachten keel en maag, in dezelfde traditie als heemst en kaasjeskruid."}
 ];
 
-SPECIES.push(...SPECIES_EXTRA, ...SPECIES_TUIN, ...SPECIES_VIER, ...SPECIES_VIJF, ...SPECIES_ZWAM1, ...SPECIES_ZWAM2, ...SPECIES_ZWAM3, ...SPECIES_ZWAM4, ...SPECIES_BOOM1, ...SPECIES_TUIN1, ...SPECIES_KRUID1, ...SPECIES_KRUID2, ...SPECIES_KRUID3);
+/* =======================================================================
+   TIENDE LICHTING — de verwarbare soorten zelf
+   Deze stonden allemaal al in de dubbelgangerlijsten van andere soorten,
+   maar niet als eigen soort. Daardoor kwamen ze nooit in een vraag terecht
+   en konden ze ook geen afleider zijn \u2014 terwijl juist zij het zijn waarmee
+   het in het veld misgaat.
+   ======================================================================= */
+const SPECIES_VERWAR = [
+
+/* --- planten --- */
+{k:"grotepimpernel",nl:"Grote pimpernel",la:"Sanguisorba officinalis",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Jong blad",mnd:[4,5,6],
+ herken:"Geveerd blad met drie tot zeven paar langwerpige, grof gezaagde deelblaadjes, en aan de top compacte, eivormige, donker wijnrode bloemhoofdjes op lange stelen. Op natte, schrale hooilanden.",
+ let:"Jong blad mild en komkommerachtig, als bij de kleine pimpernel. In Nederland zeldzaam en gebonden aan beschermd blauwgrasland \u2014 herkennen en laten staan.",
+ dubbel:["Kleine pimpernel (eetbaar; groenrode hoofdjes, droge kalkgrond)","Agrimonie (gele aren, viltig blad)"],
+ med:"Sterk samentrekkend; traditioneel bij bloedingen en diarree, zoals de kleine pimpernel."},
+{k:"ossentong",nl:"Gewone ossentong",la:"Anchusa officinalis",grp:"kruid",tags:["medicinaal"],delen:"Bloem",mnd:[6,7,8],
+ herken:"Ruw borstelig behaarde plant met smal lancetvormig blad en krullen bloemen die in de knop paars zijn en opengaan als diep helderblauw, met een witte keelbezetting. Anders dan slangenkruid steken de meeldraden niet uit.",
+ let:"Bevat pyrrolizidine-alkalo\u00efden en belast de lever; inwendig gebruik wordt afgeraden. De blauwe bloempjes worden wel als garnering gebruikt \u2014 hooguit een enkele.",
+ dubbel:["Slangenkruid (rode wratjes op de stengel, uitstekende meeldraden)","Smeerwortel (hangende klokjes, ook alkalo\u00efden)"],
+ med:"Traditioneel als wondkruid en zweetdrijvend middel; door de leveralkalo\u00efden nu alleen uitwendig."},
+{k:"ridderspoor",nl:"Wilde ridderspoor",la:"Consolida regalis",grp:"kruid",tags:["giftig"],delen:"—",mnd:[],
+ herken:"IJle vertakte plant met fijn draadvormig verdeeld blad en blauwviolette bloemen die achterwaarts uitlopen in \u00e9\u00e9n rechte spoor. Dat ene spoor is het verschil met de akelei, die er vijf heeft.",
+ let:"Bevat delphinine, verwant aan het gif van monnikskap: verdoving van mond en keel, hartritmestoornissen. Zaden zijn het sterkst.",
+ dubbel:["Akelei (giftig; vijf gebogen sporen per bloem)","Blauwe monnikskap (dodelijk; helmvormige bloem)","Tuinridderspoor (Delphinium, even giftig)"]},
+{k:"lenteklokje",nl:"Lenteklokje",la:"Leucojum vernum",grp:"kruid",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Bloeit in februari en maart met \u00e9\u00e9n knikkende, breed klokvormige witte bloem waarvan alle zes de slippen even lang zijn en elk een groen puntje dragen. Breed gootvormig blad uit een bol.",
+ let:"Bevat galanthamine en lycorine; braken en darmkrampen, ernstiger bij de bol. De bol lijkt op een kleine ui en staat vaak in tuinen waar ook daslook groeit.",
+ dubbel:["Sneeuwklokje (giftig; drie lange en drie korte slippen)","Daslook (eetbaar; knoflookgeur, plat blad)","Wilde hyacint (giftig; blauwe klokjes)"]},
+{k:"beredruif",nl:"Beredruif",la:"Arctostaphylos uva-ursi",grp:"boom",tags:["medicinaal"],delen:"Blad",mnd:[5,6,7,8,9],
+ herken:"Kruipend altijdgroen dwergstruikje met kleine, dikke, omgekeerd eivormige leerachtige blaadjes met een gave rand en een net van ingezonken nerven aan de onderkant. Roze urnvormige bloempjes, daarna melige rode bessen.",
+ let:"Blad als blaasthee, maar hooguit een week aaneen en niet meer dan vijf keer per jaar; langdurig gebruik belast de lever. Niet tijdens zwangerschap of bij kinderen. In Nederland uiterst zeldzaam en beschermd.",
+ dubbel:["Rode bosbes (eetbaar; blad met donkere stippen aan de onderkant)","Kraaihei (naaldvormig blad, zwarte bessen)","Bosbes (bladverliezend, blauwe bessen)"],
+ med:"Arbutine wordt in de blaas omgezet in een licht ontsmettende stof; het klassieke Europese middel bij blaasontsteking."},
+{k:"penningkruid",nl:"Penningkruid",la:"Lysimachia nummularia",grp:"kruid",tags:["medicinaal"],delen:"Bloeiend kruid",mnd:[6,7,8],
+ herken:"Kruipende stengels die op de knopen wortelen, met tegenoverstaande, vrijwel ronde blaadjes als muntjes, en grote dooiergele bloemen in de bladoksels. Op natte, beschaduwde grond.",
+ let:"Bitter en samentrekkend, geen keukenplant. Woekert stevig in tuinen.",
+ dubbel:["Wederik (rechtopstaand, bloemen in een pluim)","Klimop (leerachtig gelobd blad, giftig)"],
+ med:"Traditioneel als wondkruid en bij hoest; het samentrekkende blad werd op slecht helende wonden gelegd."},
+{k:"zeekool",nl:"Zeekool",la:"Crambe maritima",grp:"kruid",tags:["eetbaar"],delen:"Jonge scheut, blad",mnd:[3,4,5],
+ herken:"Forse, blauwgroen berijpte kool met dikke, golvend gelobde, vlezige bladeren op een korte stam, en grote schermen witte kruisbloemen met een honinggeur. Op grindstranden en zeedijken.",
+ let:"De gebleekte lentescheuten zijn een klassieke groente; ouder blad wordt bitter. In Nederland zeldzaam en op de meeste plekken beschermd \u2014 controleer of plukken mag.",
+ dubbel:["Lepelblad (eetbaar; klein, lepelvormig blad)","Zeeraket (vlezig maar veerdelig blad)","Koolzaad (geel, akkerplant)"]},
+{k:"reukelozekamille",nl:"Reukeloze kamille",la:"Tripleurospermum maritimum",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Ziet er precies uit als echte kamille \u2014 witte lintbloemen om een geel hart \u2014 maar ruikt bij wrijven nergens naar, en het bloembodempje is vol in plaats van hol. Snijd het hoofdje door: dat is de test.",
+ let:"Niet giftig maar zonder aroma en dus zonder nut als thee. De doorgesneden bloembodem scheidt hem van de echte kamille.",
+ dubbel:["Echte kamille (eetbaar; sterke geur, holle bloembodem)","Schijfkamille (geen lintbloemen, ananasgeur)","Margriet (veel groter)"]},
+{k:"canadeseguldenroede",nl:"Canadese guldenroede",la:"Solidago canadensis",grp:"kruid",tags:["medicinaal"],delen:"Bloeiend kruid",mnd:[8,9],
+ herken:"Manshoog, met een dichtbebladerde stengel en aan de top een brede, overhangende pluim van honderden kleine gele bloemhoofdjes aan eenzijdig gebogen takken. Blad drienervig en gezaagd. Vormt dichte velden op braakland.",
+ let:"Invasieve exoot die inheemse vegetatie verdringt \u2014 plukken helpt eerder dan het schaadt. Zelfde gebruik als de echte guldenroede, maar milder.",
+ dubbel:["Echte guldenroede (inheems, kleinere ijle pluim)","Late guldenroede (kale stengel)","Boerenwormkruid (platte gele knopen zonder lintbloemen)"],
+ med:"Als de echte guldenroede gebruikt bij blaas- en nierklachten, als mild plasmiddel."},
+{k:"grotecentaurie",nl:"Grote centaurie",la:"Centaurea scabiosa",grp:"kruid",tags:[],delen:"—",mnd:[],
+ herken:"Stevige plant met diep veerdelig gesneden, ruw blad en grote purperrode bloemhoofden waarvan de buitenste bloemen groter zijn en uitwaaieren. Het omwindsel draagt zwartbruine, gefranjerde randjes als dakpannen.",
+ let:"Niet giftig maar bitter en zonder gebruik. Belangrijke drachtplant op kalkgrasland.",
+ dubbel:["Knoopkruid (kleiner, blad ongedeeld)","Beemdkroon (lila, plattere hoofdjes)","Distels (stekelig)"]},
+{k:"koolzaad",nl:"Koolzaad",la:"Brassica napus",grp:"kruid",tags:["eetbaar"],delen:"Jong blad, knop, bloem",mnd:[3,4,5],
+ herken:"Blauwgroen berijpt blad waarvan de bovenste met een hartvormige voet de stengel omvatten, en dichte trossen zwavelgele kruisbloemen die boven de knoppen uitsteken. Hele akkers tegelijk in april.",
+ let:"Knoppen en jonge bloemen als broccoli. Vrijwel alle koolzaadakkers zijn bespoten en particulier bezit \u2014 pluk van bermen en vraag toestemming.",
+ dubbel:["Barbarakruid (eetbaar; glanzend donkergroen blad)","Herik (stengelblad niet omvattend, ruwer)","Raapzaad (kleiner, bloemen onder de knoppen)"]},
+{k:"wittewaterlelie",nl:"Witte waterlelie",la:"Nymphaea alba",grp:"kruid",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Grote, vrijwel ronde drijfbladeren met een smalle spleet tot aan het midden, en grote witte bloemen met tientallen kroonbladen die vlak op het water drijven. De bloem opent \u2019s ochtends en sluit in de namiddag.",
+ let:"Wortelstok en zaad bevatten alkalo\u00efden; braken en duizeligheid. In Nederland wettelijk beschermd \u2014 niet plukken, ook de bloem niet.",
+ dubbel:["Gele plomp (giftig; gele flesvormige bloem boven het water)","Watergentiaan (klein, gefranjerde gele bloem)"]},
+{k:"pijlkruid",nl:"Pijlkruid",la:"Sagittaria sagittifolia",grp:"kruid",tags:["eetbaar"],delen:"Knol",mnd:[10,11],
+ herken:"Boven water staan opvallende pijlvormige bladeren met twee lange, spitse achterwaartse slippen; onder water zijn ze lintvormig. Witte drietallige bloemen met een paarse vlek aan de voet van elk blaadje.",
+ let:"De knollen aan de uitlopers zijn zetmeelrijk en gekookt eetbaar; in China worden ze gekweekt. Alleen uit schoon water, en het uitgraven verstoort de oever \u2014 zeer spaarzaam.",
+ dubbel:["Grote waterweegbree (giftig; ovaal blad, ijle pluim)","Gevlekte aronskelk (dodelijk; op het droge, glanzend blad)","Grote lisdodde (lintvormig blad)"]},
+{k:"hemelsleutel",nl:"Hemelsleutel",la:"Hylotelephium telephium",grp:"kruid",tags:["eetbaar"],delen:"Jong blad",mnd:[4,5,6],
+ herken:"Rechtopstaande stengels met dikke, vlezige, grof getande blauwgroene bladeren en aan de top een dicht plat scherm van dofroze bloempjes, laat in de zomer. Knolvormig verdikte wortels.",
+ let:"Jong blad rauw of gestoofd, sappig en mild; ouder wordt het taai. In hoeveelheid licht laxerend. Niet verwarren met muurpeper, die brandend scherp is.",
+ dubbel:["Muurpeper (giftig; klein, brandend scherp, gele bloemen)","Wit vetkruid (klein, witte bloemen)","Huislook (rozetten)"]},
+{k:"witvetkruid",nl:"Wit vetkruid",la:"Sedum album",grp:"kruid",tags:["eetbaar"],delen:"Blad",mnd:[5,6,7],
+ herken:"Laag matje van dikke, cilindrische, worstvormige blaadjes die in de zon rood aanlopen, met een ijl scherm sterretjeswitte bloemen. Op muren, daken en droog zand.",
+ let:"Mild en waterig, in kleine hoeveelheid rauw bruikbaar. Proef altijd: brandt het na, dan is het muurpeper en laat je het staan.",
+ dubbel:["Muurpeper (giftig; gele bloemen, brandend scherp)","Hemelsleutel (veel groter, roze schermen)"]},
+{k:"witteabeel",nl:"Witte abeel",la:"Populus alba",grp:"boom",tags:["medicinaal"],delen:"Bast, knop",mnd:[3,4],
+ herken:"Blad aan de bovenkant donkergroen en aan de onderkant sneeuwwit viltig, zodat de kruin bij wind zilverwit oplicht. Jonge bladeren esdoornachtig gelobd. Bast lichtgrijs met ruitvormige lenticellen in rijen.",
+ let:"Zelfde salicine als bij de andere populieren, met dezelfde bezwaren: niet bij aspirineovergevoeligheid, niet bij kinderen met koorts.",
+ dubbel:["Ratelpopulier (blad rond, trilt, niet wit vanonder)","Grauwe abeel (kruising, blad grijsviltig)","Zwarte populier (blad driehoekig)"],
+ med:"Bast en knoppen bij pijn en koorts, uitwendig in zalf bij gewrichtsklachten."},
+{k:"grauwewilg",nl:"Grauwe wilg",la:"Salix cinerea",grp:"boom",tags:["medicinaal"],delen:"Bast, katje",mnd:[3,4],
+ herken:"Struikvormige wilg met omgekeerd eivormig, grijsviltig behaard blad en \u2014 het kenmerk \u2014 duidelijke ribbels op het hout onder de bast van tweejarige takken. Schil een twijgje af en voel ze. Op natte grond.",
+ let:"Zelfde salicine als de andere wilgen. Grauwe wilg vormt hele moerasbossen; oogst spaarzaam en ring nooit een stam.",
+ dubbel:["Boswilg (breder blad, geen ribbels onder de bast)","Schietwilg (smal lancetvormig blad)","Gagel (geurend blad, geen katjes als deze)"],
+ med:"Bast bij pijn en koorts, dezelfde traditie en beperkingen als schietwilg."},
+{k:"noorseesdoorn",nl:"Noorse esdoorn",la:"Acer platanoides",grp:"boom",tags:[],delen:"—",mnd:[],
+ herken:"Blad met vijf lobben die eindigen in lange, draadvormige spitse punten, en een bladsteel die bij afbreken wit melksap geeft. Bloeit in april met opvallend geelgroene schermen v\u00f3\u00f3r het blad. Vruchtvleugels vrijwel horizontaal gespreid.",
+ let:"Niet giftig maar zonder gebruik; het sap is te dun om in te koken. Het melksap in de bladsteel is de snelste manier om hem van de gewone esdoorn te scheiden.",
+ dubbel:["Gewone esdoorn (lobben stomp, geen melksap, bloeit na het blad)","Spaanse aak (klein blad, stompe lobben)","Plataan (afschilferende bast)"]},
+{k:"amerikaanseeik",nl:"Amerikaanse eik",la:"Quercus rubra",grp:"boom",tags:[],delen:"—",mnd:[],
+ herken:"Groot blad met vier tot vijf paar spitse lobben die elk in een fijn stekelpuntje eindigen \u2014 inheemse eiken hebben afgeronde lobben. In de herfst vuurrood. Eikels breed en gedrongen met een platte napje.",
+ let:"De eikels zijn veel bitterder dan die van de zomereik en vragen zeer lang uitlogen; de moeite meestal niet waard. Invasief op zandgrond, waar hij de bodem verzuurt.",
+ dubbel:["Zomereik (eetbare eikel na uitlogen; ronde lobben, gesteelde eikels)","Wintereik (ronde lobben, gesteeld blad)","Plataan (afschilferende bast, blad afwisselend)"]},
+{k:"vuurdoorn",nl:"Vuurdoorn",la:"Pyracantha coccinea",grp:"boom",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Altijdgroene doornstruik met klein, glanzend, fijn gezaagd blad en zware trossen feloranje tot scharlaken bessen die de hele winter blijven hangen. Zijtakken eindigen in scherpe doorns.",
+ let:"De bessen bevatten cyanogene verbindingen; kleine hoeveelheden geven misselijkheid, en de doorns steken lelijk. Een van de meest gemelde tuinbessen bij kinderen, meestal zonder ernstige afloop.",
+ dubbel:["Lijsterbes (eetbaar na verhitting; geveerd blad, geen doorns)","Dwergmispel (geen doorns, minder bessen)","Duindoorn (eetbaar; smal zilverig blad)"]},
+
+/* --- zwammen --- */
+{k:"geleridderzwam",nl:"Gele ridderzwam",la:"Tricholoma equestre",grp:"zwam",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Zwavelgele plaatjes en steel onder een geelbruine, iets kleverige hoed die in het midden bruin geschubd is. Meelgeur en milde smaak. In mos onder grove den op zandgrond, laat in het jaar.",
+ let:"Werd eeuwenlang gegeten en gold als delicatesse, tot in Frankrijk sterfgevallen optraden: bij herhaalde grote maaltijden breekt het spierweefsel af. Sinds 2005 in meerdere landen verboden in de handel. Niet eten.",
+ dubbel:["Grauwe ridderzwam (eetbaar; grijs, meelgeur)","Zwavelridderzwam (giftig; egaal geel, gasgeur)","Gele knolamaniet (giftig; ring en beker)"]},
+{k:"zeepridderzwam",nl:"Zeepridderzwam",la:"Tricholoma saponaceum",grp:"zwam",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Grijsgroene tot olijfbruine hoed, plaatjes ver uiteen en bleek, steel wit en aan de voet vaak roze aanlopend bij doorsnijden. De geur is het kenmerk: doordringend naar groene zeep of wasmiddel.",
+ let:"Geeft maag- en darmklachten. De zeepgeur is zo eigen dat hij de determinatie draagt \u2014 ruik altijd voordat je een ridderzwam meeneemt.",
+ dubbel:["Grauwe ridderzwam (eetbaar; meelgeur, grijs gestreept)","Gele ridderzwam (giftig; zwavelgele plaatjes)","Zwavelridderzwam (giftig; gasgeur)"]},
+{k:"galrussula",nl:"Galrussula",la:"Russula fellea",grp:"zwam",tags:["giftig"],delen:"—",mnd:[],
+ herken:"Egaal strogeel tot honingkleurig van hoed, plaatjes en steel \u2014 die eenkleurigheid is het kenmerk. Geur naar appelcompote of geraniumblad, smaak brandend scherp en bitter. Uitsluitend onder beuk.",
+ let:"Braken en darmklachten, zoals bij alle scherpe russula\u2019s. Proeven en meteen uitspugen is de test die kenners gebruiken; brandt het na, dan gaat hij terug.",
+ dubbel:["Geelwitte russula (eetbaar; okergeel, mild, steel wit)","Beukenrussula (giftig; scharlakenrood)","Braakrussula (giftig; rood, onder naaldhout)"]},
+{k:"zoetmelkzwam",nl:"Zoetmelkzwam",la:"Lactarius subdulcis",grp:"zwam",tags:["eetbaar"],delen:"Hoed",mnd:[8,9,10,11],
+ herken:"Kaneelbruine tot roodbruine hoed zonder kringen, met een klein spits puntje in het midden. Overvloedig wit melksap dat wit blijft en mild tot licht bitter smaakt \u2014 niet scherp. Onder beuk.",
+ let:"Eetbaar maar zonder veel smaak en snel papperig; in een mengsel bruikbaar. De smaaktest beslist: brandt het melksap, dan is het een andere melkzwam.",
+ dubbel:["Peperige melkzwam (brandend scherp, wit)","Wollige melkzwam (giftig rauw; wollige rand, bij berk)","Kaneelkleurige melkzwammen (onderling lastig)"]},
+{k:"grijzeslankeamaniet",nl:"Grijze slanke amaniet",la:"Amanita vaginata",grp:"zwam",tags:["eetbaar"],delen:"Hoed",mnd:[7,8,9,10],
+ herken:"Slanke, ringloze amaniet met een muisgrijze hoed met duidelijk geribde rand, witte plaatjes, en aan de voet een losse witte beker. Geen ring, geen knol met randje. Graaf de voet altijd uit.",
+ let:"Eetbaar maar uitsluitend goed doorgekookt; rauw giftig. Hij staat in het geslacht van de dodelijke soorten \u2014 ontbreekt de beker, of z\u00edt er een ring, dan laat je hem staan.",
+ dubbel:["Panteramaniet (dodelijk; ring, witte vlokken, knol met randje)","Groene knolamaniet (dodelijk; ring en brede beker)","Roodbruine slanke amaniet (eetbaar mits gekookt; roodbruin)"]},
+{k:"kammetjesstekelzwam",nl:"Kammetjesstekelzwam",la:"Hericium coralloides",grp:"zwam",tags:["eetbaar"],delen:"Vruchtlichaam",mnd:[8,9,10,11],
+ herken:"Witte, koraalachtig vertakte struik op dood loofhout, waarbij aan de onderkant van de takken rijen korte stekeltjes hangen als de tanden van een kam. Anders dan de pruikzwam is hij vertakt en zijn de stekels kort.",
+ let:"Uitstekend, maar in Nederland zeldzaam en beschermd \u2014 bewonderen en fotograferen. Het geslacht kent geen giftige soorten.",
+ dubbel:["Pruikzwam (eetbaar; \u00e9\u00e9n bal met lange afhangende stekels)","Witte koraalzwam (geen stekels, op de grond)","Gele koraalzwam (laxerend, geel)"]}
+];
+
+SPECIES.push(...SPECIES_EXTRA, ...SPECIES_TUIN, ...SPECIES_VIER, ...SPECIES_VIJF, ...SPECIES_ZWAM1, ...SPECIES_ZWAM2, ...SPECIES_ZWAM3, ...SPECIES_ZWAM4, ...SPECIES_BOOM1, ...SPECIES_TUIN1, ...SPECIES_KRUID1, ...SPECIES_KRUID2, ...SPECIES_KRUID3, ...SPECIES_VERWAR);
 SPECIES.forEach(x=>{
   if(KWALEN_MAP[x.k]) x.kwalen = KWALEN_MAP[x.k];
   if(EMA_MAP[x.k]){ x.emaInfo = EMA_MAP[x.k]; x.ema = true;
@@ -5263,7 +5403,7 @@ const S = {
   })(),
   scr:"map", open:null, urls:new Map(),
   leer:lsGet("leer",{streak:0,laatst:null,totaal:0,doel:10,niveau:"herkennen",
-    thema:{herkennen:"alles",gebruik:"alles",namen:"alles"}}),
+    thema:{herkennen:"alles",gebruik:"alles",namen:"alles"}, recent:[], recentV:[]}),
   /* Het herbarium is een naslagwerk; dat hoort compleet open te gaan. */
   specView:"alle", kastView:"alles", kastMode:"kast", recView:"alles",
   spook:null, ontdekVol:null, concept:null, thuis:lsGet("thuis",null), afsluiten:false,
@@ -6314,9 +6454,27 @@ function bandHtml(mnd, ink){
 /* De verwarringen staan als vrije tekst: "Kruidvlier (giftig, kruidachtig...)".
    Zit de genoemde soort in de gids, dan wordt het een knop naar dat blad.
    Zo niet, dan blijft het gewoon tekst — beter dan een knop die niets doet. */
+/* Sommige soorten staan in de gids onder een andere Nederlandse naam dan de
+   dubbelgangerlijsten gebruiken. Zonder deze tabel bleven ze onzichtbaar voor
+   de koppeling — en dus voor de afleiders in de quiz. */
+const DUBBEL_SYN = {
+  "hosta":"hartlelie",
+  "wilde kaardebol":"grote kaardebol",
+  "molenaarssatijnzwam":"grote molenaar",
+  "grauwe els":"witte els",
+  "wortelvruchten":"gele wortelvrucht",
+  "gekroesde zwam":"sponszwam",
+  "leverkruid":"koninginnenkruid",
+  "kompassla":"wilde sla",
+  "aalbes":"rode bes",
+  "grote lisdodde":"lisdodde",
+  "zwarte bes":"zwarte bes"
+};
 function dubbelSleutel(tekst){
-  const kop = String(tekst).split("(")[0].trim().toLowerCase();
+  let kop = String(tekst).split("(")[0].trim().toLowerCase();
   if(!kop) return null;
+  kop = kop.replace(/ is dezelfde soort$/, "");
+  if(DUBBEL_SYN[kop]) kop = DUBBEL_SYN[kop];
   let hit = SPECIES.find(x=> x.nl.toLowerCase() === kop);
   if(hit) return hit.k;
   hit = SPECIES.find(x=> kop.includes(x.nl.toLowerCase()) || x.nl.toLowerCase().includes(kop));
@@ -7944,15 +8102,49 @@ function nivNu(){ return NIVEAUS[S.leer.niveau] || NIVEAUS.herkennen; }
 
 /* Op moeilijk komen afleiders uit hetzelfde geslacht als dat kan: dezelfde
    eerste helft van de wetenschappelijke naam. Dat maakt het pas echt lastig. */
+/* Wie is er in het veld met deze soort te verwarren? Dat staat al in de
+   gids: de dubbelgangerlijst van de soort zelf, plus iedereen die dezé soort
+   in zijn eigen lijst noemt. Die twee samen leveren de afleiders die er
+   werkelijk toe doen — een vraag met drie willekeurige soorten ernaast
+   traint niets, want je herkent de goede al aan uitsluiting. */
+let VERWAR_KAS = null;
+function verwarIndex(){
+  if(VERWAR_KAS) return VERWAR_KAS;
+  VERWAR_KAS = {};
+  const zet = (a, b)=>{ if(a===b) return; (VERWAR_KAS[a] = VERWAR_KAS[a] || new Set()).add(b); };
+  SPECIES.forEach(sp=>{
+    (sp.dubbel||[]).forEach(t=>{
+      const k = dubbelSleutel(t);
+      if(!k) return;
+      zet(sp.k, k);   /* zijn dubbelganger */
+      zet(k, sp.k);   /* en omgekeerd: verwarring gaat twee kanten op */
+    });
+  });
+  return VERWAR_KAS;
+}
+const verwarLijst = s => [...(verwarIndex()[s.k] || [])].map(k=>SPEC_BY_K[k]).filter(Boolean);
+
 function afleiders(s, n){
   const wereld = zelfdeWereld(s);
-  if(nivNu().zwaar){
+  const uit = [];
+  const vrij = () => n - uit.length;
+  const nog = lijst => lijst.filter(x=> x.k!==s.k && !uit.includes(x));
+
+  /* Eerst de echte dubbelgangers. */
+  uit.push(...pickN(nog(verwarLijst(s)), vrij()));
+  /* Dan het geslacht: gelijkende naam, gelijkende plant. */
+  if(vrij() > 0){
     const geslacht = (s.la||"").split(" ")[0];
-    const zelfdeGesl = wereld.filter(x=> (x.la||"").split(" ")[0] === geslacht);
-    if(zelfdeGesl.length >= n) return pickN(zelfdeGesl, n);
-    return [...zelfdeGesl, ...pickN(wereld.filter(x=>!zelfdeGesl.includes(x)), n - zelfdeGesl.length)];
+    uit.push(...pickN(nog(wereld.filter(x=> (x.la||"").split(" ")[0] === geslacht)), vrij()));
   }
-  return pickN(wereld, n);
+  /* Dan de familie. */
+  if(vrij() > 0){
+    const fam = famVan(s);
+    if(fam) uit.push(...pickN(nog(wereld.filter(x=> famVan(x) === fam)), vrij()));
+  }
+  /* En pas als laatste de rest van dezelfde wereld. */
+  if(vrij() > 0) uit.push(...pickN(nog(wereld), vrij()));
+  return uit.slice(0, n);
 }
 /* Afleiders moeten uit dezelfde wereld komen. Een zwamvraag met drie planten
    ernaast is geen vraag maar een weggevertje. */
@@ -8143,6 +8335,16 @@ function qMaand(s){
 /* Twee soorten kunnen woordelijk dezelfde waarschuwing dragen — "bij een
    allergie voor composieten voorzichtig" staat bij een handvol composieten.
    Vandaar dat de afleiders op tekst worden ontdubbeld, niet op soort. */
+/* Voor de tekstvragen geldt hetzelfde: liever het veldkenmerk van een soort
+   waarmee je hem kunt verwarren dan van een willekeurige andere. */
+function uniekeVerwar(s, veld, n, minLen){
+  const eigen = s[veld];
+  const bruikbaar = x => x[veld] && x[veld].length > (minLen||40) && x[veld] !== eigen;
+  const eerst = verwarLijst(s).filter(bruikbaar).map(x=>x[veld]);
+  const rest  = zelfdeWereld(s).filter(bruikbaar).map(x=>x[veld]);
+  return unieke([...shuffle(eerst), ...shuffle(rest)], eigen, n);
+}
+
 function unieke(lijst, eigen, n){
   const uit = [], gezien = new Set([eigen]);
   for(const t of shuffle(lijst)){
@@ -8154,7 +8356,7 @@ function unieke(lijst, eigen, n){
 }
 function qLet(s){
   const n = nivNu().opties - 1;
-  const w = unieke(zelfdeWereld(s).filter(x=>x.let&&x.let.length>40).map(x=>x.let), s.let, n);
+  const w = uniekeVerwar(s, "let", n);
   if(w.length<n) return null;
   return {kind:"Let op",risk:true,q:"Wat moet je onthouden bij <em>"+esc(s.nl)+"</em>?",
     opts:shuffle([s.let,...w]).map(esc), aTxt:esc(s.let), uitleg:s.let,
@@ -8208,7 +8410,7 @@ function qExtractie(s){
 }
 function qHerken(s){
   const n = nivNu().opties - 1;
-  const w = unieke(zelfdeWereld(s).filter(x=>x.herken&&x.herken.length>40).map(x=>x.herken), s.herken, n);
+  const w = uniekeVerwar(s, "herken", n);
   if(w.length<n) return null;
   return {kind:"Veldkenmerk",risk:s.grp==="zwam",q:"Welk kenmerk hoort bij <em>"+esc(s.nl)+"</em>?",
     opts:shuffle([s.herken,...w]).map(esc), aTxt:esc(s.herken), uitleg:s.herken,
@@ -8242,7 +8444,7 @@ function qWaarvoor(s){
    maar die heb je pas na een paar seizoenen. Daarom haalt de veldschool ook
    beeld uit GBIF, met de fotograaf en de licentie eronder — dat laatste is geen
    bronvermelding maar een voorwaarde van de licentie. */
-const FOTO_KAS = {};      /* soortsleutel -> lijst met beelden, per sessie */
+let FOTO_KAS = {};        /* soortsleutel -> lijst met beelden, per sessie */
 
 /* =======================================================================
    NASLAG BIJ EEN VRAAG
@@ -8472,6 +8674,13 @@ const qInfoOpenIs = ()=> qInfoEl.classList.contains("on");
 document.getElementById("qInfoX").onclick = qInfoSluit;
 qInfoEl.addEventListener("click", e=>{ if(e.target === qInfoEl) qInfoSluit(); });
 
+/* Een misklik hoort geen blijvend gevolg te hebben. */
+function deblokkeerFoto(url){
+  if(!url) return;
+  S.fotoWeg = S.fotoWeg.filter(u=> u !== url);
+  lsSet("fotoweg", S.fotoWeg);
+  FOTO_KAS = {};   /* de kas is gefilterd op de blokkade, dus opnieuw ophalen */
+}
 function blokkeerFoto(url){
   if(!url || S.fotoWeg.includes(url)) return;
   S.fotoWeg.push(url);
@@ -8642,9 +8851,26 @@ async function startQuiz(){
   let due = dueKeys().filter(k=> vijver.has(k));
   if(due.length < 4) due = [...vijver];
   const n=Math.min(S.leer.doel,Math.max(due.length,4));
-  let keys=pickN(due.sort((a,b)=>leerGewicht(b)-leerGewicht(a)).slice(0,n*2), n);
+
+  /* Zonder geheugen komen dezelfde soorten ronde na ronde terug: het gewicht
+     verandert nauwelijks en de bovenste twintig blijven de bovenste twintig.
+     Daarom onthouden we wat er net langskwam en slaan we dat over zolang de
+     vijver groot genoeg is. Pas als er te weinig overblijft, mag alles weer
+     meedoen — anders zou een klein thema helemaal opdrogen. */
+  S.leer.recent = S.leer.recent || [];
+  const vers = due.filter(k=> !S.leer.recent.includes(k));
+  if(vers.length >= n) due = vers;
+
+  /* En binnen wat overblijft: trekken uit een ruimere kop, zodat de volgorde
+     niet elke keer dezelfde is. */
+  const kop = Math.max(n * 3, 24);
+  let keys=pickN(due.sort((a,b)=>leerGewicht(b)-leerGewicht(a)).slice(0, kop), n);
   if(!keys.length) keys=pickN([...vijver],n);
   keys = balanceer(keys);
+  /* Geheugen bijwerken: ruim genoeg om een paar rondes te overspannen, niet
+     zo ruim dat de vijver leegloopt. */
+  S.leer.recent = [...keys, ...S.leer.recent].slice(0, Math.max(S.leer.doel * 4, 40));
+  lsSet("leer", S.leer);
   QZ.list=[]; QZ.i=0; QZ.goed=0; QZ.done=false;
 
   /* De knop zelf wordt het laadscherm: kleine groeiende varen tot de ronde
@@ -8775,9 +9001,16 @@ async function check(){
      wegsturen. De foto verdwijnt meteen en komt nooit meer terug. */
   const meld = document.getElementById("qMeld");
   if(meld) meld.onclick = ()=>{
+    if(meld.dataset.weg === "1"){
+      deblokkeerFoto(q.img);
+      meld.dataset.weg = "";
+      meld.textContent = "Foto klopt niet";
+      toast("Teruggezet");
+      return;
+    }
     blokkeerFoto(q.img);
-    meld.textContent = "Dank \u2014 deze foto komt niet meer terug";
-    meld.disabled = true;
+    meld.dataset.weg = "1";
+    meld.textContent = "Weggestuurd \u2014 tik om terug te zetten";
   };
   const nx=document.getElementById("qNext");
   nx.className="qbtn"; nx.disabled=false;
@@ -8822,6 +9055,9 @@ async function renderSet(){
     try{ const e=await navigator.storage.estimate(); t+=" · "+(e.usage/1048576).toFixed(1)+" MB"; }catch(e){}
   }
   document.getElementById("cacheInfo").textContent=t;
+  const ft = document.getElementById("setFotoTerugSub");
+  if(ft) ft.textContent = S.fotoWeg.length
+    ? S.fotoWeg.length + " foto’s staan weggestuurd" : "Er staat niets weggestuurd";
   try{ const g=await dbAll("gbif"); document.getElementById("gbifInfo").textContent=g.length+" bewaarde GBIF-antwoorden"; }catch(e){}
 }
 const blobToDataURL = b => new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b);});
@@ -8968,6 +9204,13 @@ document.getElementById("setImport").onclick=doImport;
 document.getElementById("setCache").onclick=renderSet;
 /* De ontdek-laag zat op de kaartknop die nu de camera draagt. */
 document.getElementById("setOntdek").onclick=()=>{ go("map"); ontdekKiezer(); };
+document.getElementById("setFotoTerug").onclick=()=>{
+  const n = S.fotoWeg.length;
+  if(!n){ toast("Er staat niets weggestuurd"); return; }
+  if(!confirm("Alle "+n+" weggestuurde foto\u2019s weer toelaten?")) return;
+  S.fotoWeg = []; lsSet("fotoweg", S.fotoWeg); FOTO_KAS = {};
+  toast(n+" foto\u2019s teruggezet"); renderSet();
+};
 let beeldBezig = false;
 document.getElementById("setBeeld").onclick = async ()=>{
   if(beeldBezig){ beeldBezig = false; toast("Gestopt"); return; }
