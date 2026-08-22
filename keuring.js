@@ -130,6 +130,24 @@ try{
       return herhaald ? herhaald+" HERHALINGEN tussen opeenvolgende rondes"
         : new Set(alle).size+" unieke soorten in 6 rondes van 10, geen herhaling tussen opeenvolgende rondes";
     }],
+    /* Een dubbelgangerregel die alleen "(giftig)" zegt, helpt je in het veld
+       niets: er moet een kenmerk in staan waaraan je de twee scheidt. */
+    ["dubbelgangers met kenmerk", ()=>{
+      const bij = t=>{
+        const h = String(t).indexOf("(");
+        return h < 0 ? "" : String(t).slice(h+1).replace(/\)$/, "").trim();
+      };
+      const mager = t=>{
+        const b = bij(t);
+        return b.length < 18 || (!/[;,]/.test(b) && b.split(" ").length < 4);
+      };
+      let totaal = 0, dun = 0;
+      SPECIES.forEach(sp=> (sp.dubbel||[]).forEach(t=>{ totaal++; if(mager(t)) dun++; }));
+      const pct = Math.round(100 * (totaal - dun) / totaal);
+      return dun > totaal * 0.2
+        ? dun+" van "+totaal+" regels ZONDER KENMERK ("+pct+"% in orde)"
+        : (totaal-dun)+"/"+totaal+" dubbelgangerregels noemen een onderscheidend kenmerk ("+pct+"%)";
+    }],
     ["gif met dubbelgangers", ()=>{
       const gif = SPECIES.filter(s=> s.tags.includes("giftig"));
       const leeg = gif.filter(s=> !s.dubbel || !s.dubbel.length);
