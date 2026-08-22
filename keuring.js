@@ -181,6 +181,23 @@ try{
     /* De quiz toont sinds 0.47 hetzelfde soortenblad als het herbarium. Deze
        controle draait daarom op specBlok: het blad moet voor elke soort
        inhoud van betekenis opleveren. */
+    /* De algemene waarschuwingen horen onderaan: bovenaan duwden ze bij elke
+       paddenstoel de kenmerken van de soort zelf uit beeld. */
+    ["waarschuwingen onderaan", ()=>{
+      const sp = SPECIES.find(s=> s.grp === "zwam" && s.tags.includes("giftig") && s.dubbel.length);
+      if(!sp) return "geen giftige zwam om te toetsen";
+      let h = "";
+      const bewaard = showSheet;
+      showSheet = x => { h = x; };
+      try{ specSheet(sp.k); } finally { showSheet = bewaard; }
+      const i = t => h.indexOf(t);
+      const goed = i("Verwarbaar met") > 0
+        && i("Verwarbaar met") < i("<b>Paddenstoelen</b>")
+        && i("<b>Paddenstoelen</b>") < i("Bij vermoeden van vergiftiging")
+        && i("Bij vermoeden van vergiftiging") < i("knopvak");
+      return goed ? "kenmerken eerst, algemene waarschuwingen onderaan"
+        : "VOLGORDE FOUT op het blad van "+sp.nl;
+    }],
     ["soortenblad in de quiz", ()=>{
       let mager = 0;
       SPECIES.forEach(sp=>{

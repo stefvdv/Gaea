@@ -876,6 +876,10 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;
   text-decoration-thickness:1.5px;cursor:pointer}
 .dblink:active{opacity:.6}
+.dbllijst{list-style:none;margin:2px 0 0;padding:0}
+.dbllijst li{margin:0;padding:4px 0;text-align:left;line-height:1.35}
+.dbllijst li + li{border-top:1px solid rgba(124,39,31,.16)}
+.dbllijst .bij{display:block;font-size:12px;opacity:.78;margin-top:1px}
 /* Meerdere foto's per soort, als raster in plaats van een strook: op een
    soortenblad wil je vergelijken, niet scrollen. */
 /* De strip is normaal een horizontale schuifrij en steekt met negatieve
@@ -1127,7 +1131,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.47.0";
+const APP_VERSION = "0.48.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -6486,11 +6490,20 @@ function dubbelSleutel(tekst){
   hit = SPECIES.find(x=> kop.includes(x.nl.toLowerCase()) || x.nl.toLowerCase().includes(kop));
   return hit ? hit.k : null;
 }
+/* Eerder één doorlopende zin met punten ertussen. Bij drie dubbelgangers met
+   elk een toelichting werd dat een blok van tien regels waarin je niets meer
+   terugvond. Nu per soort een regel: naam vooraan, kenmerk eronder. */
 function dubbelHtml(lijst){
-  return (lijst||[]).map(t=>{
+  const rijen = (lijst||[]).map(t=>{
+    const tekst = String(t);
+    const haak  = tekst.indexOf("(");
+    const naam  = (haak > 0 ? tekst.slice(0, haak) : tekst).trim();
+    const bij   = haak > 0 ? tekst.slice(haak).replace(/^\(|\)$/g, "").trim() : "";
     const k = dubbelSleutel(t);
-    return k ? '<button class="dblink" data-dbl="'+k+'">'+esc(t)+'</button>' : esc(t);
-  }).join(" · ");
+    const kop = k ? '<button class="dblink" data-dbl="'+k+'">'+esc(naam)+'</button>' : esc(naam);
+    return '<li>'+kop+(bij ? '<span class="bij">'+esc(bij)+'</span>' : '')+'</li>';
+  });
+  return '<ul class="dbllijst">'+rijen.join("")+'</ul>';
 }
 
 function tagsHtml(tags, grp){
@@ -7175,17 +7188,13 @@ async function specSheet(k, terugPin){
     '<div class="tagrow">'+tagsHtml(s.tags,s.grp)+
     (s.mnd.length?'<span style="margin-left:2px">'+bandHtml(s.mnd,true)+'</span>':'')+'</div></div>';
 
-  if(s.grp==="zwam")
-    h += '<div class="warn oker"><b>Paddenstoelen</b>Bij zwammen is één verkeerd kenmerk genoeg voor een fatale afloop. Laat elke eerste vondst van een soort controleren door iemand die hem al jaren kent, of door een paddenstoelenwerkgroep.</div>';
+  /* De zwamwaarschuwing en het noodblok stonden bovenaan, waardoor je bij elke
+     paddenstoel eerst twee blokken algemene tekst voorbij moest voordat de
+     kenmerken van déze soort in beeld kwamen. Ze horen er wel te staan, maar
+     onderaan: je leest ze één keer, niet elke keer opnieuw. */
   if(s.dubbel && s.dubbel.length)
     h += '<div class="warn'+(dood?' dood':'')+'">'+(dood?ZEGEL:'')+'<b>Verwarbaar met</b>'+dubbelHtml(s.dubbel)+'</div>';
   if(s.let) h += '<div class="warn'+(dood?' dood':' oker')+'"><b>Let op</b>'+esc(s.let)+'</div>';
-
-  if(dood)
-    h += '<div class="nood"><b>Bij vermoeden van vergiftiging</b>'+
-      'Bel je huisarts of bij ernstige klachten 112. Zeg welke plant of zwam het is en hoeveel er is gegeten, '+
-      'en bewaar een restant of een foto. De arts kan het Nationaal Vergiftigingen Informatie Centrum raadplegen. '+
-      'Wacht niet op klachten: bij amatoxinen komen die pas na uren, als de schade al begonnen is.</div>';
 
   /* Foto's meteen bovenaan: het beeld is waar je een soort aan herkent.
      Eigen foto's van je vondsten staan in hetzelfde raster, met een merkje. */
@@ -7242,6 +7251,14 @@ async function specSheet(k, terugPin){
 
   /* Vier gelijke vierkanten in plaats van drie rijen van ongelijke breedte:
      de tekst bepaalde eerder de vorm, nu de vorm de tekst. */
+  if(s.grp==="zwam")
+    h += '<div class="warn oker"><b>Paddenstoelen</b>Bij zwammen is \u00e9\u00e9n verkeerd kenmerk genoeg voor een fatale afloop. Laat elke eerste vondst van een soort controleren door iemand die hem al jaren kent, of door een paddenstoelenwerkgroep.</div>';
+  if(dood)
+    h += '<div class="nood"><b>Bij vermoeden van vergiftiging</b>'+
+      'Bel je huisarts of bij ernstige klachten 112. Zeg welke plant of zwam het is en hoeveel er is gegeten, '+
+      'en bewaar een restant of een foto. De arts kan het Nationaal Vergiftigingen Informatie Centrum raadplegen. '+
+      'Wacht niet op klachten: bij amatoxinen komen die pas na uren, als de schade al begonnen is.</div>';
+
   h += '<div class="knopvak">'+
        '<button class="btn sec2" data-act="ontdek">Toon op<br>kaart</button>'+
        '<button class="btn sec2" id="oefenSoort">Herkenning<br>oefenen</button>'+
