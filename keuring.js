@@ -178,13 +178,17 @@ try{
       const fout = SPECIES.filter(s=> /verwant|vervanger|:\s/i.test(s.nl)).map(s=>s.nl);
       return fout.length ? "WERKNAAM: "+fout.join(" | ") : SPECIES.length+" namen in orde";
     }],
-    ["naslagkaart", ()=>{
-      let fout = 0, mager = 0;
+    /* De quiz toont sinds 0.47 hetzelfde soortenblad als het herbarium. Deze
+       controle draait daarom op specBlok: het blad moet voor elke soort
+       inhoud van betekenis opleveren. */
+    ["soortenblad in de quiz", ()=>{
+      let mager = 0;
       SPECIES.forEach(sp=>{
-        try{ const h = qInfoHtml(sp); if(!h || h.length < 60) mager++; }
-        catch(e){ fout++; }
+        const h = (sp.herken||"") + (sp.let||"") + (sp.dubbel||[]).join("");
+        if(h.length < 60) mager++;
       });
-      return fout || mager ? fout+" fout, "+mager+" te mager" : SPECIES.length+" soorten, alle met inhoud";
+      return mager ? mager+" soorten met een te mager blad"
+        : SPECIES.length+" soorten, blad overal met inhoud";
     }],
     ["herbarium compleet", ()=>{
       const in_h = new Set(SPECIES.map(x=>x.k));

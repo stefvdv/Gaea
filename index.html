@@ -234,6 +234,11 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   transform:translateY(101%);transition:transform .28s cubic-bezier(.2,.72,.3,1);
   padding-bottom:calc(var(--safe-b) + 20px);box-shadow:0 -12px 44px rgba(0,0,0,.55)}
 .sheet.on{transform:translateY(0)}
+/* Tijdens de quiz hoort hetzelfde soortenblad te verschijnen als in het
+   herbarium. Het blad staat normaal onder de quiz; met deze klasse komt het
+   erboven, samen met zijn eigen schim. */
+.sheet.boven{z-index:660}
+.scrim.boven{z-index:650}
 .grab{width:40px;height:4px;border-radius:2px;background:rgba(44,42,31,.2);margin:10px auto 0}
 
 .label{padding:12px 18px 15px;position:relative}
@@ -1114,12 +1119,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 </div>
 <input type="file" id="scanPick" accept="image/*" capture="environment" hidden>
 
-<div class="qinfo" id="qInfo" aria-hidden="true">
-  <div class="qinfo-kaart" role="dialog" aria-modal="true" aria-labelledby="qInfoTitel">
-    <button class="qinfo-x" id="qInfoX" aria-label="Sluiten"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    <div class="qinfo-body" id="qInfoBody"></div>
-  </div>
-</div>
+<!-- De naslagkaart in de quiz is vervangen door het soortenblad zelf. -->
 
 <input type="file" id="filePick" accept="image/*" multiple hidden>
 <input type="file" id="jsonPick" accept="application/json,.json" hidden>
@@ -1127,7 +1127,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.46.0";
+const APP_VERSION = "0.47.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -6429,7 +6429,13 @@ function showSheet(html){
     });
   });
 }
+/* Het soortenblad vanuit de quiz: zelfde blad, alleen boven de quizlaag. */
+async function specSheetBoven(k){
+  sheetEl.classList.add("boven"); scrimEl.classList.add("boven");
+  await specSheet(k);
+}
 function closeSheet(){
+  sheetEl.classList.remove("boven"); scrimEl.classList.remove("boven");
   sheetEl.classList.remove("dicht");
   if(S.concept) S.concept = null;
   sheetEl.classList.remove("on"); scrimEl.classList.remove("on");
@@ -8613,66 +8619,10 @@ document.querySelectorAll("[data-scan]").forEach(b=> b.onclick = e=>{
   e.preventDefault(); scanPick.click();
 });
 
-const qInfoEl = document.getElementById("qInfo");
-function qInfoHtml(sp){
-  let h = '<h2>'+esc(sp.nl)+'</h2><div class="la">'+esc(sp.la)+'</div>'+
-    '<div class="qinfo-foto" id="qInfoFoto"><div class="wacht">Foto ophalen\u2026</div></div>'+
-    '<div class="tagrow">'+tagsHtml(sp.tags, sp.grp)+
-    (sp.mnd && sp.mnd.length ? '<span style="margin-left:2px">'+bandHtml(sp.mnd,true)+'</span>' : '')+'</div>';
-  const dood = sp.tags.includes("giftig");
-  if(sp.dubbel && sp.dubbel.length)
-    h += '<div class="warn'+(dood?' dood':'')+'"><b>Verwarbaar met</b>'+dubbelHtml(sp.dubbel)+'</div>';
-  if(sp.let)
-    h += '<div class="warn'+(dood?' dood':' oker')+'"><b>Let op</b>'+esc(sp.let)+'</div>';
-  const blok = (kop, tekst)=> tekst
-    ? '<div class="blok"><div class="kop">'+esc(kop)+'</div><div class="tekst">'+esc(tekst)+'</div></div>' : "";
-  h += blok("Veldkenmerken", sp.herken);
-  h += blok(dood ? "Wat er giftig is" : "Wat je gebruikt",
-            dood ? "Ga uit van de hele plant." : (sp.delen && sp.delen !== "\u2014" ? sp.delen : ""));
-  h += blok("Hoe je het inzet", sp.med);
-  if(sp.kwalen && sp.kwalen.length)
-    h += blok("Waarvoor", sp.kwalen.map(x=>(KWAAL_BY_K[x]||{}).nm).filter(Boolean).join(", "));
-  const st = STOF[sp.k];
-  if(st) h += blok("Werkzame stof", st.stof + " \u00b7 " + st.grp + ". " + st.uitleg);
-  const fam = famVan(sp);
-  if(fam) h += blok("Familie", famLabel(fam));
-  /* Ook hier: al aanwezige gegevens die nergens te zien waren. */
-  const rijk = (kop, tekst)=> tekst
-    ? '<div class="blok"><div class="kop">'+esc(kop)+'</div><div class="tekst">'+tekst+'</div></div>' : "";
-  h += rijk("Waar de naam vandaan komt", ETYM[sp.k] && ETYM[sp.k].t);
-  h += rijk("Volksgebruik", VOLKS[sp.k] && VOLKS[sp.k].t);
-  return h;
-}
-function qInfoOpen(k){
-  const sp = SPEC_BY_K[k]; if(!sp) return;
-  document.getElementById("qInfoBody").innerHTML = qInfoHtml(sp);
-  /* Beeld erbij: bij een naslag over een soort wil je hem ook z\u00eden. Komt uit
-     dezelfde kas als de quizfoto's, dus meestal staat hij er meteen. Het
-     soorttoken voorkomt dat een laat antwoord in een andere kaart landt. */
-  const vak = document.getElementById("qInfoFoto");
-  if(vak){
-    vak.dataset.soort = k;
-    soortBeeld(k).then(b=>{
-      if(vak.dataset.soort !== k) return;
-      if(!b.length){ vak.remove(); return; }
-      const f = b[0];
-      vak.innerHTML = '<img src="'+esc(f.url)+'" alt="" loading="lazy">'+
-        '<div class="bron">'+esc(f.maker)+(f.lic?' \u00b7 '+esc(f.lic):'')+'</div>';
-      vak.querySelector("img").onclick = ()=>
-        openLoep(f.url, [f.maker, f.lic].filter(Boolean).join(" \u00b7 "));
-    }).catch(()=> vak.remove());
-  }
-  qInfoEl.classList.add("on");
-  qInfoEl.setAttribute("aria-hidden","false");
-  qInfoEl.querySelector(".qinfo-kaart").scrollTop = 0;
-}
-function qInfoSluit(){
-  qInfoEl.classList.remove("on");
-  qInfoEl.setAttribute("aria-hidden","true");
-}
-const qInfoOpenIs = ()=> qInfoEl.classList.contains("on");
-document.getElementById("qInfoX").onclick = qInfoSluit;
-qInfoEl.addEventListener("click", e=>{ if(e.target === qInfoEl) qInfoSluit(); });
+/* De aparte naslagkaart in de quiz is vervallen: de i-knop opent nu hetzelfde
+   soortenblad als het herbarium, zodat er maar één versie van de informatie
+   bestaat. Zie specSheetBoven(). */
+const qInfoOpenIs = ()=> false;
 
 /* Een misklik hoort geen blijvend gevolg te hebben. */
 function deblokkeerFoto(url){
@@ -8996,7 +8946,10 @@ async function check(){
     (q.key && SPEC_BY_K[q.key]
       ? '<button class="qinfo-knop" id="qInfoBtn" aria-label="Meer over deze soort" title="Meer over deze soort">i</button>' : '');
   const ib = document.getElementById("qInfoBtn");
-  if(ib) ib.onclick = ()=> qInfoOpen(q.key);
+  /* Eerder een eigen, uitgeklede naslagkaart. Dat betekende twee versies van
+     dezelfde informatie onderhouden, en de quizversie liep achter. Nu gewoon
+     het soortenblad uit het herbarium. */
+  if(ib) ib.onclick = ()=> specSheetBoven(q.key);
   /* Geen filter vangt alles: wat er toch doorheen komt, kun je hier zelf
      wegsturen. De foto verdwijnt meteen en komt nooit meer terug. */
   const meld = document.getElementById("qMeld");
@@ -9292,6 +9245,7 @@ window.addEventListener("popstate",()=>{
   else if(zoekLeeg()) { /* eerst de zoekopdracht opheffen, dan pas weg */ }
   else if(loepEl.classList.contains("on")) sluitLoep();
   else if(qInfoOpenIs()) qInfoSluit();
+  else if(sheetEl.classList.contains("on") && sheetEl.classList.contains("boven")) closeSheet();
   else if(quizEl.classList.contains("on")){ quizEl.classList.remove("on"); renderLeer(); }
   else if(S.spook) wisSpook();
   else if(sheetEl.classList.contains("on")) closeSheet();
