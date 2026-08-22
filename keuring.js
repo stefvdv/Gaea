@@ -201,6 +201,27 @@ try{
        inhoud van betekenis opleveren. */
     /* De algemene waarschuwingen horen onderaan: bovenaan duwden ze bij elke
        paddenstoel de kenmerken van de soort zelf uit beeld. */
+    /* De paginaladder: doorklikken naar een dubbelganger hoort een laag
+       dieper te gaan, en de terugknop hoort per stap terug te wandelen in
+       plaats van alles ineens te sluiten. */
+    ["paginaladder", ()=>{
+      NAV.length = 0;
+      const stappen = [];
+      specSheet("daslook");        stappen.push(NAV.length);
+      specSheet("lelietje");       stappen.push(NAV.length);
+      specSheet("herfsttijloos");  stappen.push(NAV.length);
+      if(stappen.join(",") !== "1,2,3")
+        return "STAPELT NIET: "+stappen.join(",")+" in plaats van 1,2,3";
+      navTerug();
+      const na1 = S.bladNu;
+      navTerug();
+      const na2 = S.bladNu;
+      navTerug();
+      if(na1 !== "lelietje" || na2 !== "daslook")
+        return "TERUG FOUT: "+na1+" dan "+na2+", verwacht lelietje dan daslook";
+      if(NAV.length) return "STAPEL NIET LEEG na sluiten: "+NAV.length;
+      return "vier lagen, doorklikken stapelt en terug wandelt per stap";
+    }],
     ["waarschuwingen onderaan", ()=>{
       const sp = SPECIES.find(s=> s.grp === "zwam" && s.tags.includes("giftig") && s.dubbel.length);
       if(!sp) return "geen giftige zwam om te toetsen";

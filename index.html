@@ -1133,7 +1133,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.49.0";
+const APP_VERSION = "0.50.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -6382,13 +6382,15 @@ const loepImg = document.getElementById("loepImg");
 let loepSchaal = 1, loepX = 0, loepY = 0;
 function loepZet(){ loepImg.style.transform = "translate("+loepX+"px,"+loepY+"px) scale("+loepSchaal+")"; }
 function openLoep(src, bij){
+  navDuw(4, "loep", ()=> sluitLoep());
   if(!src) return;
   loepImg.src = src;
   document.getElementById("loepBij").textContent = bij || "";
   loepSchaal = 1; loepX = 0; loepY = 0; loepZet();
   loepEl.classList.add("on");
 }
-function sluitLoep(){ loepEl.classList.remove("on"); loepImg.src = ""; }
+function sluitLoep(){
+  navWeg("loep"); loepEl.classList.remove("on"); loepImg.src = ""; }
 document.getElementById("loepSluit").onclick = sluitLoep;
 loepEl.addEventListener("click", e=>{ if(e.target === loepEl) sluitLoep(); });
 (function loepGebaren(){
@@ -6417,6 +6419,41 @@ loepEl.addEventListener("click", e=>{ if(e.target === loepEl) sluitLoep(); });
     if(loepSchaal <= 1.05){ loepSchaal = 1; loepX = 0; loepY = 0; loepZet(); }
   }, {passive:true});
 })();
+
+/* =======================================================================
+   PAGINALADDER
+   De terugknop liep langs een vaste if-else-keten. Dat werkte zolang er
+   \u00e9\u00e9n ding tegelijk openstond, maar niet meer zodra je vanaf een
+   soortenblad doorklikt naar een dubbelganger: je viel dan in \u00e9\u00e9n keer
+   helemaal terug. Er is nu een echte stapel met vier lagen:
+
+     1  de kaart \u2014 de bodem, hier stopt de terugknop
+     2  de navigatieknoppen \u2014 vondsten, voorraad, herbarium, leren, instellingen
+     3  wat je binnen zo'n scherm opent \u2014 een blad, de quiz, een recept
+     4  wat je binnen dat geopende ding aanklikt \u2014 een dubbelganger, de loep
+
+   Elke laag meldt zichzelf aan met navDuw en ruimt zichzelf op met zijn
+   eigen sluitfunctie. De terugknop pakt simpelweg de bovenste. */
+const NAV = [];
+function navDuw(laag, naam, sluit){ NAV.push({laag, naam, sluit}); }
+/* Een laag die zichzelf al sluit (kruisje, veegweg) haalt zijn eigen
+   vermelding weg, zodat de stapel niet vervuilt. */
+function navWeg(naam){
+  for(let i = NAV.length - 1; i >= 0; i--)
+    if(NAV[i].naam === naam){ NAV.splice(i, 1); return; }
+}
+/* Terugkeren naar een vorig blad gebeurt door dat blad opnieuw te openen.
+   Zonder deze vlag zou dat zichzelf weer op de stapel duwen en kwam je nooit
+   naar beneden — de stapel groeide dan bij elke druk. */
+let navBezig = false;
+function navTerug(){
+  const top = NAV.pop();
+  if(!top) return false;
+  navBezig = true;
+  try{ top.sluit(); } finally { navBezig = false; }
+  return true;
+}
+const navBovenste = ()=> NAV.length ? NAV[NAV.length-1].naam : null;
 
 const sheetEl = document.getElementById("sheet");
 const scrimEl = document.getElementById("scrim");
@@ -6456,6 +6493,10 @@ async function specSheetBoven(k){
   await specSheet(k);
 }
 function closeSheet(){
+  /* Het hele bladspoor verdwijnt in één keer; losse vermeldingen zouden
+     anders als spoken op de stapel achterblijven. */
+  for(let i = NAV.length - 1; i >= 0; i--) if(NAV[i].naam === "blad") NAV.splice(i, 1);
+  S.bladNu = null; S.bladPin = null;
   sheetEl.classList.remove("boven"); scrimEl.classList.remove("boven");
   sheetEl.classList.remove("dicht");
   if(S.concept) S.concept = null;
@@ -7196,6 +7237,17 @@ function eigenFotoTegels(fotos, metStadium){
 }
 async function specSheet(k, terugPin){
   const s = SPEC_BY_K[k]; if(!s) return;
+  /* Klik je vanaf een blad door naar een dubbelganger, dan komt het vorige
+     blad op de stapel: de terugknop brengt je daar weer heen in plaats van
+     alles ineens te sluiten. Dat is laag 4 boven op laag 3. */
+  if(navBezig){ /* terugstap: niet opnieuw stapelen */ }
+  else if(sheetEl.classList.contains("on") && S.bladNu && S.bladNu !== k){
+    const vorige = S.bladNu, vorigePin = S.bladPin;
+    navDuw(4, "blad", ()=>{ specSheet(vorige, vorigePin); });
+  } else if(!sheetEl.classList.contains("on")){
+    navDuw(3, "blad", ()=> closeSheet());
+  }
+  S.bladNu = k; S.bladPin = terugPin;
   const mine = S.pins.filter(p=>p.spec===k);
   const dood = s.tags.includes("giftig");
   let h = '<div class="label">'+VINE+HOEKRANK+HOEKEN+
@@ -7480,6 +7532,9 @@ function receptSheet(k){
    SCHERMEN
    ======================================================================= */
 function go(scr){
+  /* Een schermwissel is een sprong naar laag 2: alles wat daarboven open
+     stond is niet meer zichtbaar en hoort dus ook niet meer op de stapel. */
+  if(typeof NAV !== "undefined") NAV.length = 0;
   if(typeof wisSpook === "function") wisSpook();
   document.body.classList.toggle("opkaart", scr === "map");
   S.scr = scr;
@@ -8522,8 +8577,9 @@ function zoekLeeg(){
 
 const scanEl = document.getElementById("scanBlad");
 const scanOpenIs = ()=> scanEl.classList.contains("on");
-function scanSluit(){ scanEl.classList.remove("on"); scanEl.setAttribute("aria-hidden","true"); }
+function scanSluit(){ navWeg("scan"); scanEl.classList.remove("on"); scanEl.setAttribute("aria-hidden","true"); }
 function scanToon(html){
+  if(!scanOpenIs()) navDuw(3, "scan", ()=> scanSluit());
   document.getElementById("scanBody").innerHTML = html;
   scanEl.classList.add("on"); scanEl.setAttribute("aria-hidden","false");
   scanEl.querySelector(".qinfo-kaart").scrollTop = 0;
@@ -8855,6 +8911,7 @@ async function startQuiz(){
   let keys=pickN(due.sort((a,b)=>leerGewicht(b)-leerGewicht(a)).slice(0, kop), n);
   if(!keys.length) keys=pickN([...vijver],n);
   keys = balanceer(keys);
+  navDuw(3, "quiz", ()=>{ quizEl.classList.remove("on"); renderLeer(); });
   /* Geheugen bijwerken: ruim genoeg om een paar rondes te overspannen, niet
      zo ruim dat de vijver leegloopt. */
   S.leer.recent = [...keys, ...S.leer.recent].slice(0, Math.max(S.leer.doel * 4, 40));
@@ -9278,16 +9335,14 @@ function vraagAfsluiten(){
 window.addEventListener("popstate",()=>{
   if(S.afsluiten) return;
   if(afsluitOpen){ afsluitOpen = false; closeSheet(); history.pushState({},""); return; }
+  /* Volgorde: eerst wat buiten de ladder valt en altijd voorrang heeft,
+     dan de stapel van boven naar beneden, dan de navigatielaag, dan de
+     kaart als bodem. */
   if(aselEl) aselSluit();
-  else if(scanOpenIs()) scanSluit();
-  else if(zoekLeeg()) { /* eerst de zoekopdracht opheffen, dan pas weg */ }
-  else if(loepEl.classList.contains("on")) sluitLoep();
-  else if(qInfoOpenIs()) qInfoSluit();
-  else if(sheetEl.classList.contains("on") && sheetEl.classList.contains("boven")) closeSheet();
-  else if(quizEl.classList.contains("on")){ quizEl.classList.remove("on"); renderLeer(); }
+  else if(zoekLeeg()) { /* een ingevulde zoekbalk is ook een laag */ }
+  else if(navTerug()) { /* laag 3 of 4: de stapel wist zelf wat er open was */ }
   else if(S.spook) wisSpook();
-  else if(sheetEl.classList.contains("on")) closeSheet();
-  else if(S.scr!=="map") go("map");
+  else if(S.scr!=="map") go("map");           /* laag 2 terug naar laag 1 */
   else { history.pushState({},""); vraagAfsluiten(); return; }
   history.pushState({},"");
 });
