@@ -204,6 +204,42 @@ try{
     /* De paginaladder: doorklikken naar een dubbelganger hoort een laag
        dieper te gaan, en de terugknop hoort per stap terug te wandelen in
        plaats van alles ineens te sluiten. */
+    /* De hele weg naar buiten: soort in soort, terug naar de eerste soort,
+       dan het herbarium, dan de kaart, en pas dan de afsluitvraag. */
+    /* De sentinel moet er als eerste weer in, v\u00f3\u00f3r er iets wordt gesloten.
+       Stond hij erna, dan viel een tweede snelle terugdruk in een lege
+       geschiedenis en sloot de app af in plaats van de afsluitvraag te tonen. */
+    ["sentinel eerst", ()=>{
+      const bron = popstateAfhandeling.toString();
+      const iPush = bron.indexOf("pushState");
+      const iWerk = bron.indexOf("terugStap()");
+      if(iPush < 0 || iWerk < 0) return "handler niet herkenbaar";
+      return iPush < iWerk ? "geschiedenisstap wordt hersteld v\u00f3\u00f3r het sluiten"
+        : "VOLGORDE FOUT: er wordt gesloten voordat de stap is hersteld";
+    }],
+    ["terugweg compleet", ()=>{
+      NAV.length = 0; S.afsluiten = false; afsluitOpen = false; S.spook = null;
+      go("spec");
+      specSheet("daslook"); specSheet("lelietje");
+      const weg = [];
+      for(let i = 0; i < 4; i++) weg.push(terugStap() + "(" + S.scr + ")");
+      afsluitOpen = false; closeSheet(); go("map");
+      const verwacht = "ladder(spec) > ladder(spec) > naar kaart(map) > vraagafsluiten(map)";
+      return weg.join(" > ") === verwacht ? "soort > soort > herbarium > kaart > afsluiten"
+        : "WEG FOUT: " + weg.join(" > ");
+    }],
+    /* Een fout in \u00e9\u00e9n laag mag de terugknop niet laten instorten. */
+    ["terugknop overleeft fouten", ()=>{
+      NAV.length = 0; afsluitOpen = false;
+      go("spec");
+      navDuw(3, "kapot", ()=>{ throw new Error("stuk"); });
+      const eerste = terugStap();
+      const tweede = terugStap();
+      afsluitOpen = false; closeSheet(); go("map");
+      return (eerste === "ladder" && tweede === "naar kaart" && !NAV.length)
+        ? "kapotte laag wordt overgeslagen, de ladder loopt door"
+        : "LADDER BLIJFT HANGEN: " + eerste + ", " + tweede;
+    }],
     ["paginaladder", ()=>{
       NAV.length = 0;
       const stappen = [];

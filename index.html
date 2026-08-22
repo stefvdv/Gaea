@@ -1133,7 +1133,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.50.0";
+const APP_VERSION = "0.51.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -6450,7 +6450,14 @@ function navTerug(){
   const top = NAV.pop();
   if(!top) return false;
   navBezig = true;
-  try{ top.sluit(); } finally { navBezig = false; }
+  try{
+    top.sluit();
+  }catch(e){
+    /* De laag is al van de stapel; blijf niet hangen op zijn fout. */
+    console.error("laag sluiten mislukt:", top.naam, e);
+  }finally{
+    navBezig = false;
+  }
   return true;
 }
 const navBovenste = ()=> NAV.length ? NAV[NAV.length-1].naam : null;
@@ -9332,20 +9339,39 @@ function vraagAfsluiten(){
   };
 }
 
-window.addEventListener("popstate",()=>{
-  if(S.afsluiten) return;
-  if(afsluitOpen){ afsluitOpen = false; closeSheet(); history.pushState({},""); return; }
+/* De keten als aparte functie, zodat de keuring hem stap voor stap kan
+   doorlopen zonder een echte terugknop. */
+function terugStap(){
+  if(S.afsluiten) return "afsluiten";
+  if(afsluitOpen){ afsluitOpen = false; closeSheet(); return "afsluitdialoog"; }
   /* Volgorde: eerst wat buiten de ladder valt en altijd voorrang heeft,
      dan de stapel van boven naar beneden, dan de navigatielaag, dan de
      kaart als bodem. */
-  if(aselEl) aselSluit();
-  else if(zoekLeeg()) { /* een ingevulde zoekbalk is ook een laag */ }
-  else if(navTerug()) { /* laag 3 of 4: de stapel wist zelf wat er open was */ }
-  else if(S.spook) wisSpook();
-  else if(S.scr!=="map") go("map");           /* laag 2 terug naar laag 1 */
-  else { history.pushState({},""); vraagAfsluiten(); return; }
-  history.pushState({},"");
-});
+  if(aselEl){ aselSluit(); return "menu"; }
+  if(zoekLeeg()) return "zoekbalk";           /* een ingevulde zoekbalk is ook een laag */
+  if(navTerug()) return "ladder";             /* laag 3 of 4 */
+  if(S.spook){ wisSpook(); return "spook"; }
+  if(S.scr!=="map"){ go("map"); return "naar kaart"; }   /* laag 2 naar laag 1 */
+  else { vraagAfsluiten(); return "vraagafsluiten"; }
+  return "stap";
+}
+function popstateAfhandeling(){
+  /* De app houdt \u00e9\u00e9n geschiedenisstap vast als sentinel. Die werd hiervoor
+     pas teruggezet nadat de laag was gesloten \u2014 en dat is te laat. Android
+     stuurt terugdrukken vlak achter elkaar; kwam de tweede binnen terwijl de
+     eerste nog bezig was, dan viel hij in een lege geschiedenis en sloot de
+     app af. Vandaar dat de afsluitvraag zelden verscheen: er was al niets
+     meer om op terug te vallen. De sentinel gaat er nu als allereerste weer
+     in, v\u00f3\u00f3r er ook maar iets wordt gesloten. */
+  if(S.afsluiten) return;              /* de gebruiker wil echt weg */
+  history.pushState({}, "");
+  try{
+    terugStap();
+  }catch(e){
+    console.error("terugstap mislukt:", e);
+  }
+}
+window.addEventListener("popstate", popstateAfhandeling);
 history.pushState({},"");
 
 (async function boot(){
