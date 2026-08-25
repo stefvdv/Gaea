@@ -914,6 +914,10 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
    twee namen niet in elkaar overlopen. */
 .la .en{font-style:normal;opacity:.7;margin-left:.5em}
 .la .en:before{content:"\00b7";margin-right:.5em;opacity:.65}
+/* Op de kleine kaart in het herbarium staat de regel op één lijn met
+   afkapping; een maatje kleiner past er meer van de naam op het scherm. */
+.rec .la .en{font-size:11px;margin-left:.4em}
+.rec .la .en:before{margin-right:.4em}
 .dbllijst{list-style:none;margin:2px 0 0;padding:0}
 .dbllijst li{margin:0;padding:4px 0;text-align:left;line-height:1.35}
 .dbllijst li + li{border-top:1px solid rgba(124,39,31,.16)}
@@ -1173,7 +1177,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.60.0";
+const APP_VERSION = "0.61.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -8733,7 +8737,8 @@ document.getElementById("listToggle").addEventListener("click", e=>{
 
 function specRow(s){
   return '<button class="rec" data-sk="'+s.k+'">'+KAARTHOEK+'<div class="th"><span class="dot d-'+klass(s)+'" style="width:13px;height:13px"></span></div>'+
-    '<div class="body"><div class="nm">'+esc(s.nl)+'</div><div class="la">'+esc(s.la)+'</div>'+
+    '<div class="body"><div class="nm">'+esc(s.nl)+'</div><div class="la">'+esc(s.la)+
+      (EN[s.k] ? '<span class="en">'+esc(EN[s.k])+'</span>' : '')+'</div>'+
     '<div class="meta">'+esc(s.delen)+'</div>'+bandHtml(s.mnd)+'</div>'+
     (s.dubbel&&s.dubbel.length?'<span class="dot d-gif"></span>':'')+'</button>';
 }

@@ -75,6 +75,9 @@ try{
       showSheet = x => { html = x; };
       try{ specSheet("daslook"); } finally { showSheet = bewaard; }
       if(!html.includes(EN["daslook"])) return "STAAT NIET OP HET BLAD";
+      /* En op de kleine kaart in het herbarium, want daar zoek je hem op. */
+      if(!specRow(SPEC_BY_K["daslook"]).includes(EN["daslook"]))
+        return "STAAT NIET OP DE KLEINE KAART";
       return Object.keys(EN).length + " soorten met een Engelse naam, ook zichtbaar op het blad";
     }],
     ["geen dubbele soorten", ()=>{
