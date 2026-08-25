@@ -438,6 +438,24 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .scanrij .la{font-style:italic;color:var(--inkt-2);font-size:13px;margin-bottom:6px}
 .scanrij .tekst{font-size:14px;line-height:1.5;margin-top:6px}
 .scanrij .btn{margin-top:10px}
+/* Een bewaarde foto in de lijst: duim links, uitkomst rechts. */
+.scanrijtje{display:flex;align-items:center;gap:11px;text-align:left;width:100%}
+.scanduim{width:56px;height:56px;flex:0 0 auto;border-radius:12px;object-fit:cover;
+  border:1px solid rgba(232,206,128,.22)}
+.scanrijtje .tekstblok{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}
+.scanrijtje .nm{font-family:var(--slab);font-size:16px;font-weight:700}
+.scanrijtje .la{font-style:italic;font-size:12px;opacity:.72;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.scanrijtje .bij{font-family:var(--mono);font-size:11px;opacity:.6}
+.scanrijtje .score{font-family:var(--mono);font-size:12px;opacity:.75;flex:0 0 auto}
+.scanrijtje .vlagje{flex:0 0 auto;font-size:10px;padding:3px 7px;border-radius:8px;
+  background:rgba(138,110,34,.16);border:1px dashed rgba(138,110,34,.5);line-height:1.2;
+  max-width:76px;text-align:center}
+.scangroot{width:100%;border-radius:14px;display:block}
+/* Een soort die de gids niet kent krijgt een gestippelde rand, zodat je in
+   \u00e9\u00e9n oogopslag ziet dat hier geen gidskennis achter zit. */
+.scanrij.vreemd{background:rgba(138,110,34,.07);border-color:rgba(138,110,34,.34);
+  border-style:dashed}
 .qinfo-body .blok{margin-top:13px}
 .qinfo-body .kop{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--inkt-2);margin-bottom:4px}
@@ -891,6 +909,11 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .troskeuze:active{background:rgba(44,42,31,.11)}
 .troskeuze .nm{font-family:var(--slab);font-size:15px;font-weight:700}
 .troskeuze .bij{font-size:12px;opacity:.75}
+/* De Engelse naam achter de Latijnse: veel van wat je online vindt staat in
+   het Engels, en dan wil je weten waar je naar zoekt. Rechtop gezet zodat de
+   twee namen niet in elkaar overlopen. */
+.la .en{font-style:normal;opacity:.7;margin-left:.5em}
+.la .en:before{content:"\00b7";margin-right:.5em;opacity:.65}
 .dbllijst{list-style:none;margin:2px 0 0;padding:0}
 .dbllijst li{margin:0;padding:4px 0;text-align:left;line-height:1.35}
 .dbllijst li + li{border-top:1px solid rgba(124,39,31,.16)}
@@ -1011,6 +1034,10 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
   <div class="kop" id="kop-list"><div class="rij"><h1 style="margin:0">Vondsten</h1></div></div>
   <p class="sub" id="listSub">—</p>
   <div class="knoopregel" data-orn="pin"></div>
+  <div class="tabsrow" id="listToggle">
+    <button data-v="vondsten" class="on">Vondsten</button>
+    <button data-v="scans">Foto’s</button>
+  </div>
   <div class="searchbar"><div class="zoekveld"><span class="loepje"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8 21 21" stroke-linecap="round"/></svg></span><input id="qList" placeholder="Zoek op soort, plek of notitie"><button class="scanknop" data-scan aria-label="Foto herkennen"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 8.6A2.6 2.6 0 0 1 5.6 6h1.6l1.1-2h6.4l1.1 2h1.6A2.6 2.6 0 0 1 20 8.6v8.8A2.6 2.6 0 0 1 17.4 20H5.6A2.6 2.6 0 0 1 3 17.4Z"/><circle cx="11.5" cy="13" r="3.4"/></svg></button></div></div>
   <div id="listBody"></div>
 </section>
@@ -1057,7 +1084,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
     <button data-v="waarvoor">Kwaal</button>
     <button data-v="alle" class="on">Alles</button>
   </div>
-  <div class="searchbar"><div class="zoekveld"><span class="loepje"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8 21 21" stroke-linecap="round"/></svg></span><input id="qSpec" placeholder="Zoek naam, familie of gebruik"><button class="scanknop" data-scan aria-label="Foto herkennen"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 8.6A2.6 2.6 0 0 1 5.6 6h1.6l1.1-2h6.4l1.1 2h1.6A2.6 2.6 0 0 1 20 8.6v8.8A2.6 2.6 0 0 1 17.4 20H5.6A2.6 2.6 0 0 1 3 17.4Z"/><circle cx="11.5" cy="13" r="3.4"/></svg></button></div></div>
+  <div class="searchbar"><div class="zoekveld"><span class="loepje"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8 21 21" stroke-linecap="round"/></svg></span><input id="qSpec" placeholder="Zoek NL, Latijn, Engels of gebruik"><button class="scanknop" data-scan aria-label="Foto herkennen"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 8.6A2.6 2.6 0 0 1 5.6 6h1.6l1.1-2h6.4l1.1 2h1.6A2.6 2.6 0 0 1 20 8.6v8.8A2.6 2.6 0 0 1 17.4 20H5.6A2.6 2.6 0 0 1 3 17.4Z"/><circle cx="11.5" cy="13" r="3.4"/></svg></button></div></div>
   <div class="fltrij">
     <select id="fltKwaal"><option value="">Alle kwalen</option></select>
     <select id="fltMnd"><option value="">Alle maanden</option></select>
@@ -1146,7 +1173,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.56.0";
+const APP_VERSION = "0.60.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -2142,6 +2169,608 @@ const VOLKS = {
  bospaardenstaart:    {t:"Als alle paardenstaarten vol kiezelzuur: gedroogd gebruikt om tin en houtwerk te schuren, vandaar de Duitse naam Zinnkraut."},
  grofplaatrussula:    {t:"De zwarte mummies blijven tot in de winter staan en dragen dan vaak het poederzwammetje, een zwam op een zwam."},
  sponszwam:           {t:"In Japan als hanabiratake gekweekt; in Europa komt hij jaren achtereen op dezelfde den terug als je de voet laat zitten."},
+};
+
+/* Engelse namen. Veel van wat je online over een soort vindt staat in het
+   Engels; met deze naam weet je waarnaar je zoekt. Waar geen gangbare
+   Engelse naam bestaat blijft de regel weg — een verzonnen naam stuurt
+   je alleen maar het verkeerde spoor op. */
+const EN = {
+ aalbes:                    "Redcurrant",
+ aardaker:                  "Tuberous pea",
+ aardappelbovist:           "Common earthball",
+ aardkastanje:              "Pignut",
+ aardpeer:                  "Jerusalem artichoke",
+ afrikaantje:               "French marigold",
+ agrimonie:                 "Agrimony",
+ akelei:                    "Columbine",
+ akkerdistel:               "Creeping thistle",
+ akkerkool:                 "Nipplewort",
+ akkervergeetmijnietje:     "Field forget-me-not",
+ akkerwinde:                "Field bindweed",
+ alant:                     "Elecampane",
+ aloe:                      "Aloe vera",
+ alsem:                     "Wormwood",
+ amarant:                   "Redroot amaranth",
+ amerikaanseeik:            "Red oak",
+ amerikaansevogelkers:      "Black cherry",
+ amethistzwam:              "Amethyst deceiver",
+ ananaskers:                "Cape gooseberry",
+ ananassalie:               "Pineapple sage",
+ anijs:                     "Anise",
+ anijschampignon:           "Horse mushroom",
+ appelbes:                  "Black chokeberry",
+ arnica:                    "Arnica",
+ aronskelk:                 "Lords and ladies",
+ avondkoekoeksbloem:        "White campion",
+ barbarakruid:              "Winter cress",
+ basilicum:                 "Basil",
+ beemdkroon:                "Field scabious",
+ berendruif:                "Bearberry",
+ berenklauw:                "Hogweed",
+ bergamotplant:             "Bee balm / bergamot",
+ bergsteentijm:             "Wood calamint",
+ berk:                      "Silver birch",
+ berkenboleet:              "Birch bolete",
+ berkenzwam:                "Birch polypore",
+ bernagie:                  "Borage",
+ beuk:                      "Beech",
+ beukenrussula:             "Beechwood sickener",
+ beukenzwam:                "Beech mushroom / shimeji",
+ beukwortelzwam:            "Rooting shank",
+ biefstukzwam:              "Beefsteak fungus",
+ bieslook:                  "Chives",
+ biggenkruid:               "Cat's ear",
+ bijvoet:                   "Mugwort",
+ bilzekruid:                "Henbane",
+ bisschopsmuts:             "Elfin saddle",
+ bitterzoet:                "Bittersweet nightshade",
+ blaartrekkendeboterbloem:  "Celery-leaved buttercup",
+ blaasjeszwam:              "Blistered cup",
+ blaassilene:               "Bladder campion",
+ blaaswier:                 "Bladderwrack",
+ blauweknoop:               "Devil's-bit scabious",
+ blauwglidkruid:            "Common skullcap",
+ blauwwalstro:              "Field madder",
+ boerenwormkruid:           "Tansy",
+ bonenkruid:                "Summer savory",
+ borstelkrans:              "Wild basil",
+ bosaardbei:                "Wild strawberry",
+ bosandoorn:                "Hedge woundwort",
+ bosanemoon:                "Wood anemone",
+ bosbes:                    "Bilberry",
+ bosengelwortel:            "Wild angelica",
+ boshyacint:                "Bluebell",
+ boskruiskruid:             "Heath groundsel",
+ bospaardenstaart:          "Wood horsetail",
+ bosrank:                   "Old man's beard",
+ boswilg:                   "Goat willow",
+ boszwenkgras:              "Giant fescue",
+ braakrussula:              "The sickener",
+ braam:                     "Bramble / blackberry",
+ brandnetel:                "Stinging nettle",
+ breedplaatzwam:            "Whitelaced shank",
+ brem:                      "Broom",
+ bruineringboleet:          "Slippery jack",
+ brunel:                    "Selfheal",
+ bundelmosklokje:           "Funeral bell",
+ buxus:                     "Box",
+ canadapopulier:            "Hybrid black poplar",
+ canadeseguldenroede:       "Canadian goldenrod",
+ cantharel:                 "Chanterelle",
+ chaga:                     "Chaga",
+ cichorei:                  "Chicory",
+ citroengras:               "Lemongrass",
+ citroenverbena:            "Lemon verbena",
+ courgette:                 "Courgette / zucchini",
+ dagkoekoeksbloem:          "Red campion",
+ daglelie:                  "Orange daylily",
+ daslook:                   "Ramsons / wild garlic",
+ dennenkegelzwam:           "Pinecone cap",
+ dennenvoetzwam:            "Dyer's mazegill",
+ dille:                     "Dill",
+ dollekervel:               "Rough chervil",
+ doolhofzwam:               "Oak mazegill",
+ doornappel:                "Thorn apple",
+ dophei:                    "Cross-leaved heath",
+ dotterbloem:               "Marsh marigold",
+ douglas:                   "Douglas fir",
+ dovenetel:                 "White deadnettle",
+ draadknotszwam:            "Pipe club",
+ dragon:                    "Tarragon",
+ dropplant:                 "Anise hyssop",
+ duifkruid:                 "Small scabious",
+ duindoorn:                 "Sea buckthorn",
+ duivelsklauw:              "Devil's claw",
+ duizendblad:               "Yarrow",
+ dwergmispel:               "Wild cotoneaster",
+ echinacea:                 "Purple coneflower",
+ echtetijm:                 "Common thyme",
+ echtetolzwam:              "Tiger's eye",
+ eekhoorntjesbrood:         "Penny bun / cep",
+ eenbes:                    "Herb Paris",
+ eik:                       "Pedunculate oak",
+ eikelbekerzwam:            "Hare's ear",
+ eikensponszwam:            "Oak cauliflower",
+ eikhaas:                   "Hen of the woods / maitake",
+ elfenbankje:               "Turkeytail",
+ elfenschermpje:            "Common bonnet",
+ elzenkorstzwam:            "Hairy curtain crust",
+ engelsgras:                "Thrift",
+ engelwortel:               "Garden angelica",
+ ereprijs:                  "Heath speedwell",
+ es:                        "Ash",
+ esdoorn:                   "Sycamore",
+ fenegriek:                 "Fenugreek",
+ fijnspar:                  "Norway spruce",
+ fluitenkruid:              "Cow parsley",
+ fluweelboleet:             "Red cracking bolete",
+ fluweelpootje:             "Velvet shank",
+ fopelfenbankje:            "Birch mazegill",
+ framboos:                  "Raspberry",
+ gagel:                     "Bog myrtle",
+ galboleet:                 "Bitter bolete",
+ galrussula:                "Geranium brittlegill",
+ gamander:                  "Wood sage",
+ gaspeldoorn:               "Gorse",
+ geelhoorntje:              "Yellow stagshorn",
+ geelwalstro:               "Lady's bedstraw",
+ geelwitterussula:          "Ochre brittlegill",
+ geknobbeldevezelkop:       "Split fibrecap",
+ gelderseroos:              "Guelder rose",
+ geleanemoon:               "Yellow anemone",
+ gelehersenzwam:            "Brain jelly",
+ geleknolamaniet:           "False death cap",
+ gelekornoelje:             "Cornelian cherry",
+ gelelis:                   "Yellow flag iris",
+ geleplomp:                 "Yellow water-lily",
+ geleridderzwam:            "Yellow knight",
+ geletrilzwam:              "Yellow brain",
+ geletrompet:               "Yellowfoot / winter chanterelle",
+ gelewaterkers:             "Great yellow-cress",
+ gelezwavelporiezwam:       "Bitter sheep polypore",
+ gember:                    "Ginger",
+ geschubdeinktzwam:         "Shaggy inkcap",
+ geweizwam:                 "Candlesnuff fungus",
+ gewoneaardster:            "Collared earthstar",
+ gewonefopzwam:             "Deceiver",
+ gewoneliguster:            "Wild privet",
+ gewoneplataan:             "London plane",
+ gewonezwavelkop:           "Sulphur tuft",
+ gezoneerdevlekplaat:       "Brown mottlegill",
+ ginkgo:                    "Ginkgo",
+ glimmerinktzwam:           "Glistening inkcap",
+ gordijnzwam:               "Webcaps",
+ gouderegen:                "Laburnum",
+ goudsbloem:                "Pot marigold",
+ goudvliesbundelzwam:       "Golden scalycap",
+ grasklokje:                "Harebell",
+ grauweabeel:               "Grey poplar",
+ grauweels:                 "Grey alder",
+ grauweridderzwam:          "Charbonnier",
+ grauwewilg:                "Grey willow",
+ grijzebuisjeszwam:         "Smoky bracket",
+ grijzeslankeamaniet:       "Grisette",
+ groeneknolamaniet:         "Death cap",
+ grofplaatrussula:          "Blackening brittlegill",
+ groothoefblad:             "Butterbur",
+ grotebekerzwam:            "Bay cup",
+ grotebevernel:             "Greater burnet-saxifrage",
+ grotebloedsteelmycena:     "Burgundydrop bonnet",
+ grotebreeksteelmycena:     "Pale brittlestem",
+ grotecentaurie:            "Greater knapweed",
+ grotemaagdenpalm:          "Greater periwinkle",
+ grotepimpernel:            "Great burnet",
+ grotesatijnzwam:           "Livid pinkgill",
+ grotestinkzwam:            "Stinkhorn",
+ grotetolzwam:              "Velvet rollrim",
+ grotetrechterzwam:         "Trooping funnel",
+ grotewatereppe:            "Greater water-parsnip",
+ groteweegbree:             "Broadleaf plantain",
+ grovden:                   "Scots pine",
+ guldenroede:               "Goldenrod",
+ haagbeuk:                  "Hornbeam",
+ haagwinde:                 "Hedge bindweed",
+ hazelaar:                  "Hazel",
+ heelblaadjes:              "Common fleabane",
+ heemst:                    "Marshmallow",
+ heermoes:                  "Field horsetail",
+ heggendoornzaad:           "Upright hedge-parsley",
+ heggenrank:                "White bryony",
+ heggenwikke:               "Tufted vetch",
+ heksenboleet:              "Scarletina bolete",
+ hemelboom:                 "Tree of heaven",
+ hemelsleutel:              "Orpine",
+ hengel:                    "Wood cow-wheat",
+ hennepnetel:               "Common hemp-nettle",
+ herderstasje:              "Shepherd's purse",
+ herfsttijloos:             "Autumn crocus / meadow saffron",
+ herik:                     "Charlock",
+ hertentruffel:             "Deer truffle",
+ hertenzwam:                "Deer shield",
+ hondsdraf:                 "Ground ivy",
+ hondspeterselie:           "Fool's parsley",
+ hondsroos:                 "Dog rose",
+ honingklaver:              "Yellow sweet clover",
+ honingzwam:                "Honey fungus",
+ hop:                       "Hop",
+ hosta:                     "Hosta",
+ houtknotszwam:             "Dead man's fingers",
+ huislook:                  "Houseleek",
+ hulst:                     "Holly",
+ hysop:                     "Hyssop",
+ iep:                       "Field elm",
+ ijzerhard:                 "Vervain",
+ jacobskruiskruid:          "Ragwort",
+ japanseduizendknoop:       "Japanese knotweed",
+ japansesierkwee:           "Japanese quince",
+ jeneverbes:                "Juniper",
+ judasoor:                  "Wood ear",
+ judaspenning:              "Honesty",
+ juffertje:                 "Love-in-a-mist",
+ kaardebol:                 "Teasel",
+ kaasjeskruid:              "Common mallow",
+ kaleinktzwam:              "Common inkcap",
+ kalmoes:                   "Sweet flag",
+ kamille:                   "German chamomile",
+ kammetjesstekelzwam:       "Coral tooth",
+ kammosselrussula:          "Crab brittlegill",
+ kamperfoelie:              "Honeysuckle",
+ kaneel:                    "Cinnamon",
+ kapjesmorielje:            "Early morel",
+ karbolchampignon:          "Yellow stainer",
+ kardemom:                  "Cardamom",
+ kardinaalsmuts:            "Spindle",
+ karwij:                    "Caraway",
+ kastanjeboleet:            "Bay bolete",
+ kattenkruid:               "Catnip",
+ kattenstaart:              "Purple loosestrife",
+ keizersamaniet:            "Caesar's mushroom",
+ kerstroos:                 "Christmas rose",
+ kervel:                    "Chervil",
+ klaproos:                  "Common poppy",
+ klaverzuring:              "Wood sorrel",
+ kleefkruid:                "Cleavers",
+ kleinebrandnetel:          "Small nettle",
+ kleineknolparasol:         "Deadly dapperling",
+ kleinestinkzwam:           "Dog stinkhorn",
+ kleinewatereppe:           "Lesser water-parsnip",
+ kleinezonnedauw:           "Oblong-leaved sundew",
+ kleineparasolzwam:         "Dapperlings",
+ kleinhoefblad:             "Colt's foot",
+ kleinkruiskruid:           "Groundsel",
+ kleinspringzaad:           "Small balsam",
+ kleinstreepzaad:           "Smooth hawk's-beard",
+ klimop:                    "Ivy",
+ klit:                      "Greater burdock",
+ kluifzwam:                 "False morel",
+ knoflook:                  "Garlic",
+ knolparasolzwam:           "Shaggy parasol",
+ knoopkruid:                "Brown knapweed",
+ knopighelmkruid:           "Common figwort",
+ koeienboleet:              "Bovine bolete",
+ koekoeksbloem:             "Ragged robin",
+ kogelhoutskoolzwam:        "King Alfred's cakes",
+ komijn:                    "Cumin",
+ kompassla:                 "Prickly lettuce",
+ koninginnekruid:           "Hemp agrimony",
+ koningskaars:              "Great mullein",
+ koolzaad:                  "Oilseed rape",
+ kopergroenbeker:           "Green elfcup",
+ kopergroenekopspijker:     "Verdigris agaric",
+ koperrodespijkerzwam:      "Copper spike",
+ koraalzwam:                "Yellow coral",
+ koriander:                 "Coriander / cilantro",
+ korrelhoed:                "Earthy powdercap",
+ kraaihei:                  "Crowberry",
+ kraailook:                 "Crow garlic",
+ krent:                     "Juneberry",
+ kruidnagel:                "Clove",
+ kruidvlier:                "Dwarf elder",
+ kruisbes:                  "Gooseberry",
+ kruisbladwalstro:          "Crosswort",
+ kruldistel:                "Welted thistle",
+ krulzoom:                  "Brown roll-rim",
+ kurkuma:                   "Turmeric",
+ kweepeer:                  "Quince",
+ lakzwam:                   "Reishi",
+ lampionplant:              "Chinese lantern",
+ lamsoor:                   "Sea lavender",
+ lariks:                    "European larch",
+ lateguldenroede:           "Giant goldenrod",
+ laurier:                   "Bay laurel",
+ lavas:                     "Lovage",
+ lavendel:                  "Lavender",
+ leeuwenbek:                "Snapdragon",
+ lelietje:                  "Lily of the valley",
+ lenteklokje:               "Spring snowflake",
+ lepelblad:                 "Common scurvygrass",
+ lidrus:                    "Marsh horsetail",
+ liesgras:                  "Reed sweet-grass",
+ lijsterbes:                "Rowan",
+ linde:                     "Large-leaved lime",
+ lisdodde:                  "Bulrush / cattail",
+ longkruid:                 "Lungwort",
+ loodgrijzebovist:          "Grey puffball",
+ lookzonderlook:            "Garlic mustard",
+ maagdenpalm:               "Lesser periwinkle",
+ maartsviooltje:            "Sweet violet",
+ madeliefje:                "Daisy",
+ mahonie:                   "Oregon grape",
+ malrove:                   "White horehound",
+ mansoor:                   "Asarabacca",
+ margriet:                  "Oxeye daisy",
+ mariadistel:               "Milk thistle",
+ marjolein:                 "Oregano / wild marjoram",
+ meidoorn:                  "Hawthorn",
+ melganzenvoet:             "Fat hen",
+ melisse:                   "Lemon balm",
+ melkdistel:                "Common sowthistle",
+ melkeppe:                  "Milk parsley",
+ melkkruid:                 "Sea milkwort",
+ mierikswortel:             "Horseradish",
+ mispel:                    "Medlar",
+ moerasandoorn:             "Marsh woundwort",
+ moerasspirea:              "Meadowsweet",
+ moerbei:                   "Black mulberry",
+ molenaar:                  "The miller",
+ monnikskap:                "Monkshood",
+ morgenster:                "Goat's beard",
+ morielje:                  "Morel",
+ muizenoor:                 "Mouse-ear hawkweed",
+ munt:                      "Spearmint",
+ muurleeuwenbek:            "Ivy-leaved toadflax",
+ muurpeper:                 "Biting stonecrop",
+ muursla:                   "Wall lettuce",
+ nagelkruid:                "Wood avens",
+ narcis:                    "Wild daffodil",
+ narcismosklokje:           "Orange mosscap",
+ nevelzwam:                 "Clouded funnel",
+ nigella:                   "Black cumin",
+ noorseesdoorn:             "Norway maple",
+ oesterzwam:                "Oyster mushroom",
+ oleander:                  "Oleander",
+ olijfwilg:                 "Autumn olive",
+ oorlepelzwam:              "Earpick fungus",
+ oostindischekers:          "Nasturtium",
+ oranjeaderzwam:            "Wrinkled crust",
+ oranjebekerzwam:           "Orange peel fungus",
+ oranjedruppelzwam:         "Common jellyspot",
+ oranjerodegordijnzwam:     "Fool's webcap",
+ ossentong:                 "Common bugloss",
+ paardenbloem:              "Dandelion",
+ paardenkastanje:           "Horse chestnut",
+ paarsedennenzwam:          "Purplepore bracket",
+ paarsedovenetel:           "Red deadnettle",
+ paarseschijnridder:        "Wood blewit",
+ paarsesteelschijnridder:   "Field blewit",
+ panteramaniet:             "Panther cap",
+ parasolzwam:               "Parasol mushroom",
+ parelamaniet:              "Blusher",
+ parelstuifzwam:            "Common puffball",
+ passiebloem:               "Passionflower",
+ pastinaak:                 "Wild parsnip",
+ penningkruid:              "Creeping jenny",
+ peperboleet:               "Peppery bolete",
+ peperboompje:              "Mezereon",
+ peperigemelkzwam:          "Peppery milkcap",
+ pepermunt:                 "Peppermint",
+ perzikkruid:               "Redshank",
+ peterselie:                "Parsley",
+ pijlkruid:                 "Arrowhead",
+ pimpernel:                 "Salad burnet",
+ pinksterbloem:             "Cuckooflower",
+ plattetonderzwam:          "Artist's bracket",
+ plooivoetstuifzwam:        "Meadow puffball",
+ pompoen:                   "Pumpkin",
+ populierleemhoed:          "Poplar fieldcap / pioppino",
+ postelein:                 "Purslane",
+ pruikzwam:                 "Lion's mane",
+ puntwederik:               "Dotted loosestrife",
+ raapzaad:                  "Wild turnip",
+ radijsvaalhoed:            "Poisonpie",
+ raket:                     "Hedge mustard",
+ rapunzelklokje:            "Rampion bellflower",
+ ratelpopulier:             "Aspen",
+ reigersbek:                "Common stork's-bill",
+ reukelozekamille:          "Sea mayweed",
+ reuklozekamille:           "Scentless mayweed",
+ reuzenbalsemien:           "Himalayan balsam",
+ reuzenberenklauw:          "Giant hogweed",
+ reuzenbovist:              "Giant puffball",
+ reuzenknotszwam:           "Giant club",
+ reuzenzwam:                "Giant polypore",
+ ridderspoor:               "Forking larkspur",
+ riet:                      "Common reed",
+ rimpelroos:                "Japanese rose",
+ robertskruid:              "Herb Robert",
+ robinia:                   "Black locust",
+ rodebes:                   "Redcurrant",
+ rodebosbes:                "Lingonberry",
+ rodekamperfoelie:          "Fly honeysuckle",
+ rodekelkzwam:              "Scarlet elfcup",
+ rodeklaver:                "Red clover",
+ rodekornoelje:             "Common dogwood",
+ rolklaver:                 "Bird's-foot trefoil",
+ roodbruineamaniet:         "Tawny grisette",
+ roodrandhoutzwam:          "Red-belted bracket",
+ rookzwavelkop:             "Conifer tuft",
+ roomsekamille:             "Roman chamomile",
+ roomsekervel:              "Sweet cicely",
+ rozemarijn:                "Rosemary",
+ rucola:                    "Rocket / arugula",
+ ruigklokje:                "Nettle-leaved bellflower",
+ saffraankrokus:            "Saffron crocus",
+ saffraanmycena:            "Saffrondrop bonnet",
+ salie:                     "Sage",
+ salomonszegel:             "Solomon's seal",
+ satansboleet:              "Devil's bolete",
+ schaapszwam:               "Sheep polypore",
+ schapenzuring:             "Sheep's sorrel",
+ scharlei:                  "Clary sage",
+ scheerling:                "Poison hemlock",
+ scherpeboterbloem:         "Meadow buttercup",
+ scherpegroenerussula:      "Green brittlegill",
+ scherpelfenbankje:         "Bitter oysterling",
+ schijfkamille:             "Pineappleweed",
+ schijnaardbei:             "Mock strawberry",
+ schijncipres:              "Lawson cypress",
+ schijntrechterzwam:        "The goblet",
+ schorrenkruid:             "Annual seablite",
+ schubbigebundelzwam:       "Shaggy scalycap",
+ schubbigestekelzwam:       "Scaly tooth",
+ selderij:                  "Wild celery",
+ shiso:                     "Shiso / perilla",
+ sintjanskruid:             "St John's wort",
+ slaapbol:                  "Opium poppy",
+ slangenkruid:              "Viper's bugloss",
+ sleedoorn:                 "Blackthorn / sloe",
+ sleutelbloem:              "Cowslip",
+ slijmigespijkerzwam:       "Slimy spike",
+ smakelijkemelkzwam:        "Saffron milkcap",
+ smeerwortel:               "Comfrey",
+ sneeuwbes:                 "Snowberry",
+ sneeuwklokje:              "Snowdrop",
+ somberehoningzwam:         "Dark honey fungus",
+ spaansehyacint:            "Spanish bluebell",
+ speenkruid:                "Lesser celandine",
+ speerdistel:               "Spear thistle",
+ sponszwam:                 "Cauliflower fungus",
+ springbalsemien:           "Touch-me-not balsam",
+ stalkruid:                 "Common restharrow",
+ stekelzwam:                "Hedgehog mushroom",
+ stevia:                    "Stevia",
+ stinkendeballote:          "Black horehound",
+ stinkendegouwe:            "Greater celandine",
+ stinkendnieskruid:         "Stinking hellebore",
+ stobbezwam:                "Sheathed woodtuft",
+ stokroos:                  "Hollyhock",
+ strandbiet:                "Sea beet",
+ strandmelde:               "Spear-leaved orache",
+ struikhei:                 "Heather / ling",
+ suikerwier:                "Sugar kelp",
+ tammekastanje:             "Sweet chestnut",
+ tandzaad:                  "Trifid bur-marigold",
+ taxus:                     "Yew",
+ teunisbloem:               "Evening primrose",
+ tijgerridderzwam:          "Tiger knight",
+ tijm:                      "Large thyme",
+ tonderzwam:                "Tinder fungus",
+ tormentil:                 "Tormentil",
+ tuinkers:                  "Garden cress",
+ tuinridderspoor:           "Delphinium",
+ tuinwolfsmelk:             "Petty spurge",
+ tulsi:                     "Holy basil",
+ valeriaan:                 "Valerian",
+ valsehanenkam:             "False chanterelle",
+ valsjudasoor:              "Tripe fungus",
+ veenmos:                   "Sphagnum moss",
+ veldesdoorn:               "Field maple",
+ veldhondstong:             "Hound's tongue",
+ veldkers:                  "Hairy bittercress",
+ veldsalie:                 "Meadow clary",
+ veldsla:                   "Lamb's lettuce",
+ veldzuring:                "Common sorrel",
+ venkel:                    "Fennel",
+ vergeetmijnietje:          "Water forget-me-not",
+ vingerhoedskruid:          "Foxglove",
+ viooltje3:                 "Heartsease",
+ vlas:                      "Flax / linseed",
+ vlasbekje:                 "Common toadflax",
+ vliegenzwam:               "Fly agaric",
+ vlier:                     "Elder",
+ voederwikke:               "Common vetch",
+ vogelkers:                 "Bird cherry",
+ vogelmelk:                 "Star-of-Bethlehem",
+ vogelmuur:                 "Chickweed",
+ voorjaarspronkridder:      "St George's mushroom",
+ vroegeakkerzwam:           "Spring fieldcap",
+ vrouwenmantel:             "Lady's mantle",
+ vuilboom:                  "Alder buckthorn",
+ vuurdoorn:                 "Firethorn",
+ vuurzwammetje:             "Blackening waxcap",
+ waaiertje:                 "Splitgill",
+ walnoot:                   "Walnut",
+ waterdrieblad:             "Bogbean",
+ watergentiaan:             "Fringed water-lily",
+ waterkers:                 "Watercress",
+ watermunt:                 "Water mint",
+ waterpeper:                "Water pepper",
+ waterscheerling:           "Cowbane",
+ watertorkruid:             "Hemlock water dropwort",
+ waterweegbree:             "Water plantain",
+ wederik:                   "Yellow loosestrife",
+ weegbree:                  "Ribwort plantain",
+ wegedoorn:                 "Purging buckthorn",
+ weidechampignon:           "Field mushroom",
+ weidekringzwam:            "Fairy ring champignon",
+ weidetrechterzwam:         "Fool's funnel",
+ welriekendesalomonszegel:  "Angular Solomon's seal",
+ westerselevensboom:        "White cedar",
+ wijnruit:                  "Rue",
+ wijnstok:                  "Grapevine",
+ wildepeen:                 "Wild carrot",
+ wildetijm:                 "Wild thyme",
+ wildewingerd:              "Virginia creeper",
+ wilg:                      "White willow",
+ wilgenroosje:              "Rosebay willowherb",
+ wimperzwam:                "Common eyelash",
+ wintereik:                 "Sessile oak",
+ winterpostelein:           "Miner's lettuce",
+ witkoraaltje:              "Crested coral",
+ witteabeel:                "White poplar",
+ witteknolamaniet:          "Destroying angel",
+ wittemoerbei:              "White mulberry",
+ wittesatijnvezelkop:       "Lilac fibrecap",
+ wittesatijnzwam:           "Silky pinkgill",
+ wittevezelkop:             "White fibrecap",
+ wittewaterlelie:           "White water-lily",
+ witvetkruid:               "White stonecrop",
+ wolfskers:                 "Deadly nightshade",
+ wolfspoot:                 "Gypsywort",
+ wolligemelkzwam:           "Woolly milkcap",
+ wonderboom:                "Castor bean",
+ wortelvrucht:              "Yellow false truffle",
+ zachteduizendknoop:        "Tasteless water-pepper",
+ zachteooievaarsbek:        "Dovesfoot crane's-bill",
+ zadelzwam:                 "Dryad's saddle",
+ zeeaster:                  "Sea aster",
+ zeekool:                   "Sea kale",
+ zeekraal:                  "Glasswort / samphire",
+ zeepkruid:                 "Soapwort",
+ zeepridderzwam:            "Soapy knight",
+ zeeraket:                  "Sea rocket",
+ zeesla:                    "Sea lettuce",
+ zeeweegbree:               "Sea plantain",
+ zenegroen:                 "Bugle",
+ zevenblad:                 "Ground elder",
+ zilverschoon:              "Silverweed",
+ zilverspar:                "Silver fir",
+ zilversteelchampignon:     "Wood mushroom",
+ zoetekers:                 "Wild cherry",
+ zoethout:                  "Liquorice",
+ zoetmelkzwam:              "Mild milkcap",
+ zomerhoutzwam:             "Conifer blueing bracket",
+ zomertruffel:              "Summer truffle",
+ zonnebloem:                "Sunflower",
+ zonnedauw:                 "Round-leaved sundew",
+ zurekers:                  "Sour cherry",
+ zuurbes:                   "Barberry",
+ zwaluwtong:                "Black bindweed",
+ zwartebes:                 "Blackcurrant",
+ zwartekelkzwam:            "Black bulgar",
+ zwartels:                  "Black alder",
+ zwartemosterd:             "Black mustard",
+ zwartenachtschade:         "Black nightshade",
+ zwartepopulier:            "Black poplar",
+ zwartetrilzwam:            "Witches' butter",
+ zwartetrompet:             "Horn of plenty",
+ zwartgroenerussula:        "Powdery brittlegill",
+ zwartmoeskervel:           "Alexanders",
+ zwartpurperenrussula:      "Purple brittlegill",
+ zwarttandzaad:             "Beggarticks",
+ zwavelridderzwam:          "Sulphur knight",
+ zwavelzwam:                "Chicken of the woods",
 };
 
 const STOF = {
@@ -5714,13 +6343,17 @@ let DB = null;
 function idb(){
   if(DB) return Promise.resolve(DB);
   return new Promise((res,rej)=>{
-    const rq = indexedDB.open("wildpluk", 4);
+    const rq = indexedDB.open("wildpluk", 5);
     rq.onupgradeneeded = e=>{
       const db = e.target.result;
       ["pins","photos","maaksels"].forEach(n=>{ if(!db.objectStoreNames.contains(n)) db.createObjectStore(n,{keyPath:"id"}); });
       if(!db.objectStoreNames.contains("srs")) db.createObjectStore("srs",{keyPath:"k"});
       if(!db.objectStoreNames.contains("meta")) db.createObjectStore("meta",{keyPath:"k"});
       if(!db.objectStoreNames.contains("gbif")) db.createObjectStore("gbif",{keyPath:"q"});
+      /* Foto's van de scanner met de suggesties die erbij kwamen. Aparte
+         bewaarplaats: het zijn geen vondsten — er is niets vastgesteld — maar
+         je wilt ze wel kunnen terugzien. */
+      if(!db.objectStoreNames.contains("scans")) db.createObjectStore("scans",{keyPath:"id"});
     };
     rq.onsuccess = ()=>{ DB = rq.result; res(DB); };
     rq.onerror = ()=> rej(rq.error);
@@ -5755,7 +6388,7 @@ const S = {
   leer:lsGet("leer",{streak:0,laatst:null,totaal:0,doel:10,niveau:"herkennen",
     thema:{herkennen:"alles",gebruik:"alles",namen:"alles"}, recent:[], recentV:[]}),
   /* Het herbarium is een naslagwerk; dat hoort compleet open te gaan. */
-  specView:"alle", kastView:"alles", kastMode:"kast", recView:"alles",
+  specView:"alle", kastView:"alles", kastMode:"kast", recView:"alles", listView:"vondsten", scans:null,
   spook:null, ontdekVol:null, concept:null, thuis:lsGet("thuis",null), afsluiten:false,
   eigen:lsGet("eigenrecepten",[]),
   gevuld:new Set(), vulBezig:false, vulTimer:null, vulGemeld:false,
@@ -7631,7 +8264,8 @@ async function specSheet(k, terugPin){
   let h = '<div class="label">'+VINE+HOEKRANK+HOEKEN+
     '<div class="acc"><span>'+(s.grp==="zwam"?"Paddenstoel":s.grp==="boom"?"Boom of struik":"Kruid")+'</span>'+
     '<span>'+(s.mnd.length?esc(s.mnd.map(m=>MND[m-1]).join(" ")):"—")+'</span></div>'+
-    '<h2>'+esc(s.nl)+'</h2><div class="la">'+esc(s.la)+'</div>'+
+    '<h2>'+esc(s.nl)+'</h2><div class="la">'+esc(s.la)+
+      (EN[k] ? '<span class="en">'+esc(EN[k])+'</span>' : '')+'</div>'+
     '<div class="tagrow">'+tagsHtml(s.tags,s.grp)+
     (s.mnd.length?'<span style="margin-left:2px">'+bandHtml(s.mnd,true)+'</span>':'')+'</div></div>';
 
@@ -7956,7 +8590,104 @@ function go(scr){
 }
 document.querySelectorAll("#nav button").forEach(b=> b.onclick=()=>go(b.dataset.scr));
 
+/* De foto’s die je hebt laten herkennen, als eigen categorie naast de
+   vondsten. Een scan is nog geen vondst: er is niets bevestigd. */
+async function renderScans(){
+  const body = document.getElementById("listBody");
+  const q = (document.getElementById("qList").value||"").toLowerCase();
+  if(!S.scans){
+    try{ S.scans = await dbAll("scans"); }
+    catch(e){ S.scans = []; }
+  }
+  const rijen = S.scans.slice()
+    .sort((a,b)=> (b.tijd||"").localeCompare(a.tijd||""))
+    .filter(r=> !q || (r.uit||[]).some(u=>
+      ((u.k ? SPEC_BY_K[u.k].nl : "") + " " + (u.namen||[]).join(" ")).toLowerCase().includes(q)));
+
+  document.getElementById("listSub").textContent = (S.scans.length
+    ? rijen.length + " van " + S.scans.length + " foto’s" : "Nog geen foto’s");
+
+  if(!rijen.length){
+    body.innerHTML = '<div class="empty"><b>'+(S.scans.length?"Niets gevonden":"Nog geen foto’s")+'</b>'+
+      (S.scans.length ? "Pas je zoekterm aan."
+        : "Tik op de cameraknop op de kaart of in een zoekbalk om een foto te laten herkennen.")+'</div>';
+    return;
+  }
+
+  body.innerHTML = rijen.map(r=>{
+    const top = (r.uit||[])[0];
+    const naam = !top ? "Geen suggestie"
+      : top.k ? SPEC_BY_K[top.k].nl
+      : (top.namen||[])[0] || "Onbekende soort";
+    const pct = top ? Math.round(top.score*100)+"%" : "";
+    const rest = (r.uit||[]).length > 1 ? " \u00b7 nog "+((r.uit.length)-1)+" suggestie"+(r.uit.length>2?"s":"") : "";
+    const d = new Date(r.tijd);
+    const wanneer = isNaN(d) ? "" : d.toLocaleDateString("nl-NL",{day:"numeric",month:"short"})+
+      " " + d.toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"});
+    return '<button class="kaart scanrijtje" data-scanid="'+esc(r.id)+'">'+
+      '<img class="scanduim" src="'+esc(r.foto)+'" alt="">'+
+      '<span class="tekstblok"><span class="nm">'+esc(naam)+'</span>'+
+      '<span class="la">'+esc((top && !top.k ? (top.namen||[]).join(", ") : (top&&top.k? SPEC_BY_K[top.k].la : "")) || "")+'</span>'+
+      '<span class="bij">'+esc(wanneer+rest)+'</span></span>'+
+      (top && !top.k ? '<span class="vlagje">niet in de gids</span>'
+                     : '<span class="score">'+pct+'</span>')+'</button>';
+  }).join("");
+
+  body.querySelectorAll("[data-scanid]").forEach(b=>
+    b.onclick = ()=> scanBlad(S.scans.find(x=> x.id === b.dataset.scanid)));
+}
+
+/* Het blad van één bewaarde foto. */
+function scanBlad(r){
+  if(!r) return;
+  const d = new Date(r.tijd);
+  const rijen = (r.uit||[]).map(u=>{
+    const sp = u.k ? SPEC_BY_K[u.k] : null;
+    const pct = Math.round(u.score*100)+"%";
+    return '<div class="scanrij'+(sp?"":" vreemd")+'">'+
+      '<div class="kop2"><b>'+esc(sp ? sp.nl : (u.namen||[])[0] || "Onbekend")+'</b>'+
+      '<span class="score">'+pct+'</span></div>'+
+      '<div class="la">'+esc((u.namen||[]).join(", "))+(u.familie?' \u00b7 '+esc(u.familie):"")+'</div>'+
+      (sp ? '<button class="btn sec2" data-scank="'+esc(sp.k)+'">Soortenblad openen</button>'
+          : '<div class="tekst">Staat niet in de gids.</div>'+
+            '<button class="btn sec2" data-gbifla="'+esc((u.namen||[])[0]||"")+'"'+
+            (u.gbif?' data-gbifid="'+esc(String(u.gbif))+'"':'')+'>Bekijk op GBIF</button>')+
+      '</div>';
+  }).join("") || '<div class="tekst">Er kwam geen suggestie uit.</div>';
+
+  showSheet('<div class="label">'+VINE+HOEKRANK+'<div class="acc"><span>Foto</span><span>'+
+    esc(isNaN(d)?"":d.toLocaleDateString("nl-NL"))+'</span></div>'+
+    '<h2>Wat kwam eruit</h2>'+
+    '<div class="la">Een suggestie is geen determinatie</div></div>'+
+    '<div class="sec"><img class="scangroot" src="'+esc(r.foto)+'" alt=""></div>'+
+    '<div class="sec">'+sech("Suggesties","",'blad')+rijen+'</div>'+
+    '<div class="row"><button class="btn sec2" id="scanWeg">Verwijderen</button>'+
+    '<button class="btn sec2" id="scanDicht">Sluiten</button></div>');
+
+  document.getElementById("scanDicht").onclick = closeSheet;
+  document.getElementById("scanWeg").onclick = async ()=>{
+    if(!confirm("Deze foto en de suggesties verwijderen?")) return;
+    await dbDel("scans", r.id);
+    S.scans = null; closeSheet(); renderList();
+    toast("Foto verwijderd");
+  };
+  bodyEl.querySelectorAll("[data-scank]").forEach(b=>
+    b.onclick = ()=> specSheet(b.dataset.scank));
+  bodyEl.querySelectorAll("[data-gbifla]").forEach(b=>
+    b.onclick = ()=>{
+      const id = b.dataset.gbifid;
+      window.open(id ? "https://www.gbif.org/species/"+encodeURIComponent(id)
+        : "https://www.gbif.org/species/search?q="+encodeURIComponent(b.dataset.gbifla),
+        "_blank", "noopener");
+    });
+}
+
 async function renderList(){
+  /* Twee categorieën onder één kop: bevestigde vondsten en losse foto’s. */
+  const tabs = document.getElementById("listToggle");
+  if(tabs) tabs.querySelectorAll("button").forEach(b=>
+    b.classList.toggle("on", b.dataset.v === (S.listView||"vondsten")));
+  if((S.listView||"vondsten") === "scans") return renderScans();
   const q=(document.getElementById("qList").value||"").toLowerCase();
   const rows = S.pins.slice().sort((a,b)=>(b.gewijzigd||"").localeCompare(a.gewijzigd||""))
     .filter(p=> !q || (pinName(p)+" "+pinLatin(p)+" "+(p.plek||"")+" "+(p.notitie||"")).toLowerCase().includes(q));
@@ -7994,6 +8725,11 @@ async function renderList(){
   })();
 }
 document.getElementById("qList").oninput = renderList;
+/* Vondsten en foto’s zijn twee categorieën onder dezelfde kop. */
+document.getElementById("listToggle").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  S.listView = b.dataset.v; renderList();
+});
 
 function specRow(s){
   return '<button class="rec" data-sk="'+s.k+'">'+KAARTHOEK+'<div class="th"><span class="dot d-'+klass(s)+'" style="width:13px;height:13px"></span></div>'+
@@ -8077,7 +8813,9 @@ function renderSpec(){
     if(!q) return true;
     const fam = famVan(x) || "";
     const kwalen = (x.kwalen||[]).map(k=> (KWAAL_BY_K[k]||{}).nm || "").join(" ");
-    return (x.nl+" "+x.la+" "+fam+" "+(FAM_NL[fam]||"")+" "+kwalen+" "+(x.delen||""))
+    /* De Engelse naam doet mee in de zoekbalk: kom je iets onder die naam
+       tegen, dan wil je hem hier ook kunnen vinden. */
+    return (x.nl+" "+x.la+" "+(EN[x.k]||"")+" "+fam+" "+(FAM_NL[fam]||"")+" "+kwalen+" "+(x.delen||""))
       .toLowerCase().includes(q);
   });
   document.getElementById("specTitle").textContent =
@@ -9023,27 +9761,94 @@ function scanKoppel(la){
   return zelfde.length ? {sp:zelfde[0], hoe:"geslacht", broers:zelfde} : null;
 }
 
-function scanKaartje(r){
-  const koppel = scanKoppel(r.la);
-  const pct = Math.round((r.score||0)*100);
-  const nl = koppel ? koppel.sp.nl : (r.namen && r.namen[0]) || "\u2014";
-  let h = '<div class="scanrij"><div class="kop2"><b>'+esc(nl)+'</b><span class="score">'+pct+'%</span></div>'+
-    '<div class="la">'+esc(r.la||"")+(r.familie?' \u00b7 '+esc(r.familie):"")+'</div>';
+/* Elke suggestie blijft zijn eigen soort.
+   Eerder werden antwoorden die op hetzelfde geslacht uitkwamen samengevoegd
+   onder \u00e9\u00e9n soort uit de gids. Dat leest als een determinatie die er niet is:
+   Pl@ntNet noemde vijf rozen die geen van alle in de gids staan, en het
+   kaartje zei "Hondsroos". Wat de gids niet kent, hoort ook niet onder een
+   naam uit de gids te verschijnen \u2014 dan verwijzen we naar GBIF en zeggen we
+   erbij dat de soort ontbreekt. Alleen exact dezelfde naam wordt samengenomen. */
+function scanBundel(lijst){
+  const uit = new Map();
+  lijst.forEach(r=>{
+    const koppel = scanKoppel(r.la);
+    const raak = koppel && koppel.hoe === "soort";
+    const sleutel = raak ? "soort:" + koppel.sp.k : "los:" + (r.la || "?").toLowerCase();
+    if(!uit.has(sleutel))
+      uit.set(sleutel, {koppel: raak ? koppel : null, score:0, namen:[],
+                        familie:r.familie, gbif:r.gbif, volks:(r.namen||[])[0]});
+    const b = uit.get(sleutel);
+    b.score += r.score || 0;
+    if(r.la && !b.namen.includes(r.la)) b.namen.push(r.la);
+    if(!b.gbif && r.gbif) b.gbif = r.gbif;
+  });
+  return [...uit.values()].sort((a,b)=> b.score - a.score);
+}
+
+
+/* De GBIF-pagina van precies de soort die Pl@ntNet noemde. Zonder nummer
+   valt hij terug op een zoekopdracht met de naam. */
+const gbifLink = b => b.gbif
+  ? "https://www.gbif.org/species/" + b.gbif
+  : "https://www.gbif.org/search?q=" + encodeURIComponent(b.la || "");
+
+function scanKaartje(b){
+  const koppel = b.koppel;
+  const pct = Math.round(b.score * 100);
+  const la = b.namen.join(", ");
+  const nl = koppel ? koppel.sp.nl : (b.volks || la || "\u2014");
+  let h = '<div class="scanrij'+(koppel ? "" : " vreemd")+'">'+
+    '<div class="kop2"><b>'+esc(nl)+'</b><span class="score">'+pct+'%</span></div>'+
+    '<div class="la">'+esc(la)+(b.familie?' \u00b7 '+esc(b.familie):"")+'</div>';
+
   if(!koppel){
-    h += '<div class="tekst">Deze soort staat niet in de gids. Kijk hem na op GBIF voor je iets meeneemt.</div>';
-  } else {
-    const sp = koppel.sp;
-    if(koppel.hoe === "geslacht")
-      h += '<div class="tekst">Alleen het geslacht komt overeen. In de gids staan hier: '+
-        esc(koppel.broers.map(x=>x.nl).join(", "))+'.</div>';
-    if(sp.tags.includes("giftig"))
-      h += '<div class="warn dood"><b>Giftig in de gids</b>Als deze richting klopt, niet plukken.</div>';
-    if(sp.dubbel && sp.dubbel.length)
-      h += '<div class="warn"><b>Verwarbaar met</b>'+dubbelHtml(sp.dubbel)+'</div>';
-    if(sp.herken) h += '<div class="tekst"><b>Controleer:</b> '+esc(sp.herken)+'</div>';
-    h += '<button class="btn sec2" data-scank="'+esc(sp.k)+'">Soortenblad openen</button>';
+    /* Niet in de gids: dat hoort er te staan, met de naam die Pl@ntNet gaf en
+       een weg naar GBIF om hem zelf na te zoeken. Geen gidssoort erbij halen \u2014
+       een andere soort onder dezelfde naam schuiven is hier het gevaar. */
+    h += '<div class="warn oker"><b>Staat niet in de gids</b>'+
+      'Gaea kent deze soort niet, dus er is hier geen veldkenmerk of waarschuwing over te geven. '+
+      'Zoek hem na voor je iets meeneemt.</div>';
+    const gesl = (b.namen[0] || "").split(" ")[0].toLowerCase();
+    const buren = gesl ? SPECIES.filter(x=> (x.la||"").toLowerCase().split(" ")[0] === gesl) : [];
+    if(buren.length)
+      h += '<div class="tekst">Uit hetzelfde geslacht staan w\u00e9l in de gids: '+
+        esc(buren.map(x=>x.nl).join(", "))+'. Dat zijn andere soorten \u2014 gebruik ze niet als antwoord.</div>';
+    h += '<button class="btn sec2" data-gbifla="'+esc(b.namen[0]||"")+'"'+
+         (b.gbif ? ' data-gbifid="'+esc(String(b.gbif))+'"' : '')+'>Bekijk op GBIF</button>';
+    return h + '</div>';
   }
+
+  const sp = koppel.sp;
+  if(sp.tags.includes("giftig"))
+    h += '<div class="warn dood"><b>Giftig in de gids</b>Als deze richting klopt, niet plukken.</div>';
+  if(sp.dubbel && sp.dubbel.length)
+    h += '<div class="warn"><b>Verwarbaar met</b>'+dubbelHtml(sp.dubbel)+'</div>';
+  if(sp.herken) h += '<div class="tekst"><b>Controleer:</b> '+esc(sp.herken)+'</div>';
+  h += '<button class="btn sec2" data-scank="'+esc(sp.k)+'">Soortenblad openen</button>';
   return h + '</div>';
+}
+
+
+/* Een gemaakte foto met wat Pl@ntNet erover zei bewaren, zodat je later kunt
+   terugkijken wat je gefotografeerd hebt en welke richting eruit kwam. De foto
+   gaat in IndexedDB; localStorage loopt na een paar opnamen vol. */
+async function scanBewaar(b64, bundels){
+  try{
+    const rij = {
+      id: "sc_" + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+      tijd: new Date().toISOString(),
+      foto: b64,
+      lat: S.pos ? S.pos.lat : null,
+      lng: S.pos ? S.pos.lng : null,
+      uit: (bundels||[]).slice(0,5).map(b=>({
+        score: b.score, namen: b.namen, familie: b.familie || null,
+        gbif: b.gbif || null, k: b.koppel ? b.koppel.sp.k : null
+      }))
+    };
+    await dbPut("scans", rij);
+    S.scans = null;                     /* lijst opnieuw laten ophalen */
+    return rij;
+  }catch(e){ console.error("scan bewaren mislukt:", e); return null; }
 }
 
 async function scanStart(file){
@@ -9077,18 +9882,27 @@ async function scanStart(file){
         scanZwamKnop());
       return;
     }
-    const lijst = (d.resultaten||[]).filter(x=> x.score >= 0.02).slice(0,5);
+    const lijst = scanBundel((d.resultaten||[]).filter(x=> x.score >= 0.02)).slice(0,5);
     if(!lijst.length){
       scanToon('<h2>Geen suggestie</h2><div class="tekst">Probeer een foto van \u00e9\u00e9n plantendeel: blad, bloem of vrucht, van dichtbij en scherp.</div>'+scanZwamKnop());
       return;
     }
+    scanBewaar(b64, lijst);
     scanToon('<h2>Mogelijke richtingen</h2>'+
       '<div class="warn oker"><b>Dit is geen determinatie</b>Een machine kijkt naar vorm en kleur, niet naar geur, melksap of wortel. Loop de kenmerken na voor je iets meeneemt, en pluk nooit op een percentage.</div>'+
       lijst.map(scanKaartje).join("")+
       '<div class="tekst" style="margin-top:12px;color:var(--inkt-2);font-size:13px">Beeldherkenning: Pl@ntNet'+
       (d.resterend!==undefined ? ' \u00b7 nog '+d.resterend+' vandaag' : '')+'</div>'+scanZwamKnop());
-    document.getElementById("scanBody").querySelectorAll("[data-scank]").forEach(b=>
+    const lijf = document.getElementById("scanBody");
+    lijf.querySelectorAll("[data-scank]").forEach(b=>
       b.onclick = ()=>{ scanSluit(); specSheet(b.dataset.scank); });
+    lijf.querySelectorAll("[data-gbifla]").forEach(b=>
+      b.onclick = ()=>{
+        const id = b.dataset.gbifid;
+        const url = id ? "https://www.gbif.org/species/"+encodeURIComponent(id)
+          : "https://www.gbif.org/species/search?q="+encodeURIComponent(b.dataset.gbifla);
+        window.open(url, "_blank", "noopener");
+      });
   }catch(e){
     scanToon('<h2>Geen verbinding</h2><div class="tekst">Foto herkennen werkt alleen online. De rest van de app werkt gewoon door.</div>'+scanZwamKnop());
   }

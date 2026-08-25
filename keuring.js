@@ -61,6 +61,22 @@ try{
        nooit gevraagd wordt, leer je nooit. */
     /* Twee soorten met dezelfde sleutel of dezelfde Latijnse naam betekent dat
        er \u00e9\u00e9n stilletjes onbereikbaar is: SPEC_BY_K houdt er maar \u00e9\u00e9n over. */
+    /* De Engelse naam is de ingang naar alles wat je online vindt; hij hoort
+       er bij elke soort te staan en naar een bestaande soort te wijzen. */
+    ["engelse namen", ()=>{
+      const wees = Object.keys(EN).filter(k=> !SPEC_BY_K[k]);
+      if(wees.length) return "WEESSLEUTELS: " + wees.slice(0,6).join(", ");
+      const zonder = SPECIES.filter(s=> !EN[s.k]);
+      if(zonder.length) return zonder.length + " ZONDER ENGELSE NAAM: " +
+        zonder.map(s=>s.nl).slice(0,6).join(", ");
+      /* En de naam moet op het blad terechtkomen, niet alleen in de tabel. */
+      let html = "";
+      const bewaard = showSheet;
+      showSheet = x => { html = x; };
+      try{ specSheet("daslook"); } finally { showSheet = bewaard; }
+      if(!html.includes(EN["daslook"])) return "STAAT NIET OP HET BLAD";
+      return Object.keys(EN).length + " soorten met een Engelse naam, ook zichtbaar op het blad";
+    }],
     ["geen dubbele soorten", ()=>{
       const tel = (veld)=>{
         const m = {};
@@ -279,6 +295,54 @@ try{
     }],
     /* Twee waarnemingen op dezelfde plek: de onderste was niet aan te tikken.
        Ze horen tot \u00e9\u00e9n pin gebundeld te worden, met een keuzelijst. */
+    /* Pl@ntNet geeft losse soorten terug waar de gids er van een geslacht maar
+       \u00e9\u00e9n of twee kent. Vijf rozen leverden vijf identieke kaartjes. */
+    /* Een soort die de gids niet kent mag niet onder een gidssoort worden
+       geschoven: dat suggereert een determinatie die er niet is. Hij hoort met
+       zijn eigen naam te blijven staan, met de melding en een weg naar GBIF. */
+    /* Gemaakte foto\u2019s met hun suggesties horen terug te vinden te zijn onder
+       een eigen categorie, los van de bevestigde vondsten. */
+    ["foto\u2019s in de vondstenlijst", ()=>{
+      const bewaardView = S.listView, bewaardScans = S.scans;
+      S.listView = "scans";
+      S.scans = [
+        {id:"sc_1", tijd:"2026-08-25T10:00:00Z", foto:"data:image/jpeg;base64,xx",
+         uit:[{score:0.44, namen:["Sambucus nigra"], k:"vlier"}]},
+        {id:"sc_2", tijd:"2026-08-24T09:00:00Z", foto:"data:image/jpeg;base64,yy",
+         uit:[{score:0.21, namen:["Rosa spinosissima"], k:null, gbif:3003444}]}
+      ];
+      const body = document.getElementById("listBody");
+      renderScans();
+      const h = body.innerHTML || "";
+      let blad = "";
+      const bewaardSheet = showSheet;
+      showSheet = x => { blad = x; };
+      try{ scanBlad(S.scans[1]); } finally { showSheet = bewaardSheet; }
+      S.listView = bewaardView; S.scans = bewaardScans;
+
+      if((h.match(/data-scanid=/g) || []).length !== 2) return "LIJST TOONT DE FOTO\u2019S NIET";
+      if(!/niet in de gids/.test(h)) return "onbekende soort wordt niet gemarkeerd in de lijst";
+      if(!/data-gbifla=/.test(blad)) return "GEEN GBIF-VERWIJZING op het fotoblad";
+      if(!/scangroot/.test(blad)) return "de foto zelf staat niet op het blad";
+      return "foto\u2019s staan onder een eigen categorie, met suggesties en GBIF-verwijzing";
+    }],
+    ["onbekende soort blijft zichzelf", ()=>{
+      const b = scanBundel([
+        {la:"Rosa spinosissima", score:0.14, gbif:3003444},
+        {la:"Rosa rubiginosa",   score:0.08, gbif:3003555},
+        {la:"Rosa canina",       score:0.10, gbif:3003666},
+        {la:"Rosa canina",       score:0.02, gbif:3003666}
+      ]);
+      if(b.length !== 3) return "VOEGT SAMEN: " + b.length + " kaartjes, verwacht 3";
+      const gids = b.filter(x=> x.koppel);
+      if(gids.length !== 1) return "KOPPELT VERKEERD: " + gids.length + " gidstreffers";
+      if(Math.round(gids[0].score * 100) !== 12) return "gelijke namen niet opgeteld";
+      const h = b.map(scanKaartje).join("");
+      if((h.match(/Staat niet in de gids/g) || []).length !== 2) return "MELDT NIET dat de soort ontbreekt";
+      if((h.match(/data-gbifla=/g) || []).length !== 2) return "GEEN GBIF-VERWIJZING bij onbekende soorten";
+      if(!/data-gbifid="3003444"/.test(h)) return "GBIF-id wordt niet doorgegeven";
+      return "onbekende soorten blijven apart, met melding en GBIF-verwijzing";
+    }],
     ["gestapelde waarnemingen", ()=>{
       const rijen = [
         {lat:59.123456, lng:18.123456, k:"daslook", bron:"GBIF", jaar:2021},
