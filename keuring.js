@@ -277,6 +277,31 @@ try{
         ? "kapotte laag wordt overgeslagen, de ladder loopt door"
         : "LADDER BLIJFT HANGEN: " + eerste + ", " + tweede;
     }],
+    /* Twee waarnemingen op dezelfde plek: de onderste was niet aan te tikken.
+       Ze horen tot \u00e9\u00e9n pin gebundeld te worden, met een keuzelijst. */
+    ["gestapelde waarnemingen", ()=>{
+      const rijen = [
+        {lat:59.123456, lng:18.123456, k:"daslook", bron:"GBIF", jaar:2021},
+        {lat:59.123457, lng:18.123456, k:"vlier",   bron:"GBIF", jaar:2019},
+        {lat:59.200000, lng:18.200000, k:"brandnetel", bron:"GBIF", jaar:2022}
+      ];
+      const trossen = new Map();
+      rijen.forEach(o=>{
+        const sl = o.lat.toFixed(5) + "," + o.lng.toFixed(5);
+        if(!trossen.has(sl)) trossen.set(sl, []);
+        trossen.get(sl).push(o);
+      });
+      if(trossen.size !== 2) return "BUNDELT NIET: " + trossen.size + " pinnen uit 3 waarnemingen";
+      const groot = [...trossen.values()].find(g=> g.length > 1);
+      let html = "";
+      const bewaard = showSheet;
+      showSheet = x => { html = x; };
+      try{ ontdekTros(groot); } finally { showSheet = bewaard; }
+      const knoppen = (html.match(/data-tros=/g) || []).length;
+      return knoppen === groot.length
+        ? "gestapelde punten worden \u00e9\u00e9n pin met een keuzelijst"
+        : "KEUZELIJST KLOPT NIET: " + knoppen + " knoppen voor " + groot.length + " waarnemingen";
+    }],
     ["paginaladder", ()=>{
       NAV.length = 0;
       const stappen = [];

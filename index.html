@@ -878,6 +878,19 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .dblink:active{opacity:.6}
 .verwarlei{margin:0 0 9px;padding-bottom:8px;border-bottom:1px solid rgba(124,39,31,.22);
   font-weight:600;line-height:1.45}
+/* Gestapelde waarnemingen: telling op de pin, en een keuzelijst in het blad. */
+.trosmerk{position:relative;width:26px;height:26px}
+.trostel{position:absolute;right:-4px;top:-4px;min-width:16px;height:16px;padding:0 3px;
+  border-radius:8px;background:var(--goud);color:#2C2A1F;font-family:var(--mono);
+  font-size:10px;font-weight:700;display:grid;place-items:center;
+  box-shadow:0 1px 3px rgba(0,0,0,.6)}
+.troslijst{display:flex;flex-direction:column;gap:6px}
+.troskeuze{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;
+  padding:9px 11px;border-radius:12px;border:1px solid rgba(44,42,31,.14);
+  background:rgba(44,42,31,.05);text-align:left;font:inherit;color:inherit}
+.troskeuze:active{background:rgba(44,42,31,.11)}
+.troskeuze .nm{font-family:var(--slab);font-size:15px;font-weight:700}
+.troskeuze .bij{font-size:12px;opacity:.75}
 .dbllijst{list-style:none;margin:2px 0 0;padding:0}
 .dbllijst li{margin:0;padding:4px 0;text-align:left;line-height:1.35}
 .dbllijst li + li{border-top:1px solid rgba(124,39,31,.16)}
@@ -1133,7 +1146,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.55.0";
+const APP_VERSION = "0.56.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -6388,10 +6401,27 @@ async function tekenOntdek(){
   if(S.ontdekVol) return;          /* automatische vulling blijft staan */
   S.ontdekLaag.clearLayers();
   const rijen = await ontdekWaarnemingen();
+  /* Waarnemingen liggen vaak op dezelfde vindplaats gestapeld. Wie dan tikt
+     krijgt altijd de bovenste en komt bij de rest nooit. We bundelen alles
+     wat binnen een paar meter van elkaar ligt tot één pin, met een telling
+     erop, en de tik toont ze allemaal. */
+  const trossen = new Map();
   rijen.forEach(o=>{
-    const m = L.marker([o.lat,o.lng],{icon:L.divIcon({className:"",iconSize:[26,26],iconAnchor:[13,13],
-      html: merkHtml(o.k ? SPEC_BY_K[o.k] : null)})});
-    m.on("click", ()=> ontdekSheet(o));
+    /* Vijf decimalen is ongeveer een meter; genoeg om echt gestapelde
+       punten samen te nemen zonder buren op te slokken. */
+    const sleutel = o.lat.toFixed(5) + "," + o.lng.toFixed(5);
+    if(!trossen.has(sleutel)) trossen.set(sleutel, []);
+    trossen.get(sleutel).push(o);
+  });
+  trossen.forEach(groep=>{
+    const eerste = groep[0];
+    const merk = merkHtml(eerste.k ? SPEC_BY_K[eerste.k] : null);
+    const html = groep.length > 1
+      ? '<div class="trosmerk">'+merk+'<span class="trostel">'+groep.length+'</span></div>'
+      : merk;
+    const m = L.marker([eerste.lat, eerste.lng],{icon:L.divIcon({className:"",
+      iconSize:[26,26], iconAnchor:[13,13], html})});
+    m.on("click", ()=> groep.length > 1 ? ontdekTros(groep) : ontdekSheet(eerste));
     S.ontdekLaag.addLayer(m);
   });
   if(!kaartInBeeld()) return;
@@ -7827,6 +7857,24 @@ function kwaalSheet(k){
 }
 
 /* blad: losse GBIF-waarneming */
+/* Meerdere waarnemingen op dezelfde plek: eerst de keuze, dan het blad. */
+function ontdekTros(groep){
+  const rijen = groep.map((o,i)=>{
+    const s = o.k ? SPEC_BY_K[o.k] : null;
+    return '<button class="troskeuze" data-tros="'+i+'">'+
+      '<span class="nm">'+esc(s ? s.nl : (o.naam || "Onbekende soort"))+'</span>'+
+      '<span class="bij">'+esc((o.bron||"GBIF")+" \u00b7 "+(o.jaar||"jaar onbekend"))+'</span></button>';
+  }).join("");
+  showSheet('<div class="label">'+VINE+HOEKRANK+'<div class="acc"><span>GBIF-waarnemingen</span><span>'+
+    groep.length+'</span></div><h2>'+groep.length+' op deze plek</h2>'+
+    '<div class="la">Kies er \u00e9\u00e9n om te bekijken</div></div>'+
+    '<div class="sec">'+sech("Waarnemingen","",'kaart')+'<div class="troslijst">'+rijen+'</div></div>'+
+    '<div class="row"><button class="btn sec2" id="trosClose">Sluiten</button></div>');
+  document.getElementById("trosClose").onclick = closeSheet;
+  document.querySelectorAll("[data-tros]").forEach(b=>
+    b.onclick = ()=> ontdekSheet(groep[+b.dataset.tros]));
+}
+
 function ontdekSheet(o){
   const s = o.k ? SPEC_BY_K[o.k] : null;
   showSheet('<div class="label">'+VINE+HOEKRANK+'<div class="acc"><span>GBIF-waarneming</span><span>'+(o.jaar||"—")+'</span></div>'+
@@ -9010,8 +9058,23 @@ async function scanStart(file){
     });
     const d = await r.json();
     if(!r.ok || d.fout){
-      scanToon('<h2>Niet gelukt</h2><div class="tekst">'+esc(d.fout || "De dienst antwoordde niet.")+
-        ' Dit werkt alleen met verbinding.</div>'+scanZwamKnop());
+      /* Onderscheid maken tussen "geen verbinding" en "de sleutel bereikt de
+         functie niet": dat tweede is een instelling, geen storing, en vraagt
+         om een andere handeling. */
+      const geenSleutel = /PLANTNET_KEY/i.test(d.fout || "");
+      scanToon('<h2>'+(geenSleutel ? "Sleutel niet gevonden" : "Niet gelukt")+'</h2>'+
+        (geenSleutel
+          ? '<div class="tekst">De functie draait, maar krijgt de Pl@ntNet-sleutel niet door. '+
+            'Meestal staat de sleutel er wel, maar mag de functie er niet bij.</div>'+
+            '<div class="blok"><div class="kop">Na te lopen in Netlify</div><div class="tekst">'+
+            '1. Site configuration \u2192 Environment variables: staat er <b>PLANTNET_KEY</b>, precies zo geschreven?<br>'+
+            '2. Tik de variabele aan en kijk bij <b>Scopes</b>: <b>Functions</b> moet aangevinkt staan. Alleen Builds is niet genoeg.<br>'+
+            '3. Kijk bij <b>Values</b> of hij voor <b>Production</b> geldt en niet alleen voor een branch.<br>'+
+            '4. Daarna Deploys \u2192 Trigger deploy \u2192 Deploy site. Zonder nieuwe deploy blijft de oude waarde staan.'+
+            '</div></div>'
+          : '<div class="tekst">'+esc(d.fout || "De dienst antwoordde niet.")+
+            ' Dit werkt alleen met verbinding.</div>')+
+        scanZwamKnop());
       return;
     }
     const lijst = (d.resultaten||[]).filter(x=> x.score >= 0.02).slice(0,5);
