@@ -329,6 +329,50 @@ try{
       if(!/scangroot/.test(blad)) return "de foto zelf staat niet op het blad";
       return "foto\u2019s staan onder een eigen categorie, met suggesties en GBIF-verwijzing";
     }],
+    /* Elk blad hoort een laag te zijn. Stond dat alleen bij het soortenblad,
+       dan bleef een fotoblad of receptblad staan terwijl het scherm erachter
+       terugging. */
+    ["elk blad is een laag", ()=>{
+      const bron = showSheet.toString();
+      return /navDuw/.test(bron) ? "showSheet meldt elk blad aan bij de ladder"
+        : "SHOWSHEET MELDT NIETS AAN: bladen sluiten niet met de terugknop";
+    }],
+    /* Pl@ntNet weegt een blad anders dan een bloem, en meerdere opnamen van
+       dezelfde plant geven samen een zekerder antwoord. Beide moeten dus mee. */
+    ["foto\u2019s met deel en notitie", ()=>{
+      const bron = scanVerstuur.toString();
+      if(!/organen:\s*scanMand\.map/.test(bron)) return "ORGAAN WORDT NIET MEEGESTUURD";
+      if(!/fotos:\s*scanMand\.map/.test(bron)) return "STUURT MAAR \u00c9\u00c9N FOTO";
+
+      const bewaard = scanMand;
+      scanMand = [
+        {b64:"data:image/jpeg;base64,a", orgaan:"leaf",   notitie:"onderkant blad, wit viltig"},
+        {b64:"data:image/jpeg;base64,b", orgaan:"flower", notitie:""}
+      ];
+      scanMandToon();
+      const h = document.getElementById("scanBody").innerHTML || "";
+      /* Elke foto een eigen kaartje met eigen keuze en eigen notitieveld. */
+      const kaarten = (h.match(/class="fotokaart"/g) || []).length;
+      const noten = (h.match(/data-notitie=/g) || []).length;
+      const knoppen = (h.match(/data-deel=/g) || []).length;
+
+      let blad = "";
+      const bewaardSheet = showSheet;
+      showSheet = x => { blad = x; };
+      try{
+        scanBlad({id:"x", tijd:"2026-08-25T10:00:00Z", foto:"data:image/jpeg;base64,a",
+          fotos: scanMand.map(f=>({b64:f.b64, orgaan:f.orgaan, notitie:f.notitie})),
+          uit:[{score:0.5, namen:["Sambucus nigra"], k:"vlier"}]});
+      } finally { showSheet = bewaardSheet; }
+      scanMand = bewaard;
+
+      if(kaarten !== 2) return "GEEN KAARTJE PER FOTO: " + kaarten;
+      if(noten !== 2) return "GEEN NOTITIEVELD PER FOTO: " + noten;
+      if(knoppen !== 2 * SCAN_DELEN.length) return "keuze niet per foto: " + knoppen + " knoppen";
+      if((blad.match(/scangroot/g) || []).length !== 2) return "TERUGKIJKEN TOONT NIET ALLE FOTO\u2019S";
+      if(!/wit viltig/.test(blad)) return "DE NOTITIE WORDT NIET TERUGGETOOND";
+      return "per foto een plantendeel en een eigen notitie, ook bij terugkijken";
+    }],
     ["onbekende soort blijft zichzelf", ()=>{
       const b = scanBundel([
         {la:"Rosa spinosissima", score:0.14, gbif:3003444},

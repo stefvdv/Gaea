@@ -438,6 +438,20 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 .scanrij .la{font-style:italic;color:var(--inkt-2);font-size:13px;margin-bottom:6px}
 .scanrij .tekst{font-size:14px;line-height:1.5;margin-top:6px}
 .scanrij .btn{margin-top:10px}
+/* Het opbouwscherm: gemaakte foto\u2019s met hun onderdeel, en de keuzeknoppen. */
+.mandrij{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;margin:8px 0 4px}
+.mandje{position:relative;flex:0 0 auto;width:88px}
+.mandje img{width:88px;height:88px;object-fit:cover;border-radius:12px;display:block;
+  border:1px solid rgba(44,42,31,.18)}
+.mandje .wat{display:block;font-family:var(--mono);font-size:10px;text-align:center;
+  margin-top:3px;opacity:.75}
+.mandweg{position:absolute;right:-4px;top:-4px;width:20px;height:20px;border-radius:10px;
+  border:0;background:rgba(44,42,31,.82);color:#F3ECD8;font-size:13px;line-height:1;
+  display:grid;place-items:center}
+.deelrij{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.deelknop{padding:7px 11px;border-radius:11px;border:1px solid rgba(44,42,31,.18);
+  background:rgba(44,42,31,.05);font:inherit;font-size:13px;color:inherit}
+.deelknop.aan{background:var(--mos-d);border-color:var(--mos);color:#fff}
 /* Een bewaarde foto in de lijst: duim links, uitkomst rechts. */
 .scanrijtje{display:flex;align-items:center;gap:11px;text-align:left;width:100%}
 .scanduim{width:56px;height:56px;flex:0 0 auto;border-radius:12px;object-fit:cover;
@@ -452,6 +466,25 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   background:rgba(138,110,34,.16);border:1px dashed rgba(138,110,34,.5);line-height:1.2;
   max-width:76px;text-align:center}
 .scangroot{width:100%;border-radius:14px;display:block}
+/* Opbouwscherm: per foto een kaartje met keuze en notitie. */
+.fotokaart{margin-top:12px;padding:10px;border-radius:14px;
+  border:1px solid rgba(44,42,31,.14);background:rgba(44,42,31,.04)}
+.fkop{display:flex;gap:10px;align-items:flex-start}
+.fkop img{width:78px;height:78px;object-fit:cover;border-radius:11px;flex:0 0 auto;
+  border:1px solid rgba(44,42,31,.18)}
+.fmeta{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.fnr{font-family:var(--mono);font-size:11px;opacity:.7}
+.fotokaart .mandweg{position:static;width:auto;height:auto;padding:4px 9px;border-radius:9px;
+  font-size:12px}
+.fnotitie{width:100%;margin-top:8px;padding:8px 10px;border-radius:11px;font:inherit;
+  font-size:14px;color:inherit;background:rgba(255,255,255,.5);
+  border:1px solid rgba(44,42,31,.16);resize:vertical}
+.fnotitie::placeholder{opacity:.5}
+/* Terugkijken: de foto met wat je erover noteerde. */
+.bewaardefoto{margin-bottom:12px}
+.fbij{display:flex;flex-direction:column;gap:2px;margin-top:5px}
+.fdeel{font-family:var(--mono);font-size:11px;opacity:.7}
+.fnoot{font-size:14px;line-height:1.45}
 /* Een soort die de gids niet kent krijgt een gestippelde rand, zodat je in
    \u00e9\u00e9n oogopslag ziet dat hier geen gidskennis achter zit. */
 .scanrij.vreemd{background:rgba(138,110,34,.07);border-color:rgba(138,110,34,.34);
@@ -1177,7 +1210,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.61.0";
+const APP_VERSION = "0.63.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -7466,6 +7499,11 @@ function klap(titel, inhoud, bij, open){
 }
 
 function showSheet(html){
+  /* Elk blad is een laag. Dat stond eerder alleen bij het soortenblad, waardoor
+     een fotoblad of receptblad bleef staan en de terugknop het scherm erachter
+     terugzette. Hier geregistreerd geldt het voor alle bladen tegelijk. */
+  if(!sheetEl.classList.contains("on") && !navBezig)
+    navDuw(3, "blad", ()=> closeSheet());
   bladSinds = Date.now();
   sheetEl.classList.remove("dicht");
   bodyEl.innerHTML = html;
@@ -8259,9 +8297,8 @@ async function specSheet(k, terugPin){
   else if(sheetEl.classList.contains("on") && S.bladNu && S.bladNu !== k){
     const vorige = S.bladNu, vorigePin = S.bladPin;
     navDuw(4, "blad", ()=>{ specSheet(vorige, vorigePin); });
-  } else if(!sheetEl.classList.contains("on")){
-    navDuw(3, "blad", ()=> closeSheet());
   }
+  /* Het openen van een gesloten blad wordt door showSheet zelf gemeld. */
   S.bladNu = k; S.bladPin = terugPin;
   const mine = S.pins.filter(p=>p.spec===k);
   const dood = s.tags.includes("giftig");
@@ -8663,7 +8700,16 @@ function scanBlad(r){
     esc(isNaN(d)?"":d.toLocaleDateString("nl-NL"))+'</span></div>'+
     '<h2>Wat kwam eruit</h2>'+
     '<div class="la">Een suggestie is geen determinatie</div></div>'+
-    '<div class="sec"><img class="scangroot" src="'+esc(r.foto)+'" alt=""></div>'+
+    '<div class="sec">'+
+      ((r.fotos && r.fotos.length ? r.fotos : [{b64:r.foto, orgaan:"auto", notitie:""}])
+        .map((f,i)=>{
+          const deel = (SCAN_DELEN.find(d=>d[0]===f.orgaan)||["","Onbekend deel"])[1];
+          return '<div class="bewaardefoto">'+
+            '<img class="scangroot" src="'+esc(f.b64)+'" alt="">'+
+            '<div class="fbij"><span class="fdeel">'+esc(deel)+'</span>'+
+            (f.notitie ? '<span class="fnoot">'+esc(f.notitie)+'</span>' : '')+'</div></div>';
+        }).join(""))+
+    '</div>'+
     '<div class="sec">'+sech("Suggesties","",'blad')+rijen+'</div>'+
     '<div class="row"><button class="btn sec2" id="scanWeg">Verwijderen</button>'+
     '<button class="btn sec2" id="scanDicht">Sluiten</button></div>');
@@ -9837,12 +9883,13 @@ function scanKaartje(b){
 /* Een gemaakte foto met wat Pl@ntNet erover zei bewaren, zodat je later kunt
    terugkijken wat je gefotografeerd hebt en welke richting eruit kwam. De foto
    gaat in IndexedDB; localStorage loopt na een paar opnamen vol. */
-async function scanBewaar(b64, bundels){
+async function scanBewaar(fotos, bundels){
   try{
     const rij = {
       id: "sc_" + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
       tijd: new Date().toISOString(),
-      foto: b64,
+      foto: fotos[0].b64,                 /* de duimnagel voor in de lijst */
+      fotos: fotos.map(f=>({b64:f.b64, orgaan:f.orgaan, notitie:f.notitie||""})),
       lat: S.pos ? S.pos.lat : null,
       lng: S.pos ? S.pos.lng : null,
       uit: (bundels||[]).slice(0,5).map(b=>({
@@ -9856,15 +9903,77 @@ async function scanBewaar(b64, bundels){
   }catch(e){ console.error("scan bewaren mislukt:", e); return null; }
 }
 
+/* Wat er op de foto staat maakt voor de herkenning veel uit: Pl@ntNet weegt
+   een blad anders dan een bloem. En meerdere foto\u2019s van dezelfde plant \u2014 blad
+   \u00e9n bloem \u00e9n vrucht \u2014 leveren samen een aanmerkelijk zekerder antwoord dan
+   \u00e9\u00e9n losse opname. Daarom eerst dit schermpje in plaats van meteen versturen. */
+const SCAN_DELEN = [
+  ["leaf","Blad"], ["flower","Bloem"], ["fruit","Vrucht"],
+  ["bark","Bast of stam"], ["habit","Hele plant"], ["auto","Weet ik niet"]
+];
+let scanMand = [];      /* {b64, orgaan} */
+
+function scanMandToon(){
+  /* Per foto een eigen kaartje: welk deel het is, en wat je er zelf bij ziet.
+     Dat laatste gaat niet naar Pl@ntNet — die kent alleen het plantendeel —
+     maar blijft wel bij de foto bewaard. Kom je er later op terug, dan weet je
+     nog wat je in handen had: welke kant van het blad, hoe het rook, waar het
+     stond. Dat is precies wat je op een foto niet terugziet. */
+  const kaartjes = scanMand.map((f,i)=>
+    '<div class="fotokaart">'+
+      '<div class="fkop"><img src="'+esc(f.b64)+'" alt="">'+
+        '<div class="fmeta"><span class="fnr">Foto '+(i+1)+'</span>'+
+        '<button class="mandweg" data-mandweg="'+i+'">Weg</button></div></div>'+
+      '<div class="deelrij">'+
+        SCAN_DELEN.map(([w,nm])=>'<button class="deelknop'+(f.orgaan===w?" aan":"")+
+          '" data-deel="'+w+'" data-idx="'+i+'">'+esc(nm)+'</button>').join("")+
+      '</div>'+
+      '<textarea class="fnotitie" data-notitie="'+i+'" rows="2" '+
+        'placeholder="Wat zie je? Bijvoorbeeld: onderkant blad, wit viltig">'+
+        esc(f.notitie||"")+'</textarea>'+
+    '</div>').join("");
+
+  scanToon('<h2>Wat staat erop?</h2>'+
+    '<div class="tekst">Geef per foto aan welk deel je hebt gefotografeerd. Dat scheelt '+
+    'aanzienlijk in de zekerheid van het antwoord. Wat je er zelf bij opschrijft blijft '+
+    'bij de foto bewaard.</div>'+
+    kaartjes+
+    '<div class="tekst" style="margin-top:14px">Meer foto\u2019s van dezelfde plant geven een '+
+    'beter antwoord: blad, bloem en vrucht samen zeggen meer dan \u00e9\u00e9n opname.</div>'+
+    '<button class="btn sec2" id="scanMeer" style="margin-top:10px">Nog een foto</button>'+
+    '<button class="btn" id="scanGo" style="margin-top:8px">Herkennen ('+scanMand.length+
+    ' foto'+(scanMand.length===1?"":"\u2019s")+')</button>');
+
+  const lijf = document.getElementById("scanBody");
+  lijf.querySelectorAll("[data-deel]").forEach(b=>
+    b.onclick = ()=>{ scanMand[+b.dataset.idx].orgaan = b.dataset.deel; scanMandToon(); });
+  lijf.querySelectorAll("[data-mandweg]").forEach(b=>
+    b.onclick = ()=>{ scanMand.splice(+b.dataset.mandweg,1); scanMand.length ? scanMandToon() : scanSluit(); });
+  /* Bij het typen niet opnieuw tekenen: dan verlies je de cursor. */
+  lijf.querySelectorAll("[data-notitie]").forEach(t=>
+    t.addEventListener("input", ()=>{ scanMand[+t.dataset.notitie].notitie = t.value; }));
+  document.getElementById("scanMeer").onclick = ()=> scanPick.click();
+  document.getElementById("scanGo").onclick = scanVerstuur;
+}
+
 async function scanStart(file){
+  if(scanMand.length >= 5){ toast("Vijf foto\u2019s is het maximum"); return; }
   scanToon('<h2>Foto bekijken</h2><div class="tekst">Een ogenblik\u2026</div>');
-  let b64;
-  try{ b64 = await scanKlein(file); }
-  catch(e){ scanToon('<h2>Niet gelukt</h2><div class="tekst">'+esc(e.message)+'</div>'); return; }
+  try{
+    scanMand.push({b64: await scanKlein(file), orgaan:"auto", notitie:""});
+  }catch(e){
+    scanToon('<h2>Niet gelukt</h2><div class="tekst">'+esc(e.message)+'</div>'); return;
+  }
+  scanMandToon();
+}
+
+async function scanVerstuur(){
+  scanToon('<h2>Herkennen</h2><div class="tekst">Een ogenblik\u2026</div>');
+  const mand = scanMand.slice();      /* vasthouden: scanMand wordt straks geleegd */
   try{
     const r = await fetch("/.netlify/functions/plantnet", {
       method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({fotos:[b64], organen:["auto"]})
+      body: JSON.stringify({fotos: scanMand.map(f=>f.b64), organen: scanMand.map(f=>f.orgaan)})
     });
     const d = await r.json();
     if(!r.ok || d.fout){
@@ -9888,11 +9997,12 @@ async function scanStart(file){
       return;
     }
     const lijst = scanBundel((d.resultaten||[]).filter(x=> x.score >= 0.02)).slice(0,5);
+    scanMand = [];
     if(!lijst.length){
       scanToon('<h2>Geen suggestie</h2><div class="tekst">Probeer een foto van \u00e9\u00e9n plantendeel: blad, bloem of vrucht, van dichtbij en scherp.</div>'+scanZwamKnop());
       return;
     }
-    scanBewaar(b64, lijst);
+    scanBewaar(mand, lijst);
     scanToon('<h2>Mogelijke richtingen</h2>'+
       '<div class="warn oker"><b>Dit is geen determinatie</b>Een machine kijkt naar vorm en kleur, niet naar geur, melksap of wortel. Loop de kenmerken na voor je iets meeneemt, en pluk nooit op een percentage.</div>'+
       lijst.map(scanKaartje).join("")+
