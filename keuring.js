@@ -481,6 +481,33 @@ try{
     }],
     /* Het soortenfilter geldt voor beide lagen tegelijk: je eigen vondsten en
        de GBIF-waarnemingen. Anders geven de twee een verschillend beeld. */
+    /* Een knop die een functie aanroept die niet meer bestaat, is stil kapot:
+       hij staat er, hij is gekoppeld, en er gebeurt niets. Precies dat gebeurde
+       met de GBIF-knop toen de zoekfuncties bij een herschrijving wegvielen. */
+    ["knoppen roepen bestaande functies aan", ()=>{
+      const nodig = ["gbifZoek","gbifZoekBlad","bewerkBlad","nieuweSoort","bewaarBewerking",
+                     "soortFotoKijk","filterBlad","ontdekOpnieuw","scanBundel","scanKaartje",
+                     "scanBlad","ontdekTros","renderScans"];
+      const weg = nodig.filter(n=> typeof eval(n) !== "function");
+      if(weg.length) return "ONTBREKENDE FUNCTIES: " + weg.join(", ");
+
+      /* En de GBIF-knop moet echt iets openen. */
+      const veld = document.getElementById("qSpec");
+      const bewaardZoek = veld.value, bewaardView = S.specView;
+      veld.value = "Weegbre"; S.specView = "alle";
+      renderSpec();
+      const knop = document.getElementById("naarGbif");
+      if(!knop) return "GBIF-KNOP ONTBREEKT bij een zoekterm";
+      if(typeof knop.onclick !== "function") return "GBIF-KNOP HEEFT GEEN HANDLER";
+      let geopend = false;
+      const bewaardSheet = showSheet;
+      showSheet = () => { geopend = true; };
+      try{ knop.onclick(); } catch(e){ showSheet = bewaardSheet; return "KLIK KLAPT: " + e.message; }
+      showSheet = bewaardSheet;
+      veld.value = bewaardZoek; S.specView = bewaardView;
+      return geopend ? nodig.length + " functies aanwezig, de GBIF-knop opent een blad"
+        : "DE GBIF-KNOP OPENT NIETS";
+    }],
     ["soortenfilter op de kaart", ()=>{
       const bewaardF = S.soortFilter, bewaardQ = filterZoek;
       S.soortFilter = []; filterZoek = "";
