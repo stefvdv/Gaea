@@ -466,6 +466,25 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   background:rgba(138,110,34,.16);border:1px dashed rgba(138,110,34,.5);line-height:1.2;
   max-width:76px;text-align:center}
 .scangroot{width:100%;border-radius:14px;display:block}
+/* Soortnaam in een vraag: aantikbaar, met een korte blik op de plant. */
+.soortlink{display:inline;padding:0;background:none;border:0;font:inherit;color:inherit;
+  text-decoration:underline;text-decoration-style:dotted;text-underline-offset:4px;
+  text-decoration-thickness:2px;text-decoration-color:var(--goud)}
+.soortlink:active{opacity:.6}
+.soortfoto{position:fixed;inset:0;z-index:680;display:none;align-items:center;
+  justify-content:center;padding:18px;background:rgba(12,16,12,.72)}
+.soortfoto.on{display:flex}
+.sfkaart{position:relative;width:100%;max-width:520px;max-height:82vh;overflow-y:auto;
+  padding:18px;border-radius:18px;background:var(--perkament);color:var(--inkt);
+  box-shadow:0 12px 40px rgba(0,0,0,.6)}
+.sfx{position:absolute;right:12px;top:12px;width:32px;height:32px;border-radius:50%;
+  border:1px solid rgba(44,42,31,.18);background:rgba(44,42,31,.06);color:inherit;
+  display:grid;place-items:center}
+.sfnaam{font-family:var(--slab);font-size:21px;font-weight:700;padding-right:38px}
+.sfla{font-style:italic;font-size:13px;opacity:.72;margin-bottom:12px}
+.sfbeeld{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sfbeeld img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;display:block}
+.sfbeeld .wacht{grid-column:1/-1;padding:26px 0;text-align:center;opacity:.65;font-size:14px}
 /* Soortenbewerker: een formulier in de stijl van de bladen. */
 .bwvak{display:block;margin-bottom:13px}
 .bwvak > span{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
@@ -1265,6 +1284,15 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 </div>
 <input type="file" id="scanPick" accept="image/*" capture="environment" hidden>
 
+<div class="soortfoto" id="soortFoto" aria-hidden="true">
+  <div class="sfkaart" role="dialog" aria-modal="true">
+    <button class="sfx" aria-label="Sluiten"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="sfnaam"></div>
+    <div class="sfla"></div>
+    <div class="sfbeeld"></div>
+  </div>
+</div>
+
 <!-- De naslagkaart in de quiz is vervangen door het soortenblad zelf. -->
 
 <input type="file" id="filePick" accept="image/*" multiple hidden>
@@ -1273,7 +1301,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.66.0";
+const APP_VERSION = "0.68.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -7089,11 +7117,11 @@ async function vulKaart(stil){
     if(o.id && bekend.has(o.id)) return;
     if(o.id) bekend.add(o.id);
     S.ontdekVol.push(o); nieuw++;
-    const m = L.marker([o.lat,o.lng],{icon:L.divIcon({className:"",iconSize:[26,26],iconAnchor:[13,13],
-      html: merkHtml(o.k ? SPEC_BY_K[o.k] : null)})});
-    m.on("click", ()=> ontdekSheet(o));
-    S.ontdekLaag.addLayer(m);
   });
+  /* Alles opnieuw tekenen in plaats van alleen het nieuwe erbij: zo geldt het
+     soortenfilter ook voor waarnemingen die er al lagen. Eerder tekende deze
+     lus rechtstreeks en zag hij het filter niet — aanvinken deed dan niets. */
+  ontdekOpnieuw();
   S.ontdekAan = true; lsSet("ontdekAan", true);
   document.getElementById("btnOntdek").classList.add("mos");
   S.vulBezig = false;
@@ -7434,7 +7462,7 @@ function filterBlad(){
 /* De kaart opnieuw tekenen en de knop laten oplichten als er iets aanstaat. */
 function filterPas(){
   if(S.map) drawMarkers();
-  if(S.ontdekAan) tekenOntdek();
+  ontdekOpnieuw();
   const b = document.getElementById("btnFilter");
   if(b) b.classList.toggle("aan", S.soortFilter.length > 0);
 }
@@ -7752,6 +7780,32 @@ function renderChips(){
     S.filter[b.dataset.f]=!S.filter[b.dataset.f]; lsSet("filter",S.filter); drawMarkers(); });
 }
 const kaartInBeeld = ()=> S.scr === "map" && !sheetEl.classList.contains("on");
+/* De ontdeklaag opnieuw opbouwen uit S.ontdekVol, met het soortenfilter
+   erop en gestapelde punten gebundeld. Eén plek waar de laag ontstaat. */
+function ontdekOpnieuw(){
+  if(!S.ontdekLaag) return;
+  S.ontdekLaag.clearLayers();
+  const rijen = (S.ontdekVol || [])
+    .filter(o=> !S.soortFilter.length || S.soortFilter.includes(o.k));
+  const trossen = new Map();
+  rijen.forEach(o=>{
+    const sleutel = o.lat.toFixed(5) + "," + o.lng.toFixed(5);
+    if(!trossen.has(sleutel)) trossen.set(sleutel, []);
+    trossen.get(sleutel).push(o);
+  });
+  trossen.forEach(groep=>{
+    const eerste = groep[0];
+    const merk = merkHtml(eerste.k ? SPEC_BY_K[eerste.k] : null);
+    const html = groep.length > 1
+      ? '<div class="trosmerk">'+merk+'<span class="trostel">'+groep.length+'</span></div>'
+      : merk;
+    const m = L.marker([eerste.lat, eerste.lng],{icon:L.divIcon({className:"",
+      iconSize:[26,26], iconAnchor:[13,13], html})});
+    m.on("click", ()=> groep.length > 1 ? ontdekTros(groep) : ontdekSheet(eerste));
+    S.ontdekLaag.addLayer(m);
+  });
+}
+
 async function tekenOntdek(){
   if(!S.ontdekAan){ S.ontdekLaag.clearLayers(); return; }
   if(S.ontdekVol) return;          /* automatische vulling blijft staan */
@@ -9375,6 +9429,33 @@ async function renderScans(){
 }
 
 /* Het blad van één bewaarde foto. */
+/* Een korte blik op de soort: alleen foto en naam. Het hele blad zou de
+   antwoorden verklappen, want daar staan kenmerk, gebruik en dubbelgangers. */
+async function soortFotoKijk(k){
+  const sp = SPEC_BY_K[k];
+  if(!sp) return;
+  navDuw(4, "soortfoto", ()=> soortFotoSluit());
+  const el = document.getElementById("soortFoto");
+  el.querySelector(".sfnaam").textContent = sp.nl;
+  el.querySelector(".sfla").textContent = sp.la + (EN[k] ? " \u00b7 " + EN[k] : "");
+  const vak = el.querySelector(".sfbeeld");
+  vak.innerHTML = '<div class="wacht">Foto laden\u2026</div>';
+  el.classList.add("on"); el.setAttribute("aria-hidden","false");
+  try{
+    const beelden = await beeldVoor(k);
+    vak.innerHTML = (beelden && beelden.length)
+      ? beelden.slice(0,4).map(b=>'<img src="'+esc(b.url)+'" alt="">').join("")
+      : '<div class="wacht">Geen foto beschikbaar</div>';
+  }catch(e){
+    vak.innerHTML = '<div class="wacht">Foto\u2019s laden lukt alleen met verbinding</div>';
+  }
+}
+function soortFotoSluit(){
+  navWeg("soortfoto");
+  const el = document.getElementById("soortFoto");
+  el.classList.remove("on"); el.setAttribute("aria-hidden","true");
+}
+
 function scanBlad(r){
   if(!r) return;
   const d = new Date(r.tijd);
@@ -10785,6 +10866,10 @@ scanPick.addEventListener("change", ()=>{
 });
 document.getElementById("btnScan").onclick = ()=> scanPick.click();
 document.getElementById("btnFilter").onclick = ()=>{ filterZoek = ""; filterBlad(); };
+document.querySelector("#soortFoto .sfx").onclick = soortFotoSluit;
+document.getElementById("soortFoto").addEventListener("click", e=>{
+  if(e.target.id === "soortFoto") soortFotoSluit();
+});
 /* Dezelfde knop staat ook in de zoekbalken van Vondsten en Herbarium. */
 document.querySelectorAll("[data-scan]").forEach(b=> b.onclick = e=>{
   e.preventDefault(); scanPick.click();
@@ -11080,10 +11165,18 @@ function showQ(){
   document.getElementById("qBar").style.width=(QZ.i/QZ.list.length*100)+"%";
   document.getElementById("qCnt").textContent=(QZ.i+1)+"/"+QZ.list.length;
   const body=document.getElementById("qBody");
-  body.innerHTML='<div class="qkind'+(q.risk?" risk":"")+'">'+esc(q.kind)+'</div><h2 class="qtext">'+q.q+'</h2>'+
+  /* Wordt er een soort in de vraag genoemd, dan is die naam aantikbaar en
+     laat een foto zien \u2014 ter herkenning, niet als antwoord. Bij een
+     beeldvraag blijft hij dicht: dan is de foto juist de vraag. */
+  const vraagHtml = (q.key && !q.img)
+    ? q.q.replace(/<em>(.*?)<\/em>/, '<button class="soortlink" data-qsoort="'+esc(q.key)+'">$1</button>')
+    : q.q;
+  body.innerHTML='<div class="qkind'+(q.risk?" risk":"")+'">'+esc(q.kind)+'</div><h2 class="qtext">'+vraagHtml+'</h2>'+
     (q.img?'<img class="qimg" src="'+q.img+'" alt="" id="qImg">':'')+
     '<div class="opts">'+q.opts.map((o,i)=>'<button class="opt" data-i="'+i+'">'+o+'</button>').join("")+'</div>'+
     '<div class="tipvak" id="qTipVak"></div>';
+  body.querySelectorAll("[data-qsoort]").forEach(b=>
+    b.onclick = ()=> soortFotoKijk(b.dataset.qsoort));
   body.scrollTop=0;
   /* Na vijf seconden nadenken verschijnt de tipknop. Meteen zichtbaar zou
      te verleidelijk zijn; hij hoort te komen als je vastloopt. */

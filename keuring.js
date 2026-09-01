@@ -492,17 +492,32 @@ try{
       if(!rijen) return "GEEN SOORTENLIJST in het filterblad";
       if(!/id="qFilter"/.test(blad)) return "GEEN ZOEKVELD in het filterblad";
 
-      /* Zoeken moet op alle drie de namen werken. */
       const treffers = t=>{ filterZoek = t; return (filterLijstHtml().match(/data-fk=/g)||[]).length; };
       const nl = treffers("daslook"), en = treffers("ramsons"), la = treffers("Allium ursinum");
       filterZoek = bewaardQ;
       if(!nl || !en || !la) return "ZOEKEN FAALT: nl " + nl + ", en " + en + ", la " + la;
 
-      /* En het filter moet in beide tekenlussen staan. */
+      /* Beide tekenlussen moeten het filter kennen. ontdekOpnieuw is degene die
+         de kaart werkelijk vult; tekenOntdek haalt alleen nieuwe waarnemingen op.
+         Stond het filter alleen in die laatste, dan gebeurde er zichtbaar niets. */
       if(!/soortFilter/.test(drawMarkers.toString())) return "EIGEN VONDSTEN WORDEN NIET GEFILTERD";
-      if(!/soortFilter/.test(tekenOntdek.toString())) return "GBIF-LAAG WORDT NIET GEFILTERD";
+      if(!/soortFilter/.test(ontdekOpnieuw.toString())) return "GBIF-LAAG WORDT NIET GEFILTERD";
       S.soortFilter = bewaardF;
       return "filter werkt op beide lagen, zoekbaar op Nederlands, Latijn en Engels";
+    }],
+    /* Een soort die in een vraag genoemd wordt mag je kunnen bekijken \u2014 maar
+       bij een beeldvraag is de foto juist de vraag. */
+    ["soortnaam in de vraag", ()=>{
+      const maak = q => (q.key && !q.img)
+        ? q.q.replace(/<em>(.*?)<\/em>/, '<button class="soortlink" data-qsoort="'+q.key+'">$1</button>')
+        : q.q;
+      const gewoon = maak({key:"krent", q:"Van <em>Krentenboompje</em> maak je jam?", img:null});
+      const beeld  = maak({key:"krent", q:"Welke soort staat hier?", img:"data:x"});
+      if(!/data-qsoort="krent"/.test(gewoon)) return "SOORTNAAM NIET AANTIKBAAR in een gewone vraag";
+      if(/data-qsoort/.test(beeld)) return "BEELDVRAAG VERKLAPT: de naam is daar aantikbaar";
+      if(!/sfbeeld/.test(soortFotoKijk.toString())) return "de popup toont geen foto";
+      if(/specSheet/.test(soortFotoKijk.toString())) return "POPUP TOONT HET HELE BLAD: dat verklapt de antwoorden";
+      return "naam aantikbaar met alleen een foto, beeldvragen uitgezonderd";
     }],
     ["gestapelde waarnemingen", ()=>{
       const rijen = [
