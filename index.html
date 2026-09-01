@@ -466,6 +466,56 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   background:rgba(138,110,34,.16);border:1px dashed rgba(138,110,34,.5);line-height:1.2;
   max-width:76px;text-align:center}
 .scangroot{width:100%;border-radius:14px;display:block}
+/* Soortenbewerker: een formulier in de stijl van de bladen. */
+.bwvak{display:block;margin-bottom:13px}
+.bwvak > span{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--inkt-2);margin-bottom:5px}
+.bwvak input, .bwvak textarea{width:100%;padding:9px 11px;border-radius:11px;font:inherit;
+  font-size:15px;color:inherit;background:rgba(255,255,255,.55);
+  border:1px solid rgba(44,42,31,.18);resize:vertical;margin-bottom:5px}
+.bwkeuze{display:flex;flex-wrap:wrap;gap:6px}
+.bwknop{padding:7px 12px;border-radius:11px;border:1px solid rgba(44,42,31,.18);
+  background:rgba(44,42,31,.05);font:inherit;font-size:13px;color:inherit}
+.bwknop.aan{background:var(--mos-d);border-color:var(--mos);color:#fff}
+.bwmnd{display:flex;gap:4px}
+.bwm{flex:1;padding:8px 0;border-radius:9px;border:1px solid rgba(44,42,31,.18);
+  background:rgba(44,42,31,.05);font-family:var(--mono);font-size:12px;color:inherit}
+.bwm.aan{background:var(--mos-d);border-color:var(--mos);color:#fff}
+/* Eigen invoer moet zichtbaar anders zijn dan wat de gids zelf zegt. */
+.eigenmerk2{display:inline-block;margin-bottom:7px;padding:3px 9px;border-radius:9px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
+  background:rgba(138,110,34,.16);border:1px dashed rgba(138,110,34,.55)}
+/* De balk naar GBIF onder de zoekresultaten. */
+.gbifbalk{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin:0 12px 12px;padding:10px 13px;border-radius:14px;
+  background:rgba(232,206,128,.09);border:1px solid rgba(232,206,128,.22)}
+.gbifbalk span{font-size:14px;color:var(--kalk-2)}
+.gbifbalk .btn{margin:0;flex:0 0 auto;width:auto;padding:8px 14px}
+.gbiflijst{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.gbifrij{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;
+  padding:10px 12px;border-radius:12px;border:1px solid rgba(44,42,31,.14);
+  background:rgba(44,42,31,.05);font:inherit;color:inherit;text-align:left}
+.gbifrij .nm{font-family:var(--slab);font-size:16px;font-weight:700}
+.gbifrij .la{font-style:italic;font-size:12px;opacity:.72}
+.gbifrij .bij{font-family:var(--mono);font-size:10.5px;opacity:.62;margin-top:2px}
+/* Soortenfilter: een lijst waarin je aanvinkt wat je op de kaart wilt zien. */
+.filterlijst{display:flex;flex-direction:column;gap:4px;max-height:46vh;overflow-y:auto;
+  margin-top:10px;padding-right:2px}
+.filterrij{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;
+  border-radius:11px;border:1px solid rgba(44,42,31,.12);background:rgba(44,42,31,.04);
+  font:inherit;color:inherit;text-align:left}
+.filterrij.aan{background:var(--mos-d);border-color:var(--mos);color:#fff}
+.filterrij .vink{width:20px;height:20px;flex:0 0 auto;border-radius:6px;display:grid;
+  place-items:center;border:1px solid rgba(44,42,31,.3);background:rgba(255,255,255,.45);
+  font-size:13px;line-height:1}
+.filterrij.aan .vink{background:rgba(255,255,255,.9);border-color:transparent;color:var(--mos-d)}
+.filterrij .fnaam{flex:1;display:flex;flex-direction:column;min-width:0}
+.filterrij .nm{font-family:var(--slab);font-size:15px;font-weight:700}
+.filterrij .la{font-style:italic;font-size:11px;opacity:.7;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.filterrij .eigen{flex:0 0 auto;font-family:var(--mono);font-size:11px;padding:2px 7px;
+  border-radius:8px;background:rgba(232,206,128,.3)}
+.filterrij.aan .eigen{background:rgba(255,255,255,.25)}
 /* Opbouwscherm: per foto een kaartje met keuze en notitie. */
 .fotokaart{margin-top:12px;padding:10px;border-radius:14px;
   border:1px solid rgba(44,42,31,.14);background:rgba(44,42,31,.04)}
@@ -723,7 +773,19 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
    svg{display:none} — de knop was daardoor onzichtbaar. */
 /* De gouden loeppenning die eerst bij de ontdek-laag hoorde: dezelfde stijl
    als zijn buren op de kaart, dus gebruiken we hem voor de scanknop. */
-#btnScan.beeld{background-image:var(--penning-loep)}
+#btnFilter.beeld{background-image:var(--penning-loep)}
+/* De filterknop licht op zodra er een keuze actief is. */
+#btnFilter.aan{filter:drop-shadow(0 0 7px rgba(232,206,128,.85)) drop-shadow(0 2px 5px rgba(0,0,0,.7))}
+/* De camerapenning heeft geen tekening, dus die maken we in dezelfde gouden
+   stijl als zijn buren. */
+.fab.ghost.cameraknop{width:54px;height:54px;border-radius:50%;padding:0;
+  background:radial-gradient(circle at 36% 30%, #F2E2AC 0%, #C9A227 52%, #7E651F 100%);
+  border:1px solid rgba(104,82,24,.9);color:#3E3212;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 4px rgba(0,0,0,.28),
+             0 2px 7px rgba(0,0,0,.55);
+  display:grid;place-items:center}
+.fab.ghost.cameraknop svg{display:block}
+.fab.ghost.cameraknop:active{transform:scale(.93)}
 .iconbtn.beeld:active, .fab.ghost.beeld:active{transform:scale(.93)}
 .iconbtn.beeld svg, .fab.ghost.beeld svg, .fab .kop-plus svg{display:none}
 .iconbtn.beeld.on, .fab.ghost.beeld.on, .fab.ghost.beeld.mos{
@@ -1061,9 +1123,10 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 
 <div class="fabs" id="fabs">
   <button class="fab ghost beeld" id="btnLayer" aria-label="Kaartlaag"></button>
-  <button class="fab ghost beeld" id="btnScan" aria-label="Foto herkennen"></button>
+  <button class="fab ghost beeld" id="btnFilter" aria-label="Soorten filteren"></button>
   <button class="fab ghost beeld" id="btnOntdek" style="display:none" aria-label="Ontdek-laag"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="M16.2 16.2 21 21" stroke-linecap="round"/><path d="M11 8v6M8 11h6" stroke-linecap="round"/></svg></button>
   <button class="fab ghost beeld" id="btnThuis" aria-label="Naar huis"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6.5 9.6V19h11V9.6"/><path d="M10 19v-5h4v5"/></svg></button>
+  <button class="fab ghost cameraknop" id="btnScan" aria-label="Foto herkennen"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.6A2.6 2.6 0 0 1 5.6 6h1.6l1.1-2h6.4l1.1 2h1.6A2.6 2.6 0 0 1 20 8.6v8.8A2.6 2.6 0 0 1 17.4 20H5.6A2.6 2.6 0 0 1 3 17.4Z"/><circle cx="11.5" cy="13" r="3.6"/></svg></button>
   <button class="fab ghost beeld" id="btnGps" aria-label="Volg mijn positie"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></button>
 </div>
 
@@ -1210,7 +1273,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.63.0";
+const APP_VERSION = "0.66.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -2610,7 +2673,7 @@ const EN = {
  rapunzelklokje:            "Rampion bellflower",
  ratelpopulier:             "Aspen",
  reigersbek:                "Common stork's-bill",
- reukelozekamille:          "Sea mayweed",
+
  reuklozekamille:           "Scentless mayweed",
  reuzenbalsemien:           "Himalayan balsam",
  reuzenberenklauw:          "Giant hogweed",
@@ -2810,6 +2873,210 @@ const EN = {
  zwavelzwam:                "Chicken of the woods",
 };
 
+/* Hoe verwerk je het? Op het blad stond wel waarvóór een soort werd
+   gebruikt, maar niet hoe — en juist daar zit het verschil tussen werken
+   en niets doen. Koud trekken of koken, vers of gedroogd, uitwendig of
+   inwendig: dat bepaalt of er iets in je kopje zit. Waar alleen uitwendig
+   gebruik verantwoord is, staat dat er nadrukkelijk bij. */
+const BEREIDING = {
+ agrimonie:               "Thee van het bloeiende kruid, 1 el per kop, 10 min. Als gorgeldrank bij keelpijn en als kompres bij kleine wonden.",
+ alant:                   "Wortelafkooksel, 1 tl per kop, 10 min koken; erg bitter, dus met honing. Ook als hoestsiroop of tinctuur 1:5.",
+ aloe:                    "Alleen de heldere gel uit het blad, uitwendig op brandwondjes. De gele laag direct onder de schil is sterk laxerend en hoort eraf.",
+ alsem:                   "Uitsluitend als kort bittermiddel: enkele druppels tinctuur voor de maaltijd, of een zeer slappe thee. Nooit dagelijks en niet tijdens zwangerschap.",
+ anijs:                   "Zaad kneuzen, 1 tl per kop, afgedekt 10 min. Ook als siroop bij prikkelhoest.",
+ appelbes:                "Bessen als sap, siroop of gedroogd; rauw te samentrekkend. Verhitting maakt ze aangenamer zonder de anthocyanen te verliezen.",
+ arnica:                  "Uitsluitend uitwendig: tinctuur 1:10 vertienvoudigd verdund als kompres, of kant-en-klare zalf op ongebroken huid. Nooit inwendig.",
+ berendruif:              "Blad koud trekken, 12 uur — warm trekken haalt te veel looistof mee. Hooguit een week, en niet vaker dan vijf keer per jaar.",
+ bergamotplant:           "Thee van blad en bloem, 1 el per kop, afgedekt. Bloemblaadjes rauw door salade.",
+ bergsteentijm:           "Thee 1 tl per kop, afgedekt. In Nederland zeldzaam — alleen uit eigen tuin.",
+ berk:                    "Bladthee, 2 tl per kop. Sap aftappen in maart, hooguit een liter per boom, en de wond meteen dichten met was.",
+ berkenzwam:              "Dun schaven en langdurig trekken, minstens een half uur; het is hout, geen kruid. Ook gedroogd en gemalen in thee.",
+ beukenzwam:              "Altijd doorbakken, minstens acht minuten; rauw bitter. Vooral als voedsel, niet als thee.",
+ bijvoet:                 "Kruiderij bij vet vlees. Thee spaarzaam, 1 tl per kop; niet tijdens zwangerschap. Ook als röker- of wierookkruid gedroogd.",
+ blaaswier:               "Gedroogd en gemalen als zoutvervanger, of als afkooksel. Rijk aan jodium: niet bij schildklierklachten of naast schildkliermedicatie.",
+ blauweknoop:             "Wortelafkooksel, 1 tl per kop, 10 min koken. Groeit op beschermd nat hooiland — vrijwel altijd laten staan.",
+ blauwglidkruid:          "Thee van het bloeiende kruid, 1 el per kop, 10 min. Tinctuur 1:5. Kalmerend bij onrust.",
+ boerenwormkruid:         "Uitsluitend uitwendig: gedroogd tussen kleding tegen motten, of als aftreksel als vlooienmiddel voor de mand. Inwendig niet, thujon is te riskant.",
+ bonenkruid:              "Meekoken met peulvruchten — daar komt de naam vandaan. Thee 1 tl per kop bij winderigheid.",
+ borstelkrans:            "Thee van blad en bloem, 1 tl per kop, afgedekt. Milde marjoleinvervanger.",
+ bosaardbei:              "Bladthee, 1 el per kop, 10 min. Alleen goed gedroogd of juist vers gebruiken; halfdroog blad kan schimmelen.",
+ bosandoorn:              "Uitwendig als kompres of wasing; de stank maakt hem inwendig onbruikbaar.",
+ bosbes:                  "Gedroogde bessen als afkooksel bij diarree, 1 el per kop, 10 min koken. Verse bessen werken juist andersom.",
+ bosengelwortel:          "Wortel als afkooksel bij een trage spijsvertering, 1 tl per kop. Zoals alle engelwortels: maakt de huid lichtgevoelig.",
+ bospaardenstaart:        "Als heermoes: minstens twintig minuten koken, niet trekken. Kortdurend gebruiken.",
+ boswilg:                 "Bast als afkooksel, 1 tl per kop, 10 min koken. Katjes laten staan zolang er nog niets anders bloeit.",
+ braam:                   "Blad als thee, 1 el per kop, 10 min; samentrekkend bij diarree. Gefermenteerd blad geeft een zwarte-theeachtige drank.",
+ brandnetel:              "Thee: 2 tl gedroogd blad per kop, 10 min trekken. Gekookt als groente. Vers sap uit de sapcentrifuge. Blad blancheren doodt de brandharen.",
+ brunel:                  "Thee of gorgeldrank van het bloeiende kruid, 2 tl per kop. Bij keelpijn lauw gorgelen, niet doorslikken maar uitspugen.",
+ canadapopulier:          "Knoppen in olie of vet trekken voor zalf; minder geurig dan de zwarte populier maar bruikbaar.",
+ canadeseguldenroede:     "Thee, 1 el per kop, 10 min, met ruim water erbij. Als plukken helpt tegen woekering is dat mooi meegenomen.",
+ chaga:                   "Raspen en minstens een uur zachtjes trekken bij 70 tot 80 graden, niet koken. Ook dubbel aftreksel met alcohol. Niet bij nierstenen.",
+ cichorei:                "Wortel roosteren en malen als koffievervanger; als bittermiddel een afkooksel van 1 tl per kop, 10 min zachtjes koken.",
+ citroengras:             "Stengel kneuzen en meekoken, of als thee 1 stengel per kop, 10 min. Ook als olie tegen muggen.",
+ citroenverbena:          "Thee van gedroogd blad, 1 el per kop, afgedekt. Houdt zijn geur uitzonderlijk goed bij drogen.",
+ daslook:                 "Vers door pesto, boter of azijn; de zwavelverbindingen breken bij verhitting af, dus rauw verwerken. Drogen heeft geen zin — dan blijft er niets van over.",
+ dille:                   "Zaad als thee bij winderigheid, 1 tl gekneusd per kop. Blad vers, op het laatste moment — het verdraagt geen hitte.",
+ dophei:                  "Bloementhee als struikhei, 1 el per kop. Groeit op beschermde natte heide — herkennen en laten staan.",
+ dovenetel:               "Bloementhee, 1 el per kop. Jonge toppen gekookt als groente. Uitwendig als kompres bij ontstoken huid.",
+ dropplant:               "Thee van blad of bloem, 1 el per kop, afgedekt 5 min. Ook als siroop of in nagerechten; de smaak is sterk, dus spaarzaam.",
+ duivelsklauw:            "Wortelafkooksel, 1 tl per kop; bitter. Niet bij maagzweren. Werkt traag, reken op enkele weken.",
+ duizendblad:             "Thee van bloeiend kruid, 1 el per kop, 10 min afgedekt. Tinctuur 1:5 in 40% alcohol. Uitwendig als kompres bij wondjes.",
+ echinacea:               "Tinctuur 1:5 uit de verse wortel; als thee minder krachtig. Kortdurend gebruiken, niet als vaste dagelijkse thee.",
+ echtetijm:               "Thee 1 tl per kop, stoombad bij verkoudheid, siroop met honing bij hoest. Tinctuur 1:5 in 45% alcohol.",
+ eikhaas:                 "Jonge randen bakken of stoven. Medicinaal als afkooksel of poeder in soep; verhitting maakt de bèta-glucanen beschikbaar.",
+ elfenbankje:             "Dubbel aftreksel: eerst een uur koken, dan de gezeefde massa in alcohol trekken en de twee mengen. Alleen zo komen zowel de suikers als de harsen mee.",
+ engelwortel:             "Wortelafkooksel als bittermiddel, 1 tl per kop, 10 min. Jonge stengels gekonfijt. Wortel ook als aroma in kruidenbitter.",
+ ereprijs:                "Thee 1 el per kop, 10 min. Werd als theevervanger gedronken — de oude naam is Europese thee.",
+ es:                      "Bladthee, 1 el per kop, 10 min. Bast als afkooksel bij koorts, in dezelfde traditie als wilg.",
+ fenegriek:               "Zaad roosteren voor gebruik, anders overheerst de bitterheid. Ook geweekt en gekiemd. Niet in medicinale hoeveelheid tijdens zwangerschap.",
+ framboos:                "Bladthee, 1 el per kop, 10 min. In de laatste weken van een zwangerschap traditioneel gebruikt — daarvoor niet.",
+ gamander:                "Hooguit incidenteel als bittere thee, 1 tl per kop. Niet als vaste thee: sommige gamanders belasten de lever.",
+ geelwalstro:             "Thee 1 el per kop, 10 min; ook als stremsel bij het kaasmaken. Bevat cumarine, dus spaarzaam.",
+ gember:                  "Vers geraspt als thee, 1 tl per kop, 10 min zachtzieden. Ook in siroop of als gekonfijte wortel bij misselijkheid.",
+ ginkgo:                  "Alleen gestandaardiseerd extract heeft zin; zelf blad trekken levert te weinig en het ruwe blad kan de huid prikkelen.",
+ goudsbloem:              "Bloemblaadjes in olie trekken voor zalf bij schrale huid, of als thee 1 el per kop. Ook als kompres bij kleine wonden.",
+ grauweabeel:             "Bast en knoppen als bij witte abeel: afkooksel of zalf, met dezelfde bezwaren als wilg.",
+ grauwewilg:              "Bast als afkooksel, 1 tl per kop, 10 min koken. Oogst spaarzaam en ring nooit een stam.",
+ groothoefblad:           "Alleen gestandaardiseerde, alkaloïdvrije extracten uit de handel. Zelf blad of wortel trekken is levertoxisch.",
+ grotebevernel:           "Wortelafkooksel, 1 tl per kop, 10 min koken. Traditioneel bij keelpijn en vastzittend slijm.",
+ grotepimpernel:          "Wortel als afkooksel, 1 tl per kop, 10 min koken; sterk samentrekkend. Jong blad rauw als de kleine pimpernel.",
+ groteweegbree:           "Als smalle weegbree: vers kompres of hoestsiroop met honing. Het zaadslijm werkt als milde vezel bij trage stoelgang.",
+ grovden:                 "Meischeuten als siroop met suiker, laagje om laagje, drie weken. Naaldthee, 1 tl per kop. Stoombad bij verkoudheid.",
+ guldenroede:             "Thee, 1 el per kop, 10 min; drink er ruim water bij. Klassiek nierkruid, niet bij vochtophoping door hartfalen.",
+ heelblaadjes:            "Thee van het bloeiende kruid, 1 el per kop, 10 min; samentrekkend bij darmklachten.",
+ heemst:                  "Wortel koud trekken, 6 tot 8 uur, dan lauw drinken. Nooit koken. Bij hoest en maagirritatie; houd een uur afstand van andere medicijnen.",
+ heermoes:                "Afkooksel, geen aftreksel: 1 el gedroogd kruid twintig minuten koken, anders komt het kiezelzuur niet vrij. Hooguit enkele weken aaneen.",
+ herderstasje:            "Thee van het verse kruid, 2 tl per kop, 10 min. Werkt vers veel beter dan gedroogd; het gedroogde kruid verliest snel kracht.",
+ hondsdraf:               "Thee van vers of gedroogd kruid, 1 tl per kop, 5 min — langer wordt bitter. Ook als kruiderij in soep.",
+ hondsroos:               "Bottels: zaadpluis verwijderen, dan siroop, gelei of thee. Niet boven de 70 graden verhitten, dan gaat de vitamine C verloren.",
+ honingklaver:            "Alleen goed en snel gedroogd kruid als thee, 1 el per kop. Beschimmeld materiaal weggooien: dan ontstaat een bloedverdunner.",
+ hop:                     "Koud of lauw getrokken bellen, 1 el per kop — kokend water maakt hem hard bitter. Ook als kussenvulling bij slecht slapen.",
+ huislook:                "Blad doorsnijden en het sap direct op de huid, als aloë. Inwendig in hoeveelheid braakverwekkend.",
+ hysop:                   "Thee 1 tl per kop, afgedekt. Bij vastzittende hoest. Spaarzaam gebruiken: de olie bevat pinocamfon.",
+ ijzerhard:               "Thee van het bloeiende kruid, 1 el per kop, 10 min; bitter. Niet tijdens zwangerschap.",
+ jeneverbes:              "Bessen kneuzen, 1 tl per kop, 10 min trekken. Niet langer dan vier weken en niet bij nierklachten of zwangerschap.",
+ judasoor:                "Weken tot hij opzwelt, dan meekoken in soep of roerbak. Medicinaal vooral als voedingsmiddel, niet als aftreksel.",
+ kaardebol:               "Wortelafkooksel, 1 tl per kop. Geen vervanging van antibiotica bij een tekenbeet met ring; daarvoor naar de huisarts.",
+ kaasjeskruid:            "Koud trekken: 1 el blad of bloem in koud water, 2 uur. Warm getrokken verdwijnt het slijm dat juist de keel verzacht.",
+ kalmoes:                 "Wortelstok als bittermiddel, 1 tl per kop koud aanzetten en dan verwarmen. Alleen de Europese vorm; hooguit kortdurend.",
+ kamille:                 "Thee: 1 el bloemen per kop, afgedekt 8 min — zonder deksel vervliegt de olie. Stoombad bij verkoudheid, kompres bij ontstoken huid.",
+ kaneel:                  "Als stokje meekoken in melk of thee. Kies Ceylonkaneel voor dagelijks gebruik; cassia bevat veel meer cumarine.",
+ kardemom:                "Peulen kneuzen en meekoken in koffie, thee of rijst. Als thee 3 peulen per kop, 10 min.",
+ karwij:                  "Zaad kneuzen, 1 tl per kop, 10 min afgedekt. Meekoken met kool om winderigheid te dempen.",
+ kattenkruid:             "Thee 1 el per kop, afgedekt 5 min — niet koken, dan verdwijnt de nepetalacton. Kalmerend, ondanks het effect op katten.",
+ kattenstaart:            "Thee 1 el per kop, 10 min. Sterk samentrekkend bij diarree; ook als spoeling.",
+ klaproos:                "Bloemblaadjes als thee of siroop, 1 tl per kop; mild kalmerend. De onrijpe zaaddoos hoort er niet in.",
+ kleefkruid:              "Koud getrokken: een handvol vers kruid een nacht in koud water. Verhitten breekt de werkzame stoffen af. Jong ook door een groene sapmix.",
+ kleinhoefblad:           "Uitsluitend als afgemeten, kortdurende thee van de bloemen; door de leveralkaloïden hooguit een paar dagen aaneen en niet tijdens zwangerschap.",
+ klimop:                  "Uitsluitend uitwendig, en dan nog voorzichtig: een aftreksel als kompres. De gestandaardiseerde hoestdrank uit de apotheek is iets anders dan zelf trekken.",
+ klit:                    "Wortelafkooksel: 1 el per half liter, 15 min koken. Uitwendig als spoeling bij huidklachten; de wortel ook gestoofd als groente.",
+ knoflook:                "Rauw fijngesneden en tien minuten laten staan voordat je hem verhit; dan pas ontstaat de allicine. Ook in honing of azijn ingelegd.",
+ knoopkruid:              "Thee van bloem en blad, 1 el per kop. Ook uitwendig als kompres bij kleine wonden.",
+ knopighelmkruid:         "Uitwendig als kompres of zalf bij zwellingen. Inwendig niet: het bevat hartglycosiden.",
+ komijn:                  "Zaad roosteren en malen; als thee 1 tl gekneusd zaad per kop bij een zware maaltijd.",
+ kompassla:               "Alleen het jonge rozetblad, rauw of gestoofd. Het ingedroogde melksap gold als slaapmiddel, maar dat is geen thuiswerk.",
+ koninginnekruid:         "Inwendig afgeraden door de leveralkaloïden. Laat hem staan als vlinderplant; dat is zijn beste toepassing.",
+ koningskaars:            "Bloementhee, 1 el per kop, en altijd door een doek of koffiefilter zeven: de fijne haartjes prikkelen anders de keel.",
+ koriander:               "Zaad roosteren en malen als kruiderij; als thee 1 tl gekneusd zaad per kop bij een opgeblazen gevoel.",
+ kruidnagel:              "Heel meekoken in stoofpot of thee. Kauwen op één nagel verdooft kiespijn tijdelijk; de olie onverdund prikkelt het slijmvlies.",
+ kruisbladwalstro:        "Thee 1 el per kop, of vers gekneusd als kompres, in dezelfde hoek als kleefkruid.",
+ kurkuma:                 "Met vet en zwarte peper samen gebruiken, anders neemt het lichaam nauwelijks curcumine op. Gouden melk of in het gerecht.",
+ lakzwam:                 "Hard als hout: in dunne plakken een uur koken, of dubbel aftreksel met alcohol. Bitter; met gember of honing beter drinkbaar.",
+ lariks:                  "Meischeuten als siroop of in azijn. De hars uitsluitend uitwendig, verdund in zalf.",
+ lateguldenroede:         "Als de andere guldenroeden: thee 1 el per kop, 10 min, met ruim water erbij.",
+ lavas:                   "Wortel als afkooksel, 1 tl per kop; blad als kruiderij in bouillon. Niet bij nierontsteking of vochtophoping door hartfalen.",
+ lavendel:                "Bloemthee, 1 tl per kop, afgedekt 5 min. In olie getrokken tegen jeuk en insectenbeten; ook in een kussentje voor de nacht.",
+ lepelblad:               "Vers blad rauw; verhitting breekt de vitamine C en de mosterdolie af. Een paar blaadjes door de salade volstaat.",
+ linde:                   "Bloesemthee, 1 el per kop, afgedekt 8 min. Zweetdrijvend, dus warm drinken en daarna warm blijven.",
+ longkruid:               "Thee van blad en bloem, 1 el per kop, 10 min. Niet dagelijks als vaste thee: het bevat sporen leveralkaloïden.",
+ maartsviooltje:          "Bloemsiroop of thee, 1 el per kop. Wortel niet gebruiken: die werkt braakverwekkend.",
+ madeliefje:              "Thee van bloemhoofdjes, 1 el per kop. Uitwendig als kompres of in olie getrokken zalf bij blauwe plekken.",
+ malrove:                 "Thee 1 tl per kop; zo bitter dat hij altijd met honing of als siroop wordt gegeven — de klassieke malrovesnoepjes.",
+ margriet:                "Bloemhoofdjes als thee, 1 el per kop; knoppen ingelegd als kappertjes. Mild, in de hoek van kamille.",
+ mariadistel:             "Zaad malen en direct gebruiken, 1 tl per dag; de olie wordt snel ranzig. Als thee weinig zinvol, silymarine lost slecht op in water.",
+ marjolein:               "Thee van 1 tl gedroogd kruid, 5 min afgedekt. Als kruiderij op het einde toevoegen; de olie vervliegt bij lang koken.",
+ meidoorn:                "Thee van blad, bloem en bes samen, 1 el per kop, 10 min. Tinctuur 1:5. Werkt traag: reken op weken, niet op dagen.",
+ melisse:                 "Vers blad, 2 el per kop, 5 min afgedekt — gedroogd verliest hij snel geur. Ook koud getrokken in water, of in olie voor een zalf bij koortslip.",
+ mierikswortel:           "Vers geraspt, direct gebruiken; de scherpte vervliegt binnen een half uur. Ingelegd in azijn blijft hij bruikbaar.",
+ moerasandoorn:           "Vers blad als kompres op kleine wonden. De knollen zijn voedsel, gekookt; de plant zelf is geen keukenkruid.",
+ moerasspirea:            "Thee van de bloemen, 1 el per kop, afgedekt en niet koken: de salicylverbindingen vervliegen. Ook als aroma in siroop en mede.",
+ moerbei:                 "Bladthee, 1 el per kop, 10 min. Vruchten vers of als siroop. De bladthee is het medicinale deel, niet de bes.",
+ muizenoor:               "Thee van het bloeiende kruid, 1 el per kop, 10 min. Niet langdurig dagelijks.",
+ munt:                    "Thee van vers blad, 1 el per kop, afgedekt 5 min. Ook koud getrokken in water met citroen.",
+ nagelkruid:              "Verse wortelstok in wijn, bier of stoofpot als kruidnagelvervanger. De geur vervliegt bij drogen, dus vers gebruiken.",
+ nigella:                 "Zaad geroosterd over brood, of een half theelepeltje olie per dag. Niet in medicinale hoeveelheid tijdens zwangerschap.",
+ oostindischekers:        "Vers blad en bloem door salade; de scherpe mosterdolie komt alleen rauw vrij. Zaad ingelegd als kappertjes.",
+ ossentong:               "Alleen uitwendig als kompres; de bloemen hooguit als garnering. Inwendig belasten de alkaloïden de lever.",
+ paardenbloem:            "Wortelthee: 1 tl gedroogde wortel per kop, 10 min zachtjes koken. Geroosterde wortel als koffie. Blad rauw of gestoofd.",
+ paardenkastanje:         "Alleen uitwendig, en alleen als bereid extract in gel of zalf bij zware benen. Zelf zaden verwerken is niet zinvol en riskant.",
+ passiebloem:             "Thee van het gedroogde kruid, 1 el per kop, 10 min. Tinctuur 1:5. Kalmerend bij onrust en slecht inslapen.",
+ penningkruid:            "Thee van het kruid, 1 el per kop, 10 min. Vooral uitwendig als wasing op slecht helende wondjes.",
+ pepermunt:               "Thee 1 el vers of 1 tl gedroogd per kop, afgedekt 5 min. Niet bij maagzuurklachten: hij ontspant juist de maagmond.",
+ peterselie:              "Vers door het gerecht, op het laatst. Thee van de wortel als plasmiddel; niet tijdens zwangerschap in medicinale hoeveelheid.",
+ pimpernel:               "Jong blad rauw door salade of Frankfurter groene saus. Medicinaal als thee, 1 el per kop, samentrekkend.",
+ pruikzwam:               "Bakken als vlees, of gedroogd en gemalen in soep. Extracten uit kweek zijn er ook; wilde exemplaren laten staan.",
+ raket:                   "Vers blad als kruiderij; medicinaal als siroop met honing bij heesheid — vandaar de oude naam zangerskruid.",
+ ratelpopulier:           "Knoppen in olie of vet trekken voor zalf; bast als afkooksel, 1 tl per kop. Niet bij aspirineovergevoeligheid.",
+ robertskruid:            "Thee van het verse kruid, 1 el per kop, 10 min; ook als mondspoeling. De geur maakt het geen keukenkruid.",
+ rodebosbes:              "Bessen als sap of moes; blad als afkooksel bij blaasklachten, kortdurend zoals berendruif.",
+ rodeklaver:              "Bloemhoofdjes als thee, 1 el per kop, 10 min. Ook gedroogd door brood. Niet bij hormoongevoelige aandoeningen.",
+ roomsekamille:           "Thee van de bloemhoofdjes, 1 tl per kop, afgedekt — sterker en bitterder dan echte kamille, dus minder gebruiken.",
+ roomsekervel:            "Vers blad door rabarber of compote — dat halveert de suiker. Zaad als kruiderij, wortel gekookt.",
+ rozemarijn:              "Thee, 1 tl per kop. In olie getrokken voor een spierzalf. Sterk verwarmend; niet vlak voor het slapengaan.",
+ saffraankrokus:          "Enkele draadjes kort in warm water of melk laten trekken tot de kleur vrijkomt, dan meekoken. Milligrammen volstaan.",
+ salie:                   "Thee, 1 tl per kop, afgedekt 8 min. Vooral als gorgeldrank bij keelpijn. Niet langdurig in hoge dosis en niet bij borstvoeding.",
+ scharlei:                "Thee van blad of zaad, 1 tl per kop. Zaad in water geeft slijm dat uitwendig bij een geprikkeld oog werd gebruikt.",
+ selderij:                "Zaad als thee, 1 tl gekneusd per kop. Blad vers als kruiderij. Het maakt de huid lichtgevoelig, dus niet in grote hoeveelheid vóór de zon in.",
+ shiso:                   "Vers blad bij vis en rijst; het rode blad ook als kleurstof bij het inmaken. Als olie afgeraden, als blad geen bezwaar.",
+ sintjanskruid:           "Rode olie: verse bloemen in olijfolie, drie weken op de vensterbank tot hij dieprood is. Thee 1 tl per kop. Let op wisselwerking met medicijnen.",
+ slangenkruid:            "Alleen uitwendig als kompres. Inwendig gebruik is door de leveralkaloïden afgeraden.",
+ sleutelbloem:            "Wortelafkooksel bij vastzittende hoest, 1 tl per kop, 10 min koken. In Nederland beschermd — alleen uit eigen tuin.",
+ smeerwortel:             "Alleen uitwendig: wortel in olie trekken en tot zalf verwerken, of vers geraspt als kompres. Niet op open wonden en niet inwendig.",
+ sponszwam:               "Grondig spoelen, dan langdurig stoven; de lobben houden zand vast. Vooral voedsel, niet als aftreksel.",
+ stalkruid:               "Wortelafkooksel, 1 tl per kop, 10 min koken, met ruim water erbij. Niet bij vochtophoping door hart- of nierfalen.",
+ stinkendeballote:        "Thee van het gedroogde kruid, 1 el per kop; drogen haalt de stank er grotendeels uit.",
+ stinkendegouwe:          "Alleen uitwendig en spaarzaam: het verse oranje sap op een wrat, punt voor punt. Niet op gezonde huid en niet inwendig.",
+ stokroos:                "Bloemblaadjes koud trekken voor het slijm, 1 el per kop, 2 uur. Donkere rassen geven bovendien een diepe kleur.",
+ struikhei:               "Bloementhee, 1 el per kop, 10 min. Ook als aroma in bier en honing.",
+ tandzaad:                "Thee van het bloeiende kruid, 1 el per kop, 10 min. Ook als badkruid bij geïrriteerde huid.",
+ tijm:                    "Thee: 1 tl per kop, afgedekt 8 min. Stoombad bij vastzittende hoest. Siroop met honing. Tinctuur 1:5 in 45% alcohol.",
+ tormentil:               "Wortelafkooksel, 1 tl per kop, 10 min koken. Tinctuur als mondspoeling bij tandvleesontsteking; zeer looistofrijk.",
+ tuinkers:                "Kiemen op vochtig papier, na een week knippen. Vers gebruiken — verhitten haalt de scherpte eruit.",
+ tulsi:                   "Thee van vers of gedroogd blad, 1 el per kop, afgedekt. In India dagelijks gedronken; ook met gember en honing.",
+ valeriaan:               "Koud getrokken wortel: 1 tl in een kop koud water, 8 tot 12 uur. Warm trekken maakt hem bitterder. Tinctuur 1:5 in 60% alcohol.",
+ veenmos:                 "Alleen uitwendig, als wondverband — zoals in beide wereldoorlogen. Hoogveen is beschermd: niet oogsten.",
+ veldsalie:               "Thee 1 tl per kop, afgedekt; milder dan echte salie. Ook als gorgeldrank.",
+ venkel:                  "Zaad kneuzen, 1 tl per kop, 10 min afgedekt. Klassiek bij krampen en winderigheid, ook bij kleine kinderen in slappe thee.",
+ viooltje3:               "Thee van bloem en blad, 1 el per kop, 10 min. Ook als siroop. Slijmoplossend bij droge hoest.",
+ vlas:                    "Zaad malen of minstens een uur weken, met ruim water innemen. Heel doorslikken werkt niet. Hooguit twee eetlepels per dag.",
+ vlasbekje:               "Uitwendig als zalf of kompres bij aambeien en zwellingen. Inwendig hooguit incidenteel als thee.",
+ vlier:                   "Bloesem: siroop of thee, 2 el per kop, afgedekt. Bessen altijd verhitten tot siroop of stroop; rauw geven ze braken.",
+ vogelmuur:               "Rauw door salade. Uitwendig: vers gekneusd blad als kompres, of trek het in olie voor een zalf bij jeuk en schrale huid.",
+ vrouwenmantel:           "Thee, 1 el per kop, 10 min. Sterk samentrekkend, ook als zitbad. Niet tijdens zwangerschap.",
+ vuilboom:                "Alleen bast die minstens een jaar gedroogd is, als afkooksel — en dan nog hooguit een paar dagen. Vers werkt hij hevig braakverwekkend.",
+ waterdrieblad:           "Zeer bittere thee, een half theelepeltje per kop volstaat als bittermiddel voor de maaltijd.",
+ watermunt:               "Thee van vers of gedroogd blad, afgedekt 5 min. Spaarzaam: sterker van smaak dan pepermunt.",
+ waterpeper:              "Vers blad in kleine hoeveelheid als scherpe kruiderij. Als tinctuur traditioneel bij overvloedige menstruatie; niet tijdens zwangerschap.",
+ weegbree:                "Vers blad kneuzen en direct op de huid bij insectenbeten. Inwendig: thee van 1 el blad, of siroop met honing bij hoest.",
+ wijnruit:                "Zeer spaarzaam en kortdurend, enkele druppels tinctuur. Maakt de huid sterk lichtgevoelig; niet tijdens zwangerschap.",
+ wildetijm:               "Thee 1 tl per kop, afgedekt; milder dan echte tijm. Ook als kruidenbad bij verkoudheid.",
+ wilg:                    "Bastafkooksel: 1 tl per kop, 10 min koken. Tinctuur 1:5. Niet bij aspirineovergevoeligheid en niet bij kinderen met koorts.",
+ wilgenroosje:            "Bladthee, 1 el per kop; gefermenteerd blad geeft de Russische ivan-chai. Jonge scheuten als groente.",
+ witteabeel:              "Bast als afkooksel, 1 tl per kop; knoppen in vet getrokken tot zalf. Zelfde bezwaren als wilg.",
+ wolfspoot:               "Alleen onder begeleiding: het remt de jodiumopname. Geen kruid om zelf thee van te zetten.",
+ zeepkruid:               "Uitwendig als wasmiddel voor oude textiel. De wortel als hoestmiddel is werk voor een apotheek; zelf bereiden geeft darmirritatie.",
+ zenegroen:               "Thee van het bloeiende kruid, 1 el per kop, 10 min. Traditioneel als wondkruid en gorgeldrank.",
+ zilverschoon:            "Thee van blad en wortel, 1 el per kop, 10 min. Sterk samentrekkend; ook als gorgeldrank.",
+ zilverspar:              "Meischeuten als siroop of thee, 1 tl naalden per kop. Stoombad bij verkoudheid; niet bij kleine kinderen met astma.",
+ zoethout:                "Wortelafkooksel, 1 tl per kop, 10 min koken. Hooguit vier tot zes weken: langdurig gebruik verhoogt de bloeddruk.",
+ zonnedauw:               "Alleen uit gekweekt materiaal, als tinctuur of siroop bij kriebelhoest. In het wild streng beschermd.",
+ zuurbes:                 "Vruchtvlees als gelei of siroop, zaden eruit. De wortelbast met berberine is werk voor een apotheek, niet voor thuis.",
+ zwartebes:               "Bladthee, 1 el per kop, 10 min. Bessen als siroop of gelei. Het blad werkt anders dan de bes: vochtafdrijvend in plaats van versterkend.",
+ zwartels:                "Alleen uitwendig: bastafkooksel als spoeling bij keelpijn of op kleine wonden. Inwendig geeft het misselijkheid.",
+ zwartemosterd:           "Zaad malen en met lauw water tot pasta — niet met heet water, dan blijft de scherpte uit. Uitwendig hooguit een kwartier op de huid.",
+ zwartepopulier:          "De kleverige knoppen in olie of reuzel trekken op laag vuur: de klassieke populierzalf. Gebruik olie om de hars van je handen te krijgen.",
+};
+
 const STOF = {
  /* --- zwammen --- */
  honingzwam:      {stof:"Hemolysinen", grp:"eiwitten", uitleg:"Breken rode bloedcellen af en geven rauw hevige darmklachten. Ze zijn hittegevoelig; vijftien minuten koken maakt ze onschadelijk."},
@@ -2945,6 +3212,119 @@ const STOF = {
  melkdistel:      {stof:"Lactucine", grp:"sesquiterpeenlactonen", uitleg:"Hetzelfde bittere melksap als bij wilde sla, in mildere concentratie."},
  winterpostelein: {stof:"Vitamine C", grp:"vitaminen", uitleg:"Zo veel dat de plant tijdens de goudkoorts in Californi\u00eb als antischeurbuikgroente werd gegeten \u2014 vandaar de naam mijnwerkerssla."},
  aardaker:        {stof:"Zetmeel en lathyrogenen", grp:"polysachariden", uitleg:"De knol is zetmeelrijk; de zaden van lathyrussen bevatten stoffen die bij langdurig gebruik het zenuwstelsel aantasten."},
+ agrimonie:               {stof:"Looistoffen en agrimoniine", grp:"tannines", uitleg:"Sterk samentrekkend op slijmvlies; vandaar de gorgeldrank en het wondkompres."},
+ appelbes:                {stof:"Anthocyanen", grp:"flavonoïden", uitleg:"Een van de hoogste gehaltes van alle vruchten; ze geven de kleur en de droge mond."},
+ bergsteentijm:           {stof:"Pulegon en menthon", grp:"terpenen", uitleg:"Verklaart de sterke munt-tijmgeur; pulegon is de reden om spaarzaam te doseren."},
+ berkenzwam:              {stof:"Betuline en polyporeenzuur", grp:"triterpenen", uitleg:"Betuline haalt de zwam uit de berkenbast; polyporeenzuur is bacterieremmend, wat het oude gebruik als wondverband verklaart."},
+ beukenzwam:              {stof:"Bèta-glucanen en hypsin", grp:"bèta-glucanen", uitleg:"In Japan onderzocht op afweer en cholesterol; laboratoriumwerk, geen bewezen behandeling."},
+ bijvoet:                 {stof:"Thujon en bitterstoffen", grp:"terpenen", uitleg:"Thujon prikkelt in hoeveelheid het zenuwstelsel; de bitterstoffen verklaren het gebruik bij vet vlees."},
+ blaaswier:               {stof:"Jodium en alginaten", grp:"mineralen", uitleg:"Het jodiumgehalte is hoog en wisselt sterk — daarom niet bij schildklierklachten."},
+ blauwglidkruid:          {stof:"Baicaline en scutellarine", grp:"flavonoïden", uitleg:"Kalmerend op het zenuwstelsel; de Amerikaanse verwant is in de kruidenhandel bekender."},
+ boerenwormkruid:         {stof:"Thujon", grp:"terpenen", uitleg:"Werkt op insecten en op het zenuwstelsel; genoeg om motten te weren, te veel om te drinken."},
+ bonenkruid:              {stof:"Carvacrol", grp:"fenolen", uitleg:"Bacterieremmend en krampstillend; dempt de winderigheid van peulvruchten, waar de naam vandaan komt."},
+ borstelkrans:            {stof:"Carvacrol en thymol", grp:"fenolen", uitleg:"Dezelfde stoffen als in marjolein en tijm, in lagere concentratie."},
+ bosaardbei:              {stof:"Looistoffen en vitamine C", grp:"tannines", uitleg:"Het blad is samentrekkend, de vrucht juist verfrissend; twee verschillende toepassingen van één plant."},
+ bosandoorn:              {stof:"Looistoffen en stachydrine", grp:"tannines", uitleg:"Sterk samentrekkend, maar de doordringende stank maakt inwendig gebruik onaantrekkelijk."},
+ bosbes:                  {stof:"Anthocyanen en looistoffen", grp:"flavonoïden", uitleg:"Gedroogd overheersen de looistoffen, wat stopt; vers overheerst het vruchtvocht, wat juist doorlaat."},
+ bosengelwortel:          {stof:"Furocumarinen en angelicazuur", grp:"cumarinen", uitleg:"Als bij de grote engelwortel: bitter en krampstillend, met dezelfde lichtgevoeligheid van de huid."},
+ bospaardenstaart:        {stof:"Kiezelzuur", grp:"mineralen", uitleg:"Zit vastgelegd in de celwand en komt pas na lang koken vrij — trekken alleen levert niets op."},
+ boswilg:                 {stof:"Salicine", grp:"fenolglycosiden", uitleg:"Dezelfde stof als bij de schietwilg; de bast van jonge takken bevat er het meeste van."},
+ braam:                   {stof:"Looistoffen", grp:"tannines", uitleg:"Trekken het darmslijmvlies samen, wat de werking bij diarree verklaart. De rijpe bes bevat ze nauwelijks."},
+ brunel:                  {stof:"Rosmarinuszuur en looistoffen", grp:"fenolzuren", uitleg:"Samentrekkend en virusremmend; de reden voor het gorgelen bij keelpijn."},
+ canadapopulier:          {stof:"Salicine en balsemharsen", grp:"fenolglycosiden", uitleg:"Minder geurig dan de zwarte populier maar met dezelfde stoffen in de knop."},
+ canadeseguldenroede:     {stof:"Rutine en saponinen", grp:"flavonoïden", uitleg:"Waterafdrijvend zonder kalium te verliezen — daarom een klassiek nierkruid."},
+ citroengras:             {stof:"Citral", grp:"terpenen", uitleg:"Zelfde stof als in melisse; geeft de citroengeur en werkt bacterieremmend en insectenwerend."},
+ citroenverbena:          {stof:"Citral en verbascoside", grp:"terpenen", uitleg:"Citral geeft de geur en houdt bij drogen uitzonderlijk goed stand, anders dan bij melisse."},
+ dophei:                  {stof:"Arbutine", grp:"fenolglycosiden", uitleg:"Als struikhei, maar de standplaats is beschermd — herkennen is hier het gebruik."},
+ dovenetel:               {stof:"Slijmstoffen en flavonoïden", grp:"polysachariden", uitleg:"Verzachtend op slijmvlies; anders dan de brandnetel bevat de dovenetel geen brandharen en geen histamine."},
+ engelwortel:             {stof:"Furocumarinen en angelicine", grp:"cumarinen", uitleg:"Bitter en krampstillend, maar ze maken de huid lichtgevoelig — oogst met bedekte armen."},
+ ereprijs:                {stof:"Aucubine en catalpol", grp:"iridoïden", uitleg:"Bitter en licht ontstekingsremmend; verklaart het gebruik als dagelijkse thee in vroeger Europa."},
+ es:                      {stof:"Fraxine en mannitol", grp:"cumarinen", uitleg:"Mannitol werd als manna gewonnen: een zacht laxeermiddel en suikervervanger."},
+ framboos:                {stof:"Fragarine en looistoffen", grp:"tannines", uitleg:"Fragarine ontspant of verstevigt de baarmoederspier afhankelijk van de fase; daar komt het gebruik aan het eind van een zwangerschap vandaan."},
+ gamander:                {stof:"Teucriine", grp:"diterpenen", uitleg:"Bitter, maar sommige gamandersoorten belasten bij langdurig gebruik de lever — vandaar de terughoudendheid."},
+ geelwalstro:             {stof:"Cumarine en asperulosiden", grp:"cumarinen", uitleg:"Cumarine geeft de hooigeur en werkt als stremsel bij het kaasmaken."},
+ grauweabeel:             {stof:"Salicine en populine", grp:"fenolglycosiden", uitleg:"Kruising van witte abeel en ratelpopulier, met de stoffen van allebei."},
+ grauwewilg:              {stof:"Salicine", grp:"fenolglycosiden", uitleg:"Dezelfde stof als bij de andere wilgen, met dezelfde bezwaren bij aspirineovergevoeligheid."},
+ grotebevernel:           {stof:"Pimpinelline en saponinen", grp:"cumarinen", uitleg:"Slijmoplossend en krampstillend; de wortel is veel sterker dan het blad."},
+ grotepimpernel:          {stof:"Sanguisorbine en looistoffen", grp:"tannines", uitleg:"Zeer looistofrijk; <i>Sanguisorba</i> betekent bloedopslurpend, naar het stelpen van bloedingen."},
+ groteweegbree:           {stof:"Aucubine en slijmstoffen", grp:"iridoïden", uitleg:"Aucubine werkt bacterieremmend; het slijm verzacht de keel."},
+ grovden:                 {stof:"Alfa-pineen", grp:"terpenen", uitleg:"Slijmoplossend en licht ontsmettend op de luchtwegen; de stof achter de dennengeur."},
+ heelblaadjes:            {stof:"Looistoffen en inuline", grp:"tannines", uitleg:"Samentrekkend bij darmklachten; de soortnaam <i>dysenterica</i> verwijst naar dat gebruik."},
+ herderstasje:            {stof:"Peptiden en flavonoïden", grp:"peptiden", uitleg:"Werken samentrekkend op de baarmoeder; ze vervallen snel bij drogen, wat verklaart waarom vers materiaal veel sterker is."},
+ hondsdraf:               {stof:"Rosmarinuszuur", grp:"fenolzuren", uitleg:"Ontstekingsremmend, en samen met de bitterstoffen de reden voor het oude gebruik bij vastzittend slijm."},
+ huislook:                {stof:"Slijmstoffen en looistoffen", grp:"polysachariden", uitleg:"Het bladsap verzacht en trekt tegelijk samen — vandaar het gebruik als aloë-vervanger."},
+ hysop:                   {stof:"Pinocamfon", grp:"terpenen", uitleg:"Slijmoplossend, maar in hoge dosis prikkelend voor het zenuwstelsel — vandaar spaarzaam gebruik."},
+ ijzerhard:               {stof:"Verbenaline", grp:"iridoïden", uitleg:"Bitter en licht samentrekkend op de baarmoeder — vandaar het verbod tijdens zwangerschap."},
+ jeneverbes:              {stof:"Terpineol-4", grp:"terpenen", uitleg:"Waterafdrijvend via de nier; bij langdurig gebruik prikkelt het het nierweefsel, vandaar de beperkte duur."},
+ judasoor:                {stof:"Polysachariden", grp:"polysachariden", uitleg:"Onderzocht op bloedstolling; in Chinese bereidingen daarom een vaste zwam bij vaatklachten."},
+ kalmoes:                 {stof:"Asaron en bitterstoffen", grp:"fenylpropanen", uitleg:"De bitterstoffen wekken de eetlust; asaron is de reden om alleen de Europese vorm en kortdurend te gebruiken."},
+ kardemom:                {stof:"Cineol en terpinylacetaat", grp:"terpenen", uitleg:"Verteringsbevorderend en de reden dat kardemom bij koffie wordt gedaan."},
+ kattenkruid:             {stof:"Nepetalacton", grp:"terpenen", uitleg:"Werkt op katten via de reuk en op mensen mild kalmerend via de thee; verdwijnt bij koken."},
+ kattenstaart:            {stof:"Salicarine en looistoffen", grp:"tannines", uitleg:"Zeer looistofrijk — vandaar de betrouwbare werking bij diarree en als spoeling."},
+ klaproos:                {stof:"Rhoeadine", grp:"alkaloïden", uitleg:"Mild kalmerend, niet verwant aan de morfine van de slaapbol; de bloemblaadjes zijn onschuldig."},
+ kleefkruid:              {stof:"Asperulosiden", grp:"iridoïden", uitleg:"Breken bij verhitting af — vandaar dat kleefkruid koud wordt getrokken."},
+ kleinhoefblad:           {stof:"Slijmstoffen en pyrrolizidine-alkaloïden", grp:"polysachariden", uitleg:"Het slijm verzacht de hoest, de alkaloïden belasten de lever — vandaar het strikt kortdurende gebruik."},
+ klimop:                  {stof:"Hederasaponinen", grp:"saponinen", uitleg:"Krampstillend op de luchtwegen in gestandaardiseerde vorm, maar prikkelend voor huid en maag in ruw materiaal."},
+ klit:                    {stof:"Inuline en polyacetylenen", grp:"polysachariden", uitleg:"Inuline maakt de wortel zoetig en voedt de darmflora; de polyacetylenen werken bacterieremmend."},
+ knoopkruid:              {stof:"Cnicine en looistoffen", grp:"sesquiterpeenlactonen", uitleg:"Bitter en samentrekkend; verwant aan de bitterstof van de gezegende distel."},
+ komijn:                  {stof:"Cuminaldehyde", grp:"terpenen", uitleg:"Verteringsbevorderend; de stof achter de kenmerkende geur van geroosterd komijnzaad."},
+ koningskaars:            {stof:"Slijmstoffen en verbascosaponinen", grp:"polysachariden", uitleg:"Het slijm verzacht, de saponinen maken los. De haartjes moeten eruit gezeefd: die prikkelen de keel."},
+ kruisbladwalstro:        {stof:"Asperulosiden", grp:"iridoïden", uitleg:"Als bij kleefkruid: breken bij verhitting af, dus zacht behandelen."},
+ lakzwam:                 {stof:"Ganoderzuren en bèta-glucanen", grp:"triterpenen", uitleg:"De ganoderzuren geven de bittere smaak en lossen in alcohol op; de glucanen juist in water. Vandaar het dubbele aftreksel."},
+ lariks:                  {stof:"Arabinogalactaan", grp:"polysachariden", uitleg:"Een oplosbare vezel uit het hout, onderzocht als prebioticum; de hars levert Venetiaanse terpentijn."},
+ lateguldenroede:         {stof:"Rutine en saponinen", grp:"flavonoïden", uitleg:"Als de Canadese guldenroede; de stengel is kaal in plaats van behaard, de werking dezelfde."},
+ linde:                   {stof:"Slijmstoffen en farnesol", grp:"polysachariden", uitleg:"Farnesol geeft de honinggeur; het slijm verzacht de keel en het geheel werkt zweetdrijvend."},
+ longkruid:               {stof:"Slijmstoffen en allantoïne", grp:"polysachariden", uitleg:"Verzachtend bij droge hoest; de witte vlekken op het blad hadden er niets mee te maken."},
+ maartsviooltje:          {stof:"Saponinen en violine", grp:"saponinen", uitleg:"In het blad mild, in de wortel zo sterk dat die braakverwekkend werkt — die blijft dus buiten de thee."},
+ madeliefje:              {stof:"Saponinen en polyacetylenen", grp:"saponinen", uitleg:"Mild ontstekingsremmend; dezelfde hoek als de veel sterkere arnica, maar zonder de bezwaren."},
+ margriet:                {stof:"Sesquiterpeenlactonen", grp:"sesquiterpeenlactonen", uitleg:"Mild krampstillend, in dezelfde familie als kamille maar zwakker."},
+ marjolein:               {stof:"Carvacrol", grp:"fenolen", uitleg:"Bacterieremmend en krampstillend; vervliegt bij lang koken, dus laat toevoegen."},
+ melisse:                 {stof:"Citral en rosmarinuszuur", grp:"terpenen", uitleg:"Citral geeft de citroengeur en vervliegt snel bij drogen; rosmarinuszuur remt het koortslipvirus."},
+ moerasandoorn:           {stof:"Betaine en looistoffen", grp:"tannines", uitleg:"Wondhelend; de oude naam wondkruid slaat op precies dit gebruik."},
+ moerasspirea:            {stof:"Salicylaldehyde", grp:"fenolglycosiden", uitleg:"De voorloper van aspirine — de stofnaam komt van Spiraea, de oude naam van deze plant."},
+ moerbei:                 {stof:"1-Deoxynojirimycine", grp:"alkaloïden", uitleg:"Remt in het blad het enzym dat suikers afbreekt — daar komt het onderzoek naar bloedsuiker vandaan."},
+ muizenoor:               {stof:"Umbelliferon", grp:"cumarinen", uitleg:"Licht antibacterieel; een van de weinige planten waarin deze stof in bruikbare hoeveelheid zit."},
+ munt:                    {stof:"Carvon", grp:"terpenen", uitleg:"Anders dan pepermunt, die menthol bevat: carvon geeft de zachtere smaak en werkt milder op de maag."},
+ nigella:                 {stof:"Thymochinon", grp:"chinonen", uitleg:"Ontstekingsremmend en onderzocht op afweer; de stof waarop het meeste onderzoek naar zwarte komijn zich richt."},
+ oostindischekers:        {stof:"Benzylisothiocyanaat", grp:"glucosinolaten", uitleg:"Sterk bacterieremmend, ook in de blaas; komt alleen rauw vrij, verhitting breekt het af."},
+ ossentong:               {stof:"Pyrrolizidine-alkaloïden en allantoïne", grp:"alkaloïden", uitleg:"Allantoïne heelt de huid, de alkaloïden belasten de lever — samen de reden voor uitsluitend uitwendig gebruik."},
+ paardenkastanje:         {stof:"Aescine", grp:"saponinen", uitleg:"Verstevigt de vaatwand en remt vochtlekkage — de basis van alle middelen bij zware benen. Ruw zaad is giftig."},
+ penningkruid:            {stof:"Looistoffen en saponinen", grp:"tannines", uitleg:"Samentrekkend en licht wondhelend; het gebruik ligt vooral op de huid."},
+ peterselie:              {stof:"Apiol en myristicine", grp:"fenylpropanen", uitleg:"Waterafdrijvend, maar in medicinale hoeveelheid werkt apiol op de baarmoeder — niet tijdens zwangerschap."},
+ raket:                   {stof:"Glucosinolaten", grp:"glucosinolaten", uitleg:"Scherpe mosterdolie die de luchtwegen prikkelt en zo het slijm losmaakt — vandaar de naam zangerskruid."},
+ ratelpopulier:           {stof:"Salicine en populine", grp:"fenolglycosiden", uitleg:"Het lichaam zet salicine om in salicylzuur, dezelfde weg als bij wilg en aspirine."},
+ rodebosbes:              {stof:"Arbutine en anthocyanen", grp:"fenolglycosiden", uitleg:"Arbutine als in beredruif, in lagere concentratie: milder maar met dezelfde beperkte gebruiksduur."},
+ rodeklaver:              {stof:"Formononetine en biochanine", grp:"iso-flavonen", uitleg:"Plantaardige oestrogenen; daarom niet gebruiken bij hormoongevoelige aandoeningen."},
+ roomsekamille:           {stof:"Angelicazuuresters", grp:"terpenen", uitleg:"Sterker en bitterder dan echte kamille; dezelfde krampstillende werking maar in kleinere hoeveelheid nodig."},
+ scharlei:                {stof:"Linalylacetaat en sclareol", grp:"terpenen", uitleg:"Sclareol is de basis van veel parfums; het zaadslijm werd uitwendig bij een geprikkeld oog gebruikt."},
+ sleutelbloem:            {stof:"Primulasaponinen", grp:"saponinen", uitleg:"Maken vastzittend slijm dunner; ze zitten vooral in de wortel, veel minder in de bloem."},
+ sponszwam:               {stof:"Bèta-glucanen", grp:"bèta-glucanen", uitleg:"Zoals bij de meeste eetbare zwammen; de voedingswaarde is hier belangrijker dan een aftreksel."},
+ stinkendeballote:        {stof:"Marrubiine-achtige diterpenen", grp:"bitterstoffen", uitleg:"Kalmerend en misselijkheidremmend; drogen haalt de stank eruit zonder de werking weg te nemen."},
+ stinkendegouwe:          {stof:"Chelidonine", grp:"alkaloïden", uitleg:"Het oranje sap is krampstillend maar levertoxisch bij inname; uitsluitend uitwendig, druppel voor druppel."},
+ struikhei:               {stof:"Arbutine", grp:"fenolglycosiden", uitleg:"Wordt in de blaas omgezet in een licht ontsmettende stof; dezelfde weg als bij beredruif."},
+ tandzaad:                {stof:"Looistoffen en polyacetylenen", grp:"tannines", uitleg:"Samentrekkend bij lichte diarree en verzachtend op de huid in een badkruid."},
+ tijm:                    {stof:"Thymol en carvacrol", grp:"fenolen", uitleg:"Sterk bacterieremmend en slijmoplossend; de reden dat tijm het klassieke hoestkruid is."},
+ tormentil:               {stof:"Tormentol en catechinelooistoffen", grp:"tannines", uitleg:"Een van de looistofrijkste wortels van onze flora — de reden voor het gebruik als mondspoeling."},
+ tulsi:                   {stof:"Eugenol en ursolzuur", grp:"fenolen", uitleg:"Eugenol als in kruidnagel; in de ayurveda geldt tulsi als aanpassingskruid bij spanning."},
+ veenmos:                 {stof:"Sphagnol en fenolzuren", grp:"fenolzuren", uitleg:"Het mos is zuur en zuigt sterk; samen remt dat bacteriegroei — de reden voor het gebruik als wondverband."},
+ veldsalie:               {stof:"Thujon en rosmarinuszuur", grp:"terpenen", uitleg:"Minder thujon dan echte salie, wat hem milder maakt maar ook zwakker."},
+ viooltje3:               {stof:"Saponinen en salicylverbindingen", grp:"saponinen", uitleg:"Slijmoplossend bij droge hoest; het viooltje werd daarom in hoestthee gemengd."},
+ vogelmuur:               {stof:"Saponinen en vitamine C", grp:"saponinen", uitleg:"De saponinen verklaren het verzachtende gebruik op de huid; het blad is daarnaast rijk aan vitamine C."},
+ vuilboom:                {stof:"Glucofranguline", grp:"anthrachinonen", uitleg:"Vers prikkelt het hevig; pas na een jaar drogen ontstaat de mildere vorm die als laxeermiddel bruikbaar is."},
+ watermunt:               {stof:"Menthol en pulegon", grp:"terpenen", uitleg:"Meer pulegon dan pepermunt, wat hem scherper maakt en de reden is om spaarzaam te doseren."},
+ wijnruit:                {stof:"Rutine en furocumarinen", grp:"flavonoïden", uitleg:"Rutine versterkt de vaatwand; de furocumarinen maken de huid sterk lichtgevoelig."},
+ wildetijm:               {stof:"Thymol en carvacrol", grp:"fenolen", uitleg:"Zelfde stoffen als echte tijm maar in lagere concentratie — milder, en daarom geschikt als badkruid."},
+ wilgenroosje:            {stof:"Oenotheine B en looistoffen", grp:"tannines", uitleg:"Onderzocht bij prostaatklachten; het gefermenteerde blad verliest een deel van de scherpte."},
+ witteabeel:              {stof:"Salicine en populine", grp:"fenolglycosiden", uitleg:"Als bij de andere populieren; de knoppen bevatten daarnaast de balsemharsen voor zalf."},
+ zenegroen:               {stof:"Iridoïden en looistoffen", grp:"iridoïden", uitleg:"Samentrekkend en licht ontstekingsremmend; de basis van het gebruik als wondkruid."},
+ zilverschoon:            {stof:"Looistoffen", grp:"tannines", uitleg:"Sterk samentrekkend; het zilverachtige blad werd juist daarom als kompres gebruikt."},
+ zilverspar:              {stof:"Bornylacetaat", grp:"terpenen", uitleg:"Geeft de frisse naaldgeur en werkt slijmoplossend — de basis van dennenbalsem."},
+ zuurbes:                 {stof:"Berberine", grp:"alkaloïden", uitleg:"Kleurt hout en bast geel. Remt leverenzymen, dus slecht te combineren met veel medicijnen."},
+ zwartebes:               {stof:"Anthocyanen en gamma-linoleenzuur", grp:"flavonoïden", uitleg:"De bes voor de vaatwand, het blad voor de vochtafdrijving — verschillende stoffen, verschillend gebruik."},
+ zwartels:                {stof:"Ellagitannines", grp:"tannines", uitleg:"Sterk samentrekkend; verklaart het uitwendige gebruik en waarom de bast inwendig misselijk maakt."},
+ zwartepopulier:          {stof:"Salicine en balsemharsen", grp:"fenolglycosiden", uitleg:"De harsen geven de zalf zijn geur en kleefkracht, de salicine de pijnstillende werking."},
+ blauweknoop:             {stof:"Succisosiden en looistoffen", grp:"iridoïden", uitleg:"Bitter en samentrekkend; het gebruik als bloedzuiverend middel bij huidklachten stoelt hierop."},
+ kaardebol:               {stof:"Kaardebolsaponinen", grp:"saponinen", uitleg:"De wortel wordt in de kruidenhandel bij lyme genoemd, maar daar is geen bewijs voor; als bittermiddel is de werking wel begrijpelijk."},
  brandnetel:      {stof:"Histamine en mierenzuur", grp:"aminen", uitleg:"In de brandharen. Verhitting of kneuzen breekt ze af; daarom prikt gekookte netel niet."},
  sintjanskruid:   {stof:"Hypericine en hyperforine", grp:"naftodianthronen", uitleg:"Hyperforine jaagt leverenzymen aan en verzwakt daardoor onder meer de pil en bloedverdunners."},
  vingerhoedskruid:{stof:"Digoxine en digitoxine", grp:"hartglycosiden", uitleg:"Grijpt direct op de hartspier aan. Het verschil tussen werkzaam en dodelijk is klein."},
@@ -4071,7 +4451,7 @@ const SPECIES_VIJF = [
 {k:"margriet",nl:"Gewone margriet",la:"Leucanthemum vulgare",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Jong rozetblad, knop, lintbloem",mnd:[4,5,6,7],
  herken:"Eén groot bloemhoofd per onvertakte stengel: witte lintbloemen rond een gele, iets bolle schijf. Stengelblad smal, zittend, grof getand; rozetblad spatelvormig en gesteeld.",
  let:"Jong rozetblad rauw in salade, licht aromatisch. Ongeopende knoppen ingelegd in zout en azijn als kappertjes. Na de bloei wordt het blad bitter en taai.",
- dubbel:["Echte kamille (blad fijn veerdelig, bloem veel kleiner, hol bloembodem)","Reukeloze kamille (fijn veerdelig blad, veel kleinere hoofdjes)"],
+ dubbel:["Echte kamille (blad fijn veerdelig, bloem veel kleiner, hol bloembodem)","Reukloze kamille (fijn veerdelig blad, veel kleinere hoofdjes)"],
  med:"Volksgeneeskundig als kamillevervanger: thee bij hoest en onrust, gekneusd blad als kompres op kneuzingen. Kruisallergie met composieten mogelijk."},
 {k:"bosengelwortel",nl:"Gewone engelwortel",la:"Angelica sylvestris",grp:"kruid",tags:["eetbaar","medicinaal"],delen:"Jonge stengel, blad, zaad, wortel",mnd:[5,6,7,8,9],
  herken:"Manshoog, holle stengel met paarse aanloop en sterk opgeblazen bladscheden waar de zijtakken uit komen. Dubbel geveerd blad met gezaagde deelblaadjes. Halfbolronde schermen zonder omwindsel. Vochtig bos, beekoevers. Aromatisch bij kneuzen.",
@@ -5300,10 +5680,6 @@ const SPECIES_VERWAR = [
  herken:"Forse, blauwgroen berijpte kool met dikke, golvend gelobde, vlezige bladeren op een korte stam, en grote schermen witte kruisbloemen met een honinggeur. Op grindstranden en zeedijken.",
  let:"De gebleekte lentescheuten zijn een klassieke groente; ouder blad wordt bitter. In Nederland zeldzaam en op de meeste plekken beschermd \u2014 controleer of plukken mag.",
  dubbel:["Lepelblad (eetbaar; klein, lepelvormig blad)","Zeeraket (vlezig maar veerdelig blad)","Koolzaad (geel, akkerplant)"]},
-{k:"reukelozekamille",nl:"Reukeloze kamille",la:"Tripleurospermum maritimum",grp:"kruid",tags:[],delen:"—",mnd:[],
- herken:"Ziet er precies uit als echte kamille \u2014 witte lintbloemen om een geel hart \u2014 maar ruikt bij wrijven nergens naar, en het bloembodempje is vol in plaats van hol. Snijd het hoofdje door: dat is de test.",
- let:"Niet giftig maar zonder aroma en dus zonder nut als thee. De doorgesneden bloembodem scheidt hem van de echte kamille.",
- dubbel:["Echte kamille (eetbaar; sterke geur, holle bloembodem)","Schijfkamille (geen lintbloemen, ananasgeur)","Margriet (veel groter)"]},
 {k:"canadeseguldenroede",nl:"Canadese guldenroede",la:"Solidago canadensis",grp:"kruid",tags:["medicinaal"],delen:"Bloeiend kruid",mnd:[8,9],
  herken:"Manshoog, met een dichtbebladerde stengel en aan de top een brede, overhangende pluim van honderden kleine gele bloemhoofdjes aan eenzijdig gebogen takken. Blad drienervig en gezaagd. Vormt dichte velden op braakland.",
  let:"Invasieve exoot die inheemse vegetatie verdringt \u2014 plukken helpt eerder dan het schaadt. Zelfde gebruik als de echte guldenroede, maar milder.",
@@ -5681,12 +6057,48 @@ const SPECIES_SLUIT = [
 ];
 
 SPECIES.push(...SPECIES_EXTRA, ...SPECIES_TUIN, ...SPECIES_VIER, ...SPECIES_VIJF, ...SPECIES_ZWAM1, ...SPECIES_ZWAM2, ...SPECIES_ZWAM3, ...SPECIES_ZWAM4, ...SPECIES_BOOM1, ...SPECIES_TUIN1, ...SPECIES_KRUID1, ...SPECIES_KRUID2, ...SPECIES_KRUID3, ...SPECIES_VERWAR, ...SPECIES_VERWAR2, ...SPECIES_SLUIT);
+/* =======================================================================
+   EIGEN SOORTEN EN AANPASSINGEN
+   De gids is een uitgangspunt, geen eindpunt. Wat je zelf toevoegt of
+   verbetert hoort te blijven staan, ook na een nieuwe versie van de app.
+   Daarom twee aparte lagen bovenop de vaste lijst: eigen soorten, en
+   aanpassingen op bestaande. Ze worden bij het laden overheen gelegd, zodat
+   een update van de gids je eigen werk nooit overschrijft.
+   ======================================================================= */
+/* lsGet staat verderop in het bestand; hier lezen we rechtstreeks, zodat de
+   eigen soorten al bestaan voordat de indexen worden opgebouwd. */
+function opslagLees(sleutel, standaard){
+  try{
+    const v = localStorage.getItem(LS + sleutel);
+    return v === null ? standaard : JSON.parse(v);
+  }catch(e){ return standaard; }
+}
+const EIGEN_SOORTEN = opslagLees("eigenSoorten", []);
+EIGEN_SOORTEN.forEach(e=>{
+  if(!SPECIES.some(x=> x.k === e.k)) SPECIES.push(Object.assign({eigen:true}, e));
+});
+
 SPECIES.forEach(x=>{
   if(KWALEN_MAP[x.k]) x.kwalen = KWALEN_MAP[x.k];
   if(EMA_MAP[x.k]){ x.emaInfo = EMA_MAP[x.k]; x.ema = true;
     x.kwalen = [...new Set([...(x.kwalen||[]), ...EMA_MAP[x.k].waarvoor])]; }
 });
 const SPEC_BY_K = Object.fromEntries(SPECIES.map(s=>[s.k,s]));
+
+/* Aanpassingen van de gebruiker gaan er als laatste overheen. Alleen velden
+   die zijn ingevuld; de rest blijft zoals de gids hem kent. */
+const SOORT_EDITS = opslagLees("soortEdits", {});
+Object.entries(SOORT_EDITS).forEach(([k, wijziging])=>{
+  const sp = SPEC_BY_K[k];
+  if(!sp) return;
+  Object.entries(wijziging).forEach(([veld, waarde])=>{
+    if(veld === "EN"){ EN[k] = waarde; return; }
+    if(veld === "STOF"){ STOF[k] = waarde; return; }
+    if(veld === "BEREIDING"){ BEREIDING[k] = waarde; return; }
+    sp[veld] = waarde;
+  });
+  sp.bewerkt = true;
+});
 
 /* =======================================================================
    RECEPTEN — keuken en lijf
@@ -6426,6 +6838,7 @@ const S = {
     thema:{herkennen:"alles",gebruik:"alles",namen:"alles"}, recent:[], recentV:[]}),
   /* Het herbarium is een naslagwerk; dat hoort compleet open te gaan. */
   specView:"alle", kastView:"alles", kastMode:"kast", recView:"alles", listView:"vondsten", scans:null,
+  soortFilter: lsGet("soortFilter", []),
   spook:null, ontdekVol:null, concept:null, thuis:lsGet("thuis",null), afsluiten:false,
   eigen:lsGet("eigenrecepten",[]),
   gevuld:new Set(), vulBezig:false, vulTimer:null, vulGemeld:false,
@@ -6930,12 +7343,285 @@ function drawMarkers(){
        aangevinkt is. Anders zou duizendblad verdwijnen als je "eetbaar"
        uitzet, terwijl je "medicinaal" nog aan hebt. */
     if(!pinVakken(p).some(v=> S.filter[aan[v]])) return;
+    /* Soortenfilter: leeg betekent alles tonen, anders alleen wat is aangevinkt. */
+    if(S.soortFilter.length && !S.soortFilter.includes(p.spec)) return;
     const m = L.marker([p.lat,p.lng],{icon:markerIcon(p,S.open===p.id)}).addTo(S.map);
     m.on("click", ()=>openSheet(p.id));
     S.markers.set(p.id, m);
   });
   renderChips();
 }
+/* =======================================================================
+   SOORTENFILTER OP DE KAART
+   Met honderden waarnemingen op het scherm zoek je je blind. Hier kies je
+   welke soorten je wilt zien; die keuze geldt voor je eigen vondsten én voor
+   de GBIF-laag, zodat beide hetzelfde beeld geven. Niets aangevinkt betekent
+   alles tonen — dat is de rusttoestand, niet een leeg scherm.
+   ======================================================================= */
+let filterZoek = "";
+
+function filterTellingen(){
+  /* Waar je zelf iets van gevonden hebt, staat bovenaan: dat is meestal waar
+     je naar zoekt. */
+  const eigen = {};
+  S.pins.forEach(p=>{ if(p.spec) eigen[p.spec] = (eigen[p.spec]||0) + 1; });
+  return eigen;
+}
+
+function filterLijstHtml(){
+  const eigen = filterTellingen();
+  const q = filterZoek.toLowerCase();
+  const passend = SPECIES.filter(sp=>{
+    if(!q) return true;
+    return (sp.nl + " " + sp.la + " " + (EN[sp.k]||"")).toLowerCase().includes(q);
+  }).sort((a,b)=>{
+    const av = (eigen[a.k]||0), bv = (eigen[b.k]||0);
+    if(av !== bv) return bv - av;                       /* eigen vondsten eerst */
+    const ac = S.soortFilter.includes(a.k), bc = S.soortFilter.includes(b.k);
+    if(ac !== bc) return ac ? -1 : 1;                   /* dan het aangevinkte */
+    return a.nl.localeCompare(b.nl, "nl");
+  }).slice(0, 120);
+
+  if(!passend.length)
+    return '<div class="tekst">Geen soort gevonden voor \u201c'+esc(filterZoek)+'\u201d.</div>';
+
+  return '<div class="filterlijst">'+passend.map(sp=>{
+    const aan = S.soortFilter.includes(sp.k);
+    const n = eigen[sp.k] || 0;
+    return '<button class="filterrij'+(aan?" aan":"")+'" data-fk="'+esc(sp.k)+'">'+
+      '<span class="vink">'+(aan?"\u2713":"")+'</span>'+
+      '<span class="fnaam"><span class="nm">'+esc(sp.nl)+'</span>'+
+      '<span class="la">'+esc(sp.la)+'</span></span>'+
+      (n ? '<span class="eigen">'+n+'</span>' : '')+'</button>';
+  }).join("")+'</div>';
+}
+
+function filterBlad(){
+  const gekozen = S.soortFilter.length;
+  showSheet('<div class="label">'+VINE+HOEKRANK+
+    '<div class="acc"><span>Kaartfilter</span><span>'+(gekozen||"alles")+'</span></div>'+
+    '<h2>Welke soorten wil je zien?</h2>'+
+    '<div class="la">Geldt voor je eigen vondsten \u00e9n de GBIF-laag</div></div>'+
+    '<div class="sec"><div class="searchbar"><div class="zoekveld">'+
+      '<span class="loepje"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" '+
+      'stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="6.5"/>'+
+      '<path d="M15.8 15.8 21 21" stroke-linecap="round"/></svg></span>'+
+      '<input id="qFilter" placeholder="Zoek een soort" value="'+esc(filterZoek)+'"></div></div>'+
+      '<div id="filterBody">'+filterLijstHtml()+'</div></div>'+
+    '<div class="row"><button class="btn sec2" id="filterWis">Alles tonen</button>'+
+    '<button class="btn" id="filterKlaar">Klaar</button></div>');
+
+  const veld = document.getElementById("qFilter");
+  const teken = ()=>{ document.getElementById("filterBody").innerHTML = filterLijstHtml(); knoop(); };
+  const knoop = ()=> document.querySelectorAll("[data-fk]").forEach(b=>
+    b.onclick = ()=>{
+      const k = b.dataset.fk;
+      const i = S.soortFilter.indexOf(k);
+      if(i < 0) S.soortFilter.push(k); else S.soortFilter.splice(i,1);
+      lsSet("soortFilter", S.soortFilter);
+      filterPas();
+      teken();
+    });
+  knoop();
+  veld.addEventListener("input", ()=>{ filterZoek = veld.value; teken(); });
+  document.getElementById("filterWis").onclick = ()=>{
+    S.soortFilter = []; lsSet("soortFilter", S.soortFilter);
+    filterPas(); teken(); toast("Alle soorten worden getoond");
+  };
+  document.getElementById("filterKlaar").onclick = closeSheet;
+}
+
+/* De kaart opnieuw tekenen en de knop laten oplichten als er iets aanstaat. */
+function filterPas(){
+  if(S.map) drawMarkers();
+  if(S.ontdekAan) tekenOntdek();
+  const b = document.getElementById("btnFilter");
+  if(b) b.classList.toggle("aan", S.soortFilter.length > 0);
+}
+
+/* =======================================================================
+   SOORTENBEWERKER
+   Elk blad is aan te vullen: de gids weet niet alles, en wat jij in het veld
+   leert hoort erin te kunnen. Zowel bij bestaande soorten als bij soorten die
+   je zelf toevoegt, uit GBIF of uit een fotoherkenning.
+
+   Wat je verandert wordt apart bewaard en pas bij het laden over de vaste
+   lijst gelegd. Een nieuwe versie van de gids overschrijft je werk dus nooit,
+   en met \u00e9\u00e9n knop zet je een soort terug op de oorspronkelijke tekst.
+   ======================================================================= */
+const BEWERK_VELDEN = [
+  ["nl",        "Nederlandse naam",  "kort"],
+  ["la",        "Wetenschappelijke naam", "kort"],
+  ["EN",        "Engelse naam",      "kort"],
+  ["grp",       "Groep",             "groep"],
+  ["tags",      "Eigenschappen",     "tags"],
+  ["delen",     "Welk deel",         "kort"],
+  ["mnd",       "Maanden",           "mnd"],
+  ["herken",    "Veldkenmerken",     "lang"],
+  ["verwar",    "Zo scheid je hem",  "lang"],
+  ["dubbel",    "Verwarbaar met",    "regels"],
+  ["let",       "Let op",            "lang"],
+  ["med",       "Toelichting",       "lang"],
+  ["BEREIDING", "Bereiding",         "lang"],
+  ["STOF",      "Werkzame stof",     "stof"]
+];
+const GROEPEN = [["kruid","Kruid"],["boom","Boom of struik"],["zwam","Paddenstoel"],["tuin","Tuin en keuken"]];
+const MAANDNM = ["J","F","M","A","M","J","J","A","S","O","N","D"];
+
+function bewerkWaarde(sp, veld){
+  if(veld === "EN") return EN[sp.k] || "";
+  if(veld === "BEREIDING") return BEREIDING[sp.k] || "";
+  if(veld === "STOF") return STOF[sp.k] || null;
+  return sp[veld];
+}
+
+function bewerkBlad(k, terug){
+  const sp = SPEC_BY_K[k];
+  if(!sp) return;
+  const v = f => bewerkWaarde(sp, f);
+  const st = v("STOF") || {stof:"", grp:"", uitleg:""};
+
+  const rij = ([veld, label, soort])=>{
+    const w = v(veld);
+    if(soort === "groep")
+      return '<label class="bwvak"><span>'+esc(label)+'</span><div class="bwkeuze">'+
+        GROEPEN.map(([g,nm])=>'<button class="bwknop'+(sp.grp===g?" aan":"")+
+          '" data-grp="'+g+'">'+esc(nm)+'</button>').join("")+'</div></label>';
+    if(soort === "tags")
+      return '<label class="bwvak"><span>'+esc(label)+'</span><div class="bwkeuze">'+
+        ["eetbaar","medicinaal","giftig"].map(t=>'<button class="bwknop'+
+          ((sp.tags||[]).includes(t)?" aan":"")+'" data-tag="'+t+'">'+esc(t)+'</button>').join("")+
+        '</div></label>';
+    if(soort === "mnd")
+      return '<label class="bwvak"><span>'+esc(label)+'</span><div class="bwmnd">'+
+        MAANDNM.map((nm,i)=>'<button class="bwm'+((sp.mnd||[]).includes(i+1)?" aan":"")+
+          '" data-mnd="'+(i+1)+'">'+esc(nm)+'</button>').join("")+'</div></label>';
+    if(soort === "stof")
+      return '<label class="bwvak"><span>'+esc(label)+'</span>'+
+        '<input data-bw="stof.stof" placeholder="Naam van de stof" value="'+esc(st.stof)+'">'+
+        '<input data-bw="stof.grp" placeholder="Stofgroep" value="'+esc(st.grp)+'">'+
+        '<textarea data-bw="stof.uitleg" rows="2" placeholder="Wat doet hij?">'+esc(st.uitleg)+'</textarea></label>';
+    if(soort === "regels")
+      return '<label class="bwvak"><span>'+esc(label)+'</span>'+
+        '<textarea data-bw="'+veld+'" rows="4" placeholder="E\u00e9n per regel: Naam (waaraan je hem scheidt)">'+
+        esc((w||[]).join("\n"))+'</textarea></label>';
+    if(soort === "lang")
+      return '<label class="bwvak"><span>'+esc(label)+'</span>'+
+        '<textarea data-bw="'+veld+'" rows="3">'+esc(w||"")+'</textarea></label>';
+    return '<label class="bwvak"><span>'+esc(label)+'</span>'+
+      '<input data-bw="'+veld+'" value="'+esc(w||"")+'"></label>';
+  };
+
+  showSheet('<div class="label">'+VINE+HOEKRANK+
+    '<div class="acc"><span>'+(sp.eigen ? "Eigen soort" : "Bewerken")+'</span>'+
+    '<span>'+esc(sp.grp)+'</span></div><h2>'+esc(sp.nl)+'</h2>'+
+    '<div class="la">Wat je hier invult blijft van jou en overleeft een update</div></div>'+
+    '<div class="sec">'+BEWERK_VELDEN.map(rij).join("")+'</div>'+
+    '<div class="row"><button class="btn" id="bwBewaar">Bewaren</button></div>'+
+    '<div class="row"><button class="btn sec2" id="bwTerug">'+
+      (sp.eigen ? "Soort verwijderen" : "Terug naar de gids")+'</button>'+
+    '<button class="btn sec2" id="bwSluit">Sluiten</button></div>');
+
+  const lijf = bodyEl;
+  lijf.querySelectorAll("[data-grp]").forEach(b=> b.onclick = ()=>{
+    lijf.querySelectorAll("[data-grp]").forEach(x=> x.classList.toggle("aan", x === b)); });
+  lijf.querySelectorAll("[data-tag]").forEach(b=> b.onclick = ()=> b.classList.toggle("aan"));
+  lijf.querySelectorAll("[data-mnd]").forEach(b=> b.onclick = ()=> b.classList.toggle("aan"));
+
+  document.getElementById("bwSluit").onclick = ()=> terug ? terug() : specSheet(k);
+  document.getElementById("bwBewaar").onclick = ()=>{
+    const uit = {};
+    lijf.querySelectorAll("[data-bw]").forEach(el=>{
+      const naam = el.dataset.bw;
+      const waarde = (el.value || "").trim();
+      if(naam.startsWith("stof.")) return;              /* apart samengesteld */
+      if(naam === "dubbel") uit.dubbel = waarde ? waarde.split("\n").map(x=>x.trim()).filter(Boolean) : [];
+      else uit[naam] = waarde;
+    });
+    const gk = lijf.querySelector("[data-grp].aan");
+    if(gk) uit.grp = gk.dataset.grp;
+    uit.tags = [...lijf.querySelectorAll("[data-tag].aan")].map(b=> b.dataset.tag);
+    uit.mnd = [...lijf.querySelectorAll("[data-mnd].aan")].map(b=> +b.dataset.mnd).sort((a,b)=>a-b);
+    const sv = f => (lijf.querySelector('[data-bw="stof.'+f+'"]').value || "").trim();
+    if(sv("stof")) uit.STOF = {stof: sv("stof"), grp: sv("grp") || "onbekend", uitleg: sv("uitleg")};
+
+    if(!uit.nl || !uit.la){ toast("Naam en wetenschappelijke naam zijn nodig"); return; }
+    /* Een giftige soort toont nooit een plukdeel; dat is een vaste regel van
+       de gids en die blijft ook gelden voor wat jij invult. */
+    if(uit.tags.includes("giftig") && !uit.tags.includes("eetbaar")) uit.delen = "\u2014";
+
+    bewaarBewerking(k, uit, sp.eigen);
+    toast("Bewaard");
+    specSheet(k);
+  };
+  document.getElementById("bwTerug").onclick = ()=>{
+    if(sp.eigen){
+      if(!confirm("Deze soort helemaal verwijderen?")) return;
+      const lijst = lsGet("eigenSoorten", []).filter(x=> x.k !== k);
+      lsSet("eigenSoorten", lijst);
+      toast("Verwijderd \u2014 herstart de app om het door te voeren");
+      closeSheet(); return;
+    }
+    if(!confirm("Je eigen aanpassingen op deze soort wissen?")) return;
+    const alles = lsGet("soortEdits", {});
+    delete alles[k];
+    lsSet("soortEdits", alles);
+    toast("Teruggezet \u2014 herstart de app om het door te voeren");
+    closeSheet();
+  };
+}
+
+/* Bewaren en meteen toepassen, zodat je het resultaat direct ziet. */
+function bewaarBewerking(k, uit, isEigen){
+  const sp = SPEC_BY_K[k];
+  Object.entries(uit).forEach(([veld, waarde])=>{
+    if(veld === "EN") EN[k] = waarde;
+    else if(veld === "BEREIDING") BEREIDING[k] = waarde;
+    else if(veld === "STOF") STOF[k] = waarde;
+    else sp[veld] = waarde;
+  });
+  if(isEigen){
+    const lijst = lsGet("eigenSoorten", []).filter(x=> x.k !== k);
+    lijst.push({k, nl:sp.nl, la:sp.la, grp:sp.grp, tags:sp.tags, delen:sp.delen,
+                mnd:sp.mnd, herken:sp.herken, verwar:sp.verwar, dubbel:sp.dubbel,
+                let:sp.let, med:sp.med});
+    lsSet("eigenSoorten", lijst);
+  }
+  /* Naam, stof en bereiding horen bij de losse tabellen, ook voor eigen soorten. */
+  const alles = lsGet("soortEdits", {});
+  const bewaar = {};
+  ["EN","STOF","BEREIDING"].forEach(f=>{ if(uit[f] !== undefined) bewaar[f] = uit[f]; });
+  if(!isEigen) Object.entries(uit).forEach(([veld, waarde])=>{ bewaar[veld] = waarde; });
+  alles[k] = Object.assign(alles[k] || {}, bewaar);
+  lsSet("soortEdits", alles);
+  sp.bewerkt = true;
+  VERWAR_KAS = null;                    /* de verwarindex opnieuw laten opbouwen */
+}
+
+/* Een nieuwe soort aanmaken vanuit GBIF of uit een fotoherkenning. */
+function nieuweSoort(gegevens){
+  const basis = (gegevens.la || gegevens.nl || "soort")
+    .toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 22) || "soort";
+  let k = basis, n = 2;
+  while(SPEC_BY_K[k]) k = basis + (n++);
+  const sp = {
+    k, eigen:true,
+    nl: gegevens.nl || gegevens.la || "Nieuwe soort",
+    la: gegevens.la || "",
+    grp: gegevens.grp || "kruid",
+    tags: [], delen: "\u2014", mnd: [],
+    herken: "", verwar: "", dubbel: [], let: "",
+    med: gegevens.med || ""
+  };
+  SPECIES.push(sp);
+  SPEC_BY_K[k] = sp;
+  if(gegevens.en) EN[k] = gegevens.en;
+  const lijst = lsGet("eigenSoorten", []);
+  lijst.push({...sp});
+  lsSet("eigenSoorten", lijst);
+  return k;
+}
+
 /* ---------- spookpin: één tik zet een voorbeeld, nog een tik maakt hem echt ---------- */
 const spookHint = null;
 /* De tijdelijke speld overleeft niets: geen schermwissel, geen achtergrond,
@@ -7076,7 +7762,7 @@ async function tekenOntdek(){
      wat binnen een paar meter van elkaar ligt tot één pin, met een telling
      erop, en de tik toont ze allemaal. */
   const trossen = new Map();
-  rijen.forEach(o=>{
+  rijen.filter(o=> !S.soortFilter.length || S.soortFilter.includes(o.k)).forEach(o=>{
     /* Vijf decimalen is ongeveer een meter; genoeg om echt gestapelde
        punten samen te nemen zonder buren op te slokken. */
     const sleutel = o.lat.toFixed(5) + "," + o.lng.toFixed(5);
@@ -7587,6 +8273,7 @@ const DUBBEL_SYN = {
   "biggenkruid":"gewoon biggenkruid",
   "echte tonderzwam":"tonderzwam",
   "andere aardsterren":"gewone aardster",
+  "reukeloze kamille":"reukloze kamille",
   "beredruif":"berendruif",
   "veelbloemige salomonszegel":"gewone salomonszegel",
   "grote veelbloemige salomonszegel":"gewone salomonszegel"
@@ -8305,6 +8992,8 @@ async function specSheet(k, terugPin){
   let h = '<div class="label">'+VINE+HOEKRANK+HOEKEN+
     '<div class="acc"><span>'+(s.grp==="zwam"?"Paddenstoel":s.grp==="boom"?"Boom of struik":"Kruid")+'</span>'+
     '<span>'+(s.mnd.length?esc(s.mnd.map(m=>MND[m-1]).join(" ")):"—")+'</span></div>'+
+    (s.eigen ? '<div class="eigenmerk2">Eigen invoer \u2014 niet nagekeken door de gids</div>'
+             : s.bewerkt ? '<div class="eigenmerk2">Door jou aangepast</div>' : '')+
     '<h2>'+esc(s.nl)+'</h2><div class="la">'+esc(s.la)+
       (EN[k] ? '<span class="en">'+esc(EN[k])+'</span>' : '')+'</div>'+
     '<div class="tagrow">'+tagsHtml(s.tags,s.grp)+
@@ -8356,6 +9045,10 @@ async function specSheet(k, terugPin){
     h += '</div>';
   }
   if(s.med)    h += '<div class="sec">'+sech("Toelichting","",'boek')+'<div class="prose">'+esc(s.med)+'</div></div>';
+  /* Waarvoor het werkt zegt weinig als je niet weet h\u00f3\u00e9 je het verwerkt:
+     koud trekken of koken, vers of gedroogd, uitwendig of inwendig. */
+  if(BEREIDING[k]) h += '<div class="sec">'+sech("Bereiding","",'ketel')+
+    '<div class="prose">'+esc(BEREIDING[k])+'</div></div>';
   /* Deze twee stonden al in de gegevens en werden alleen in de quiz gebruikt.
      Op de kaart zelf vullen ze precies de soorten waar verder weinig over te
      zeggen valt. De teksten bevatten opmaak, dus niet escapen. */
@@ -8389,12 +9082,15 @@ async function specSheet(k, terugPin){
        '<button class="btn sec2" data-act="ontdek">Toon op<br>kaart</button>'+
        '<button class="btn sec2" id="oefenSoort">Herkenning<br>oefenen</button>'+
        '<button class="btn sec2" id="gbifPagina">Soortenpagina<br>op GBIF</button>'+
+       '<button class="btn sec2" id="bwOpen">Bewerken</button>'+
        '<button class="btn sec2" data-act="close">Sluiten</button></div>'+FLOURISH;
   showSheet(h);
 
   /* Naar de bron zelf: de GBIF-soortenpagina heeft de verspreidingskaart, de
      synoniemen en alle waarnemingen die de app hier samenvat. De sleutel staat
      meestal al in de kas; anders halen we hem alsnog op. */
+  const bw = document.getElementById("bwOpen");
+  if(bw) bw.onclick = ()=> bewerkBlad(k);
   const gp = document.getElementById("gbifPagina");
   if(gp) gp.onclick = async ()=>{
     gp.disabled = true; gp.textContent = "Zoeken\u2026";
@@ -8881,6 +9577,12 @@ function renderSpec(){
       (fMnd ? " · "+MND_VOL[fMnd-1] : "");
 
   let h="";
+  /* De gids is niet het eindpunt: wat je hier niet vindt, kun je in GBIF
+     opzoeken en van daaruit zelf toevoegen. */
+  const zoekterm = (document.getElementById("qSpec").value||"").trim();
+  if(zoekterm.length >= 3)
+    h += '<div class="gbifbalk"><span>'+(hits.length ? "Niet wat je zocht?" : "Niets in de gids.")+
+      '</span><button class="btn sec2" id="naarGbif">Zoek in GBIF</button></div>';
   if(v==="zwam") h += '<div class="empty" style="margin:0 12px 14px;padding:13px;background:rgba(192,133,82,.09);border:1px solid rgba(192,133,82,.3);border-radius:14px;text-align:left"><b style="font-size:15px">Zwammen zijn een vak apart</b><span style="font-size:13px;color:var(--kalk-2)">Deze lijst is om te lezen en te leren, niet om op te determineren. Laat elke eerste vondst van een soort nakijken door een kenner.</span></div>';
   if(v==="nu" && mijn.length){
     h += '<p class="grouphd">Jouw plekken, nu</p>' + mijn.map(p=>'<button class="rec" data-id="'+p.id+'">'+
@@ -8894,6 +9596,8 @@ function renderSpec(){
   const body=document.getElementById("specBody");
   body.innerHTML=h;
   body.querySelectorAll("[data-sk]").forEach(b=> b.onclick=()=>specSheet(b.dataset.sk));
+  const gk = document.getElementById("naarGbif");
+  if(gk) gk.onclick = ()=> gbifZoekBlad(zoekterm);
   body.querySelectorAll("[data-id]").forEach(b=> b.onclick=()=>{
     const p=S.pins.find(x=>x.id===b.dataset.id);
     go("map"); S.map.setView([p.lat,p.lng],Math.max(S.map.getZoom(),17)); openSheet(p.id); });
@@ -9469,6 +10173,24 @@ function balanceer(keys){
     uit = rest.concat(zwam.slice(0, max));
     while(uit.length < keys.length && aanvul.length) uit.push(aanvul.pop());
   }
+  /* Hetzelfde plafond voor giftige soorten. Ze hebben allemaal dubbelgangers
+     en tellen daardoor twee keer mee in het gewicht; bij sortering op gewicht
+     stond de hele kop van de lijst vol gif en werd 95% van de vragen giftig,
+     terwijl de vijver voor een kwart giftig is. Kennen moet je ze, maar een
+     ronde die alleen uit gif bestaat leert je niets over de rest. */
+  {
+    const gifMax = Math.max(1, Math.ceil(uit.length / 3));
+    const gif = [], anders = [];
+    uit.forEach(k => ((SPEC_BY_K[k]||{}).tags||[]).includes("giftig") ? gif.push(k) : anders.push(k));
+    if(gif.length > gifMax){
+      const vijver = themaPool().filter(x=> !x.tags.includes("giftig")).map(x=>x.k);
+      const aanvul = shuffle(vijver.filter(k=> !anders.includes(k)));
+      const nieuw = anders.concat(gif.slice(0, gifMax));
+      while(nieuw.length < uit.length && aanvul.length) nieuw.push(aanvul.pop());
+      uit = nieuw;
+    }
+  }
+
   /* Op Gebruik geldt nog een tweede deksel. Soorten zonder kwaal, recept,
      plukdeel of maand kunnen daar maar één vraag opleveren: "wat moet je
      onthouden". Belangrijk voor het giftige werk, maar met ruim vijftig van
@@ -9865,7 +10587,9 @@ function scanKaartje(b){
       h += '<div class="tekst">Uit hetzelfde geslacht staan w\u00e9l in de gids: '+
         esc(buren.map(x=>x.nl).join(", "))+'. Dat zijn andere soorten \u2014 gebruik ze niet als antwoord.</div>';
     h += '<button class="btn sec2" data-gbifla="'+esc(b.namen[0]||"")+'"'+
-         (b.gbif ? ' data-gbifid="'+esc(String(b.gbif))+'"' : '')+'>Bekijk op GBIF</button>';
+         (b.gbif ? ' data-gbifid="'+esc(String(b.gbif))+'"' : '')+'>Bekijk op GBIF</button>'+
+         '<button class="btn sec2" data-nieuw="'+esc(b.namen[0]||"")+'"'+
+         (b.volks ? ' data-volks="'+esc(b.volks)+'"' : '')+'>Toevoegen aan de gids</button>';
     return h + '</div>';
   }
 
@@ -10011,6 +10735,13 @@ async function scanVerstuur(){
     const lijf = document.getElementById("scanBody");
     lijf.querySelectorAll("[data-scank]").forEach(b=>
       b.onclick = ()=>{ scanSluit(); specSheet(b.dataset.scank); });
+    lijf.querySelectorAll("[data-nieuw]").forEach(b=>
+      b.onclick = ()=>{
+        const k = nieuweSoort({nl: b.dataset.volks || b.dataset.nieuw, la: b.dataset.nieuw});
+        scanSluit();
+        toast("Toegevoegd \u2014 vul aan wat je weet");
+        bewerkBlad(k);
+      });
     lijf.querySelectorAll("[data-gbifla]").forEach(b=>
       b.onclick = ()=>{
         const id = b.dataset.gbifid;
@@ -10053,6 +10784,7 @@ scanPick.addEventListener("change", ()=>{
   if(f) scanStart(f);
 });
 document.getElementById("btnScan").onclick = ()=> scanPick.click();
+document.getElementById("btnFilter").onclick = ()=>{ filterZoek = ""; filterBlad(); };
 /* Dezelfde knop staat ook in de zoekbalken van Vondsten en Herbarium. */
 document.querySelectorAll("[data-scan]").forEach(b=> b.onclick = e=>{
   e.preventDefault(); scanPick.click();

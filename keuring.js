@@ -217,6 +217,95 @@ try{
         : "ETYM "+Object.keys(ETYM).length+" · VOLKS "+Object.keys(VOLKS).length+
           " · STOF "+Object.keys(STOF).length+" · KWALEN "+Object.keys(KWALEN_MAP).length+", alle gekoppeld";
     }],
+    /* Waarvoor het werkt zegt weinig zonder waardoor en hoe. Elke medicinale
+       soort hoort de werkzame stof \u00e9n een bereidingswijze te tonen. */
+    /* De gids moet uit te breiden zijn: een soort uit GBIF of uit een
+       fotoherkenning toevoegen, en elk blad aanvullen. Wat de gebruiker
+       invult wordt apart bewaard, zodat een update het niet overschrijft. */
+    ["soorten toevoegen en bewerken", ()=>{
+      const voor = SPECIES.length;
+      const k = nieuweSoort({nl:"Keuringssoort", la:"Testus keuringus", grp:"kruid"});
+      if(!SPEC_BY_K[k]) return "NIEUWE SOORT KOMT NIET IN DE INDEX";
+      if(SPECIES.length !== voor + 1) return "SOORT NIET TOEGEVOEGD aan de lijst";
+
+      let blad = "";
+      const bewaardSheet = showSheet;
+      showSheet = x => { blad = x; };
+      try{ bewerkBlad(k); } finally { showSheet = bewaardSheet; }
+      const velden = (blad.match(/data-bw=/g) || []).length;
+      if(velden < 10) return "BEWERKER TE KAAL: " + velden + " velden";
+      if(!/data-mnd=/.test(blad)) return "geen maandkiezer in de bewerker";
+
+      /* Een giftige soort mag ook na bewerking geen plukdeel tonen. */
+      bewaarBewerking(k, {tags:["giftig"], delen:"blad", nl:"Keuringssoort"}, true);
+      /* De bewerker legt die regel op bij het bewaren; hier toetsen we de opslag. */
+      bewaarBewerking(k, {STOF:{stof:"Testine", grp:"alkalo\u00efden", uitleg:"proef"}}, true);
+      if(!STOF[k]) return "WERKZAME STOF WORDT NIET BEWAARD";
+
+      /* En een bestaande soort moet aan te passen zijn zonder de gids te raken. */
+      const origineel = SPEC_BY_K["daslook"].herken;
+      bewaarBewerking("daslook", {herken:"keuringstekst"}, false);
+      const aangepast = SPEC_BY_K["daslook"].herken === "keuringstekst" && SPEC_BY_K["daslook"].bewerkt;
+      SPEC_BY_K["daslook"].herken = origineel;
+      delete SPEC_BY_K["daslook"].bewerkt;
+
+      /* Opruimen: de keuringssoort hoort niet in de opslag achter te blijven. */
+      const lijst = lsGet("eigenSoorten", []).filter(x=> x.k !== k);
+      lsSet("eigenSoorten", lijst);
+      const edits = lsGet("soortEdits", {});
+      delete edits[k]; delete edits["daslook"];
+      lsSet("soortEdits", edits);
+      const i = SPECIES.findIndex(x=> x.k === k);
+      if(i >= 0) SPECIES.splice(i, 1);
+      delete SPEC_BY_K[k]; delete STOF[k];
+
+      return aangepast ? "toevoegen vanuit GBIF of foto, en elk blad bewerkbaar"
+        : "BESTAANDE SOORT NIET AANPASBAAR";
+    }],
+    ["medicinaal compleet", ()=>{
+      const med = SPECIES.filter(s=> s.tags.includes("medicinaal"));
+      const zonderStof = med.filter(s=> !STOF[s.k]);
+      const zonderBer = med.filter(s=> !BEREIDING[s.k]);
+      const wees = Object.keys(BEREIDING).filter(k=> !SPEC_BY_K[k]);
+      if(wees.length) return "WEESSLEUTELS in BEREIDING: " + wees.slice(0,5).join(", ");
+      if(zonderStof.length) return zonderStof.length + " ZONDER WERKZAME STOF: " +
+        zonderStof.map(s=>s.nl).slice(0,6).join(", ");
+      if(zonderBer.length) return zonderBer.length + " ZONDER BEREIDING: " +
+        zonderBer.map(s=>s.nl).slice(0,6).join(", ");
+      /* En het moet ook echt op het blad staan. */
+      let h = "";
+      const bewaard = showSheet;
+      showSheet = x => { h = x; };
+      try{ specSheet("kamille"); } finally { showSheet = bewaard; }
+      if(!/Bereiding/.test(h)) return "BEREIDING STAAT NIET OP HET BLAD";
+      if(!/Werkzame stof/.test(h)) return "WERKZAME STOF STAAT NIET OP HET BLAD";
+      return med.length + " medicinale soorten, alle met stof en bereiding";
+    }],
+    /* Giftige soorten hebben dubbelgangers en wegen daardoor dubbel; zonder
+       plafond bestond 95% van een ronde uit gif terwijl de gids voor een kwart
+       giftig is. */
+    ["gif kaapt de ronde niet", ()=>{
+      const bewaardNiv = S.leer.niveau, bewaardRec = S.leer.recent, bewaardDoel = S.leer.doel;
+      S.leer.niveau = "herkennen"; S.leer.thema.herkennen = "alles";
+      S.leer.doel = 10; S.leer.recent = [];
+      let gif = 0, n = 0;
+      for(let r = 0; r < 10; r++){
+        const vijver = new Set(themaPool().map(x=>x.k));
+        let due = dueKeys().filter(k=> vijver.has(k));
+        if(due.length < 4) due = [...vijver];
+        const m = Math.min(S.leer.doel, Math.max(due.length, 4));
+        const vers = due.filter(k=> !S.leer.recent.includes(k));
+        if(vers.length >= m) due = vers;
+        let keys = pickN(due.sort((a,b)=> leerGewicht(b) - leerGewicht(a)).slice(0, Math.max(m*3,24)), m);
+        keys = balanceer(keys);
+        S.leer.recent = [...keys, ...S.leer.recent].slice(0, 40);
+        keys.forEach(k=>{ n++; if((SPEC_BY_K[k].tags||[]).includes("giftig")) gif++; });
+      }
+      S.leer.niveau = bewaardNiv; S.leer.recent = bewaardRec; S.leer.doel = bewaardDoel;
+      const pct = Math.round(100 * gif / n);
+      return pct > 50 ? "TE VEEL GIF: " + pct + "% van de vragen"
+        : pct + "% giftige soorten in tien rondes";
+    }],
     ["medicinaal met kwalen", ()=>{
       const fout = SPECIES.filter(s=> s.tags.includes("medicinaal") && !(s.kwalen && s.kwalen.length));
       return fout.length ? fout.length+" ZONDER KWALEN: "+fout.map(s=>s.nl).slice(0,8).join(", ")
@@ -389,6 +478,31 @@ try{
       if((h.match(/data-gbifla=/g) || []).length !== 2) return "GEEN GBIF-VERWIJZING bij onbekende soorten";
       if(!/data-gbifid="3003444"/.test(h)) return "GBIF-id wordt niet doorgegeven";
       return "onbekende soorten blijven apart, met melding en GBIF-verwijzing";
+    }],
+    /* Het soortenfilter geldt voor beide lagen tegelijk: je eigen vondsten en
+       de GBIF-waarnemingen. Anders geven de twee een verschillend beeld. */
+    ["soortenfilter op de kaart", ()=>{
+      const bewaardF = S.soortFilter, bewaardQ = filterZoek;
+      S.soortFilter = []; filterZoek = "";
+      let blad = "";
+      const bewaardSheet = showSheet;
+      showSheet = x => { blad = x; };
+      try{ filterBlad(); } finally { showSheet = bewaardSheet; }
+      const rijen = (blad.match(/data-fk=/g) || []).length;
+      if(!rijen) return "GEEN SOORTENLIJST in het filterblad";
+      if(!/id="qFilter"/.test(blad)) return "GEEN ZOEKVELD in het filterblad";
+
+      /* Zoeken moet op alle drie de namen werken. */
+      const treffers = t=>{ filterZoek = t; return (filterLijstHtml().match(/data-fk=/g)||[]).length; };
+      const nl = treffers("daslook"), en = treffers("ramsons"), la = treffers("Allium ursinum");
+      filterZoek = bewaardQ;
+      if(!nl || !en || !la) return "ZOEKEN FAALT: nl " + nl + ", en " + en + ", la " + la;
+
+      /* En het filter moet in beide tekenlussen staan. */
+      if(!/soortFilter/.test(drawMarkers.toString())) return "EIGEN VONDSTEN WORDEN NIET GEFILTERD";
+      if(!/soortFilter/.test(tekenOntdek.toString())) return "GBIF-LAAG WORDT NIET GEFILTERD";
+      S.soortFilter = bewaardF;
+      return "filter werkt op beide lagen, zoekbaar op Nederlands, Latijn en Engels";
     }],
     ["gestapelde waarnemingen", ()=>{
       const rijen = [
