@@ -525,13 +525,22 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
   .gbifbalk .gbpijl{position:absolute;right:26px}
   .gbifbalk{position:relative}
 }
-.gbiflijst{display:flex;flex-direction:column;gap:6px;margin-top:10px}
-.gbifrij{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;
-  padding:10px 12px;border-radius:12px;border:1px solid rgba(44,42,31,.14);
-  background:rgba(44,42,31,.05);font:inherit;color:inherit;text-align:left}
+.gbiflijst{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.gbifrij{display:flex;align-items:flex-start;gap:11px;width:100%;
+  padding:10px 12px;border-radius:13px;border:1px solid rgba(44,42,31,.14);
+  background:rgba(44,42,31,.05);text-align:left}
+.gbtekst{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .gbifrij .nm{font-family:var(--slab);font-size:16px;font-weight:700}
 .gbifrij .la{font-style:italic;font-size:12px;opacity:.72}
-.gbifrij .bij{font-family:var(--mono);font-size:10.5px;opacity:.62;margin-top:2px}
+.gbacties{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.gbknop{padding:6px 11px;border-radius:10px;border:1px solid rgba(44,42,31,.2);
+  background:rgba(44,42,31,.06);font:inherit;font-size:12.5px;color:inherit}
+.gbknop.web{border-color:rgba(58,90,64,.45);background:rgba(58,90,64,.1)}
+.gbknop:active{background:rgba(44,42,31,.14)}
+.gbduim{flex:0 0 auto;width:74px;height:74px;border-radius:11px;overflow:hidden;
+  background:rgba(44,42,31,.07);border:1px solid rgba(44,42,31,.12);display:grid;
+  place-items:center}
+.gbduim img{width:100%;height:100%;object-fit:cover;display:block}
 /* Soortenfilter: een lijst waarin je aanvinkt wat je op de kaart wilt zien. */
 .filterlijst{display:flex;flex-direction:column;gap:4px;max-height:46vh;overflow-y:auto;
   margin-top:10px;padding-right:2px}
@@ -1316,7 +1325,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.69.0";
+const APP_VERSION = "0.70.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -7536,6 +7545,41 @@ async function gbifZoek(term){
   }).slice(0, 12);
 }
 
+/* E\u00e9n foto per gevonden soort, rechtstreeks bij GBIF. Een naam alleen zegt
+   weinig; met een beeld erbij zie je meteen of je in de goede hoek zit. */
+async function gbifDuim(taxonKey){
+  try{
+    const d = await gbif("occurrence/search?taxonKey=" + taxonKey +
+      "&mediaType=StillImage&basisOfRecord=HUMAN_OBSERVATION&limit=3");
+    for(const rec of (d.results || [])){
+      for(const m of (rec.media || [])){
+        if(m.identifier && /^https?:/.test(m.identifier)) return m.identifier;
+      }
+    }
+  }catch(e){}
+  return null;
+}
+
+/* E\u00e9n gevonden soort als rij: foto rechts, namen links, en twee wegen \u2014
+   opnemen in de gids, of nakijken op de site van GBIF zelf. */
+function gbifRijHtml(r, i){
+  const alHier = SPECIES.find(x=> (x.la||"").toLowerCase() === (r.canonicalName||"").toLowerCase());
+  const volks = r.vernacularName || "";
+  const sleutel = r.key || r.nubKey || r.speciesKey;
+  return '<div class="gbifrij">'+
+    '<div class="gbtekst">'+
+      '<span class="nm">'+esc(volks || r.canonicalName)+'</span>'+
+      '<span class="la">'+esc(r.canonicalName)+(r.family?' \u00b7 '+esc(r.family):'')+'</span>'+
+      '<div class="gbacties">'+
+        '<button class="gbknop" data-gb="'+i+'"'+(alHier?' data-al="'+esc(alHier.k)+'"':'')+'>'+
+          (alHier ? "Openen in de gids" : "Toevoegen aan de gids")+'</button>'+
+        (sleutel ? '<button class="gbknop web" data-gbweb="'+esc(String(sleutel))+'">Op GBIF</button>' : '')+
+      '</div>'+
+    '</div>'+
+    '<div class="gbduim" data-duim="'+esc(String(sleutel||""))+'"></div>'+
+  '</div>';
+}
+
 function gbifZoekBlad(term){
   showSheet('<div class="label">'+VINE+HOEKRANK+
     '<div class="acc"><span>GBIF</span><span>zoeken</span></div>'+
@@ -7546,14 +7590,7 @@ function gbifZoekBlad(term){
     const lijst = !rijen.length
       ? '<div class="tekst">Niets gevonden bij GBIF voor \u201c'+esc(term)+'\u201d. '+
         'Probeer de wetenschappelijke naam; daar werkt GBIF het best mee.</div>'
-      : rijen.map((r,i)=>{
-          const alHier = SPECIES.find(x=> (x.la||"").toLowerCase() === r.canonicalName.toLowerCase());
-          const volks = r.vernacularName || "";
-          return '<button class="gbifrij" data-gb="'+i+'"'+(alHier?' data-al="'+esc(alHier.k)+'"':'')+'>'+
-            '<span class="nm">'+esc(volks || r.canonicalName)+'</span>'+
-            '<span class="la">'+esc(r.canonicalName)+(r.family?' \u00b7 '+esc(r.family):'')+'</span>'+
-            '<span class="bij">'+esc(alHier ? "staat al in de gids" : "toevoegen aan de gids")+'</span></button>';
-        }).join("");
+      : rijen.map(gbifRijHtml).join("");
 
     showSheet('<div class="label">'+VINE+HOEKRANK+
       '<div class="acc"><span>GBIF</span><span>'+rijen.length+'</span></div>'+
@@ -7564,6 +7601,18 @@ function gbifZoekBlad(term){
       '<div class="row"><button class="btn sec2" id="gbifDicht">Sluiten</button></div>');
 
     document.getElementById("gbifDicht").onclick = closeSheet;
+    /* De naam op de GBIF-site openen. */
+    bodyEl.querySelectorAll("[data-gbweb]").forEach(b=> b.onclick = ()=>
+      window.open("https://www.gbif.org/species/" + encodeURIComponent(b.dataset.gbweb),
+        "_blank", "noopener"));
+    /* Duimnagels komen na elkaar binnen; de lijst staat er al. */
+    bodyEl.querySelectorAll("[data-duim]").forEach(async vak=>{
+      const sleutel = vak.dataset.duim;
+      if(!sleutel) { vak.innerHTML = ""; return; }
+      const url = await gbifDuim(sleutel);
+      if(!document.body.contains(vak)) return;
+      vak.innerHTML = url ? '<img src="'+esc(url)+'" alt="" loading="lazy">' : "";
+    });
     bodyEl.querySelectorAll("[data-gb]").forEach(b=> b.onclick = ()=>{
       if(b.dataset.al){ specSheet(b.dataset.al); return; }
       const r = rijen[+b.dataset.gb];

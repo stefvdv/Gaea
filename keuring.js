@@ -508,6 +508,23 @@ try{
       return geopend ? nodig.length + " functies aanwezig, de GBIF-knop opent een blad"
         : "DE GBIF-KNOP OPENT NIETS";
     }],
+    /* Een naam alleen zegt weinig: elke GBIF-treffer hoort een foto te tonen en
+       een weg naar de soortpagina op gbif.org. */
+    ["gbif-treffers met foto en link", ()=>{
+      const rij = [
+        {key:2888511, canonicalName:"Plantago major", family:"Plantaginaceae", vernacularName:"Grote weegbree"},
+        {key:5361636, canonicalName:"Plantago media", family:"Plantaginaceae"},
+        {canonicalName:"Arctia caja"}
+      ].map(gbifRijHtml).join("");
+      if((rij.match(/class="gbifrij"/g) || []).length !== 3) return "RIJEN WORDEN NIET OPGEBOUWD";
+      if((rij.match(/data-duim=/g) || []).length !== 3) return "GEEN FOTOVAK per treffer";
+      if((rij.match(/data-gbweb=/g) || []).length !== 2) return "GEEN GBIF-LINK bij treffers met sleutel";
+      if(!/Openen in de gids/.test(rij)) return "bekende soort krijgt geen weg naar zijn blad";
+      if(!/Toevoegen aan de gids/.test(rij)) return "onbekende soort is niet toe te voegen";
+      if(!/gbif\.org\/species\//.test(gbifZoekBlad.toString())) return "de link wijst niet naar gbif.org";
+      if(!/mediaType=StillImage/.test(gbifDuim.toString())) return "er wordt geen foto opgehaald";
+      return "foto, gidsknop en link naar gbif.org per treffer";
+    }],
     ["soortenfilter op de kaart", ()=>{
       const bewaardF = S.soortFilter, bewaardQ = filterZoek;
       S.soortFilter = []; filterZoek = "";
