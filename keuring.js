@@ -512,18 +512,67 @@ try{
        een weg naar de soortpagina op gbif.org. */
     ["gbif-treffers met foto en link", ()=>{
       const rij = [
-        {key:2888511, canonicalName:"Plantago major", family:"Plantaginaceae", vernacularName:"Grote weegbree"},
+        {key:111, nubKey:2888511, canonicalName:"Plantago major", family:"Plantaginaceae", vernacularName:"Grote weegbree"},
         {key:5361636, canonicalName:"Plantago media", family:"Plantaginaceae"},
         {canonicalName:"Arctia caja"}
       ].map(gbifRijHtml).join("");
       if((rij.match(/class="gbifrij"/g) || []).length !== 3) return "RIJEN WORDEN NIET OPGEBOUWD";
       if((rij.match(/data-duim=/g) || []).length !== 3) return "GEEN FOTOVAK per treffer";
       if((rij.match(/data-gbweb=/g) || []).length !== 2) return "GEEN GBIF-LINK bij treffers met sleutel";
-      if(!/Openen in de gids/.test(rij)) return "bekende soort krijgt geen weg naar zijn blad";
-      if(!/Toevoegen aan de gids/.test(rij)) return "onbekende soort is niet toe te voegen";
-      if(!/gbif\.org\/species\//.test(gbifZoekBlad.toString())) return "de link wijst niet naar gbif.org";
+      if((rij.match(/data-wiki=/g) || []).length !== 3) return "GEEN WIKIPEDIA-LINK per treffer";
+      /* De ruggengraatsleutel is de enige die werkt voor foto\u2019s en soortpagina;
+         met een deelbestandsleutel bleven de duimnagels leeg. */
+      if(!/data-duim="2888511"/.test(rij)) return "NUBKEY WORDT GENEGEERD: duimnagels blijven leeg";
+      if(!/datasetKey/.test(gbifZoek.toString())) return "zoekt buiten de ruggengraat";
+      if(!/<button class="gbduim"/.test(rij)) return "de foto is niet aantikbaar";
+      if(!/openLoep/.test(gbifZoekBlad.toString())) return "de foto vergroot niet";
+      if(!/nl\.wikipedia\.org/.test(gbifZoekBlad.toString())) return "de wikipedia-knop leidt nergens heen";
       if(!/mediaType=StillImage/.test(gbifDuim.toString())) return "er wordt geen foto opgehaald";
-      return "foto, gidsknop en link naar gbif.org per treffer";
+      return "foto (aantikbaar), gidsknop, GBIF en Wikipedia per treffer";
+    }],
+    /* Waarnemingen ophalen kost dataverkeer en tientallen verzoeken aan GBIF.
+       Dat hoort op verzoek te gebeuren, niet bij elke verschuiving van de kaart. */
+    /* Een pin hoeft niet over een soort te gaan: een rustplek, een stille bocht
+       of een uitzicht is ook het onthouden waard. */
+    ["plekken markeren", ()=>{
+      const p = leegPin(52.1, 5.1, 10);
+      if(!("plek_srt" in p)) return "GEEN VELD voor het soort plek";
+      p.plek_srt = "rust";
+      if(JSON.stringify(pinVakken(p)) !== '["plek"]')
+        return "een plek valt onder de soortvakken: " + JSON.stringify(pinVakken(p));
+      if(PLEKSOORTEN.length < 4) return "te weinig soorten plekken";
+      /* Leaflet draait niet in de keuring, dus we lezen de code. */
+      const ic = markerIcon.toString();
+      if(!/plekpin/.test(ic)) return "een plek krijgt geen eigen teken op de kaart";
+      if(!/plek_srt/.test(drawMarkers.toString())) return "plekken worden weggefilterd door de soortfilters";
+      return PLEKSOORTEN.length + " soorten plekken, met een eigen teken op de kaart";
+    }],
+    /* Weten welke kant je opgaat scheelt in het veld meer dan weten waar je bent. */
+    ["richting bij de positiestip", ()=>{
+      const gps = startGps.toString();
+      if(!/me-pijl/.test(gps)) return "GEEN PIJL bij de stip";
+      if(!/coords\.heading/.test(gps)) return "de looprichting uit de GPS wordt niet gebruikt";
+      if(typeof startKompas !== "function") return "geen kompas als aanvulling";
+      if(!/deviceorientation/.test(startKompas.toString())) return "het kompas luistert nergens naar";
+      /* Stilstaand geeft de GPS ruis; dat hoort te worden afgevangen. */
+      if(!/speed/.test(gps)) return "de richting wordt ook stilstaand overgenomen";
+      return "pijl op de looprichting, met het kompas als aanvulling";
+    }],
+    ["laden op verzoek", ()=>{
+      if(!document.getElementById("btnLaad")) return "LAADKNOP ONTBREEKT";
+      /* Niet op getElementById toetsen: de nagebouwde browser geeft voor elk id
+         iets terug. De knopstatus-functie noemt de nieuwe knop wel bij naam. */
+      if(!/btnLaad/.test(ontdekLaadKnopBij.toString())) return "de knopstatus kijkt naar de oude knop";
+      if(typeof ontdekLaadKnopBij !== "function") return "geen knopstatus-functie";
+      /* De kaart mag bij verschuiven niets meer ophalen. */
+      const kaart = initMap.toString();
+      if(/vulKaart|autoVul/.test(kaart)) return "DE KAART LAADT NOG VANZELF bij moveend";
+      if(planVul.toString().replace(/\s/g, "").length > 40)
+        return "planVul haalt nog steeds op";
+      /* En het ophalen zelf moet zich op het zichtbare stuk richten. */
+      if(!/getBounds|beeldSleutel|getCenter/.test(vulKaart.toString()))
+        return "er wordt niet op het zichtbare kaartbeeld geladen";
+      return "laden gebeurt met de knop, voor het stuk kaart in beeld";
     }],
     ["soortenfilter op de kaart", ()=>{
       const bewaardF = S.soortFilter, bewaardQ = filterZoek;
