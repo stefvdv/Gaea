@@ -536,6 +536,15 @@ try{
        of een uitzicht is ook het onthouden waard. */
     /* Na het aantikken van een soort werd het zoekveld leeggemaakt; je zag dan
        nergens meer welke soort je nu eigenlijk had gekozen. */
+    /* Sta je op de plek zelf, dan is je eigen stip de nauwkeurigste plaats die
+       je hebt; die hoort dus een vondst te kunnen openen. */
+    ["tik op de eigen stip", ()=>{
+      const g = startGps.toString();
+      if(!/interactive:\s*true/.test(g)) return "de stip is niet aantikbaar";
+      if(!/nieuweVondst\(S\.pos\.lat/.test(g))
+        return "een tik op de stip opent geen vondst op die plek";
+      return "een tik op je eigen stip opent een vondst op die plek";
+    }],
     ["gekozen soort blijft zichtbaar", ()=>{
       const bron = editPin.toString();
       if(/q\.value\s*=\s*""\s*;\s*renderPick/.test(bron))
@@ -557,6 +566,57 @@ try{
       return staat === "Daslook"
         ? "de gekozen soort blijft in het zoekveld staan, met een vinkje"
         : "een bestaande vondst toont zijn soort niet: '" + staat + "'";
+    }],
+    /* De determinatiesleutel: een reeks grove keuzes die de lijst inkort. Hij
+       moet versmallen zonder soorten kwijt te raken die er wel bij horen, en
+       de uitkomst moet uitdrukkelijk een lijst kandidaten zijn. */
+    ["determinatiesleutel", ()=>{
+      const kk = sleutelKenmerken();
+      if(Object.keys(kk).length !== SPECIES.length)
+        return "NIET ALLE SOORTEN hebben kenmerken: " + Object.keys(kk).length + "/" + SPECIES.length;
+
+      /* De gevaarlijkste zwammen moeten goed ingedeeld staan; die mogen niet
+         uit beeld vallen doordat een kenmerk verkeerd is afgeleid. */
+      const moet = {
+        groeneknolamaniet:["plaat","grond"], vliegenzwam:["plaat","grond"],
+        eekhoorntjesbrood:["porie","grond"], zwavelzwam:["porie","hout"],
+        morielje:["morielje","grond"], weidetrechterzwam:["plaat","gras"]
+      };
+      for(const [k, [type, groei]] of Object.entries(moet)){
+        if(kk[k].type !== type) return SPEC_BY_K[k].nl + " staat als " + kk[k].type + ", verwacht " + type;
+        if(kk[k].groei !== groei) return SPEC_BY_K[k].nl + " groeit volgens de sleutel op " + kk[k].groei;
+      }
+
+      const bewaard = SLEUTEL;
+      const leeg = {rijk:null, type:null, kleur:null, maat:null, groei:null,
+                    vorm:null, plek:null, bloem:null, blad:null, maand:null, stap:0};
+      const zet = o => { SLEUTEL = Object.assign({}, leeg, o); return sleutelTreffers().length; };
+
+      const alles = zet({});
+      const zwam  = zet({rijk:"zwam"});
+      const plant = zet({rijk:"plant"});
+      if(zwam + plant !== alles) return "plant en zwam samen dekken de gids niet";
+
+      /* Beide takken moeten versmallen. */
+      const z1 = zet({rijk:"zwam", type:"plaat"});
+      const z2 = zet({rijk:"zwam", type:"plaat", groei:"gras"});
+      if(!(z1 < zwam && z2 < z1)) return "de zwamtak versmalt niet";
+      const p1 = zet({rijk:"plant", vorm:"struik"});
+      const p2 = zet({rijk:"plant", vorm:"struik", blad:"samen"});
+      if(!(p1 < plant && p2 < p1)) return "de plantentak versmalt niet";
+
+      /* Een onbekend kenmerk mag niets uitsluiten: de standplaats staat maar
+         bij een deel van de soorten beschreven, en dan weten we het niet. */
+      SLEUTEL = Object.assign({}, leeg, {rijk:"plant", plek:"bos"});
+      const metOnbekend = sleutelTreffers().some(sp=> !kk[sp.k].plek);
+      SLEUTEL = bewaard;
+      if(!metOnbekend) return "soorten zonder standplaats vallen ten onrechte af";
+
+      if(!/geen determinatie/i.test(sleutelUitkomst.toString()))
+        return "de uitkomst wordt niet als lijst kandidaten gepresenteerd";
+      if(!/sleutelRijkBlad/.test(sleutelBlad.toString()))
+        return "de sleutel begint niet met plant of paddenstoel";
+      return "plant (" + plant + ") en zwam (" + zwam + "), elk vier stappen";
     }],
     ["plekken markeren", ()=>{
       const p = leegPin(52.1, 5.1, 10);
