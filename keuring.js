@@ -537,31 +537,36 @@ try{
     ["plekken markeren", ()=>{
       const p = leegPin(52.1, 5.1, 10);
       if(!("plek_srt" in p)) return "GEEN VELD voor het soort plek";
-      p.plek_srt = "rust";
+      p.plek_srt = "bosje";
       if(JSON.stringify(pinVakken(p)) !== '["plek"]')
         return "een plek valt onder de soortvakken: " + JSON.stringify(pinVakken(p));
       if(PLEKSOORTEN.length < 4) return "te weinig soorten plekken";
-      if(!/veldpin plek/.test(markerIcon.toString()))
-        return "een plek krijgt niet dezelfde speld als een vondst";
+      if(!/plekboom/.test(markerIcon.toString()))
+        return "een plek krijgt niet de levensboom als markering";
 
-      /* De echte fout van 0.73: de plek werd bewaard maar viel door de
-         filtercontrole heen, want er bestaat geen filtervakje "plek". Hij
-         verscheen dus nooit op de kaart. Daarom hier daadwerkelijk tekenen. */
+      /* Verschijnt hij ook werkelijk? Dat ging in 0.73 mis. */
       const bewaardPins = S.pins, bewaardMap = S.map, bewaardMarkers = S.markers, bewaardL = globalThis.L;
       let getekend = 0;
       S.pins = [p];
       S.map = {removeLayer(){}, getZoom:()=>15};
       S.markers = new Map();
       globalThis.L = {marker:()=>({on(){}, addTo(){ getekend++; return this; }}), divIcon:o=>o};
-      try{ drawMarkers(); }
-      catch(e){ getekend = -1; }
+      try{ drawMarkers(); } catch(e){ getekend = -1; }
       finally{
-        S.pins = bewaardPins; S.map = bewaardMap;
-        S.markers = bewaardMarkers; globalThis.L = bewaardL;
+        S.map = bewaardMap; S.markers = bewaardMarkers; globalThis.L = bewaardL;
       }
-      if(getekend < 0) return "TEKENEN KLAPT op een plek";
-      if(getekend !== 1) return "DE PLEK VERSCHIJNT NIET op de kaart";
-      return PLEKSOORTEN.length + " soorten plekken, zichtbaar op de kaart met de gewone speld";
+      if(getekend !== 1){ S.pins = bewaardPins; return "DE PLEK VERSCHIJNT NIET op de kaart"; }
+
+      /* En het blad hoort een plekblad te zijn, geen soortenblad. */
+      let blad = "";
+      const bewaardSheet = showSheet;
+      showSheet = x => { blad = x; };
+      try{ openSheet(p.id); } finally { showSheet = bewaardSheet; S.pins = bewaardPins; }
+      if(!/Grove/.test(blad)) return "het blad noemt de pleksoort niet";
+      if(/Oogstlog/.test(blad)) return "een plek krijgt een oogstlog";
+      if(/Verwarbaar met/.test(blad)) return "een plek krijgt soortwaarschuwingen";
+      if(!/Veldgegevens/.test(blad)) return "de veldgegevens ontbreken";
+      return PLEKSOORTEN.length + " soorten plekken, met de levensboom en een eigen blad";
     }],
     /* Weten welke kant je opgaat scheelt in het veld meer dan weten waar je bent. */
     ["richting bij de positiestip", ()=>{
