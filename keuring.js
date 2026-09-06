@@ -541,11 +541,27 @@ try{
       if(JSON.stringify(pinVakken(p)) !== '["plek"]')
         return "een plek valt onder de soortvakken: " + JSON.stringify(pinVakken(p));
       if(PLEKSOORTEN.length < 4) return "te weinig soorten plekken";
-      /* Leaflet draait niet in de keuring, dus we lezen de code. */
-      const ic = markerIcon.toString();
-      if(!/plekpin/.test(ic)) return "een plek krijgt geen eigen teken op de kaart";
-      if(!/plek_srt/.test(drawMarkers.toString())) return "plekken worden weggefilterd door de soortfilters";
-      return PLEKSOORTEN.length + " soorten plekken, met een eigen teken op de kaart";
+      if(!/veldpin plek/.test(markerIcon.toString()))
+        return "een plek krijgt niet dezelfde speld als een vondst";
+
+      /* De echte fout van 0.73: de plek werd bewaard maar viel door de
+         filtercontrole heen, want er bestaat geen filtervakje "plek". Hij
+         verscheen dus nooit op de kaart. Daarom hier daadwerkelijk tekenen. */
+      const bewaardPins = S.pins, bewaardMap = S.map, bewaardMarkers = S.markers, bewaardL = globalThis.L;
+      let getekend = 0;
+      S.pins = [p];
+      S.map = {removeLayer(){}, getZoom:()=>15};
+      S.markers = new Map();
+      globalThis.L = {marker:()=>({on(){}, addTo(){ getekend++; return this; }}), divIcon:o=>o};
+      try{ drawMarkers(); }
+      catch(e){ getekend = -1; }
+      finally{
+        S.pins = bewaardPins; S.map = bewaardMap;
+        S.markers = bewaardMarkers; globalThis.L = bewaardL;
+      }
+      if(getekend < 0) return "TEKENEN KLAPT op een plek";
+      if(getekend !== 1) return "DE PLEK VERSCHIJNT NIET op de kaart";
+      return PLEKSOORTEN.length + " soorten plekken, zichtbaar op de kaart met de gewone speld";
     }],
     /* Weten welke kant je opgaat scheelt in het veld meer dan weten waar je bent. */
     ["richting bij de positiestip", ()=>{

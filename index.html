@@ -69,12 +69,12 @@ em.wonk{font-family:var(--slab);font-style:italic;font-variation-settings:'WONK'
 /* De stip met een pijl eromheen die wijst waar je heen loopt. De pijl staat
    los van de stip zodat hij kan draaien zonder de stip mee te trekken, en hij
    verschijnt pas als de richting bekend is \u2014 stilstaand weet niemand die. */
-/* Plekken: een rustiger, ronder teken dan de soortenspeld. */
-.plekpin{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
-  background:rgba(31,46,36,.92);border:1.5px solid var(--goud);color:#EBDFAE;
-  box-shadow:0 2px 6px rgba(0,0,0,.6)}
-.plekpin svg{width:19px;height:19px}
-.plekpin.sel{box-shadow:0 0 0 3px rgba(232,206,128,.5), 0 2px 6px rgba(0,0,0,.6)}
+/* Een plek gebruikt dezelfde speld als een vondst; in de kop staat het teken
+   van de pleksoort in plaats van het gekleurde steentje. */
+.veldpin.plek .plekteken{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);
+  width:17px;height:17px;display:grid;place-items:center;border-radius:50%;
+  background:#E8CE80;color:#2C2A1F;box-shadow:0 0 0 1.5px rgba(28,22,12,.65)}
+.veldpin.plek .plekteken svg{width:12px;height:12px}
 /* De keuze tussen een soort en een plek, bovenaan het vondstformulier. */
 .soortofplek{display:flex;gap:8px;margin-top:4px}
 .sopknop{flex:1;padding:10px;border-radius:12px;border:1px solid rgba(44,42,31,.18);
@@ -1372,7 +1372,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.73.0";
+const APP_VERSION = "0.74.0";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -7400,11 +7400,14 @@ function markerIcon(pin, sel){
   /* Een plek krijgt een eigen teken in plaats van de soortenspeld: je zoekt
      hem om een andere reden op, en dan wil je hem er meteen uit pikken. */
   if(pin.plek_srt){
+    /* Dezelfde speld als een vondst \u2014 het blijft een plek op je kaart \u2014 maar
+       met een gouden kop en het teken van de pleksoort erin. */
     const tek = PLEK_ICOON[pin.plek_srt] || PLEK_ICOON.rust;
-    return L.divIcon({className:"", iconSize:[32,32], iconAnchor:[16,16],
-      html:'<div class="plekpin'+(sel?" sel":"")+'">'+
-           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" '+
-           'stroke-linecap="round" stroke-linejoin="round">'+tek+'</svg></div>'});
+    return L.divIcon({className:"", iconSize:[34,48], iconAnchor:[17,46],
+      html:'<div class="veldpin plek'+(sel?" sel":"")+'" style="--gl:#E8CE80">'+
+           '<span class="plekteken"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
+           'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+tek+'</svg></span>'+
+           '</div>'});
   }
   /* De speld is \u00e9\u00e9n illustratie; de klasse zit in de gloed eromheen en in
      het steentje in de kop. Zo blijft alles uit dezelfde hand getekend. */
@@ -7453,10 +7456,15 @@ function drawMarkers(){
        door de eetbaar-medicinaal-giftig-schakelaars. */
     plek:"plek"};
   S.pins.forEach(p=>{
-    /* Een vondst blijft staan zolang minstens één van zijn eigenschappen
-       aangevinkt is. Anders zou duizendblad verdwijnen als je "eetbaar"
-       uitzet, terwijl je "medicinaal" nog aan hebt. */
-    if(!pinVakken(p).some(v=> S.filter[aan[v]])) return;
+    /* Een plek hoort bij geen enkel soortvakje. Eerder viel hij daardoor door
+       de filtercontrole heen en verscheen hij nooit op de kaart, ook al was
+       hij netjes bewaard. Plekken staan er dus altijd. */
+    if(!p.plek_srt){
+      /* Een vondst blijft staan zolang minstens \u00e9\u00e9n van zijn eigenschappen
+         aangevinkt is. Anders zou duizendblad verdwijnen als je "eetbaar"
+         uitzet, terwijl je "medicinaal" nog aan hebt. */
+      if(!pinVakken(p).some(v=> S.filter[aan[v]])) return;
+    }
     /* Soortenfilter: leeg betekent alles tonen, anders alleen wat is aangevinkt.
        Een plek heeft geen soort, dus die blijft staan. */
     if(!p.plek_srt && S.soortFilter.length && !S.soortFilter.includes(p.spec)) return;
