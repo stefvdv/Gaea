@@ -105,6 +105,9 @@ function Alles(){
 global.L = Alles();
 
 const s = fs.readFileSync("index.html","utf8");
+/* De keuring mag de broncode zelf nalezen, bijvoorbeeld om te toetsen of
+   elk opgezocht element ook echt in de HTML staat. */
+globalThis.GAEA_BRON = s;
 const m = [...s.matchAll(/<script>([\s\S]*?)<\/script>/g)];
 const code = m[m.length-1][1];
 

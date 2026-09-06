@@ -1411,7 +1411,7 @@ body.opkaart #randwerk .lijn, body.opkaart #randwerk .zij{opacity:.4}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
 "use strict";
-const APP_VERSION = "0.79.0";
+const APP_VERSION = "0.79.1";
 const LS = "wildpluk:";
 
 /* =======================================================================
@@ -12220,7 +12220,11 @@ document.getElementById("setWipe").onclick=async ()=>{
   drawMarkers(); renderSet(); toast("Alles gewist");
 };
 
-document.getElementById("brandBox").insertAdjacentHTML("afterbegin", '<span class="brandmark"></span>');
+/* Het boomlogo op de kaart is vervallen. De regel die het merkteken erin
+   plaatste zocht het element nog steeds op, kreeg niets terug en liet het
+   opstarten stilvallen vóórdat de kaart werd getekend: een groen scherm en
+   verder niets. Weggehaald in plaats van afgeschermd — een verwijzing naar
+   iets dat niet bestaat hoort er niet te staan. */
 ["list","kast","spec","leer","set"].forEach(k=>{
   const el = document.getElementById("kop-"+k);
   if(el) el.querySelector(".rij").insertAdjacentHTML("afterbegin", '<span class="zegelkop"></span>');

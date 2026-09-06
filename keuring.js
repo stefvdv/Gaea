@@ -484,6 +484,24 @@ try{
     /* Een knop die een functie aanroept die niet meer bestaat, is stil kapot:
        hij staat er, hij is gekoppeld, en er gebeurt niets. Precies dat gebeurde
        met de GBIF-knop toen de zoekfuncties bij een herschrijving wegvielen. */
+    /* Een verwijzing naar een element dat niet meer bestaat gooit een fout, en
+       als die tijdens het opstarten valt, blijft het scherm leeg. Precies dat
+       gebeurde toen het boomlogo van de kaart verdween. */
+    ["alle gezochte elementen bestaan", ()=>{
+      const bron = (typeof GAEA_BRON === "string" && GAEA_BRON) ||
+        (document.documentElement && document.documentElement.innerHTML) || "";
+      if(!bron) return "broncode niet beschikbaar in de keuring";
+      const gezocht = new Set();
+      const re = /getElementById\("([A-Za-z0-9_-]+)"\)/g;
+      let m;
+      while((m = re.exec(bron))) gezocht.add(m[1]);
+      const bestaat = new Set();
+      const re2 = /\sid="([A-Za-z0-9_-]+)"/g;
+      while((m = re2.exec(bron))) bestaat.add(m[1]);
+      const mis = [...gezocht].filter(id=> !bestaat.has(id));
+      return mis.length ? "GEZOCHT MAAR NIET AANWEZIG: " + mis.join(", ")
+        : gezocht.size + " elementen opgezocht, alle aanwezig";
+    }],
     ["knoppen roepen bestaande functies aan", ()=>{
       const nodig = ["gbifZoek","gbifZoekBlad","bewerkBlad","nieuweSoort","bewaarBewerking",
                      "soortFotoKijk","filterBlad","ontdekOpnieuw","scanBundel","scanKaartje",
