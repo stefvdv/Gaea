@@ -534,6 +534,30 @@ try{
        Dat hoort op verzoek te gebeuren, niet bij elke verschuiving van de kaart. */
     /* Een pin hoeft niet over een soort te gaan: een rustplek, een stille bocht
        of een uitzicht is ook het onthouden waard. */
+    /* Na het aantikken van een soort werd het zoekveld leeggemaakt; je zag dan
+       nergens meer welke soort je nu eigenlijk had gekozen. */
+    ["gekozen soort blijft zichtbaar", ()=>{
+      const bron = editPin.toString();
+      if(/q\.value\s*=\s*""\s*;\s*renderPick/.test(bron))
+        return "HET VELD WORDT GELEEGD na het kiezen";
+      if(!/q\.value\s*=\s*s\.nl/.test(bron))
+        return "de gekozen naam wordt niet in het veld gezet";
+      if(!/gekozenBij/.test(bron)) return "geen zichtbaar merkteken bij een gekozen soort";
+
+      /* Een bestaande vondst hoort zijn soort al in het veld te tonen. */
+      const p = leegPin(52.1, 5.1, 10);
+      p.spec = "daslook";
+      const bewaardPins = S.pins, bewaardConcept = S.concept;
+      S.pins = [p]; S.concept = null;
+      const bewaardSheet = showSheet;
+      showSheet = () => {};
+      try{ editPin(p.id, false); } finally { showSheet = bewaardSheet; }
+      const staat = (document.getElementById("edQ").value || "");
+      S.pins = bewaardPins; S.concept = bewaardConcept;
+      return staat === "Daslook"
+        ? "de gekozen soort blijft in het zoekveld staan, met een vinkje"
+        : "een bestaande vondst toont zijn soort niet: '" + staat + "'";
+    }],
     ["plekken markeren", ()=>{
       const p = leegPin(52.1, 5.1, 10);
       if(!("plek_srt" in p)) return "GEEN VELD voor het soort plek";
@@ -543,6 +567,9 @@ try{
       if(PLEKSOORTEN.length < 4) return "te weinig soorten plekken";
       if(!/plekboom/.test(markerIcon.toString()))
         return "een plek krijgt niet de levensboom als markering";
+      /* Formaat: eerder 38 bij 32, te klein om de tekening te herkennen. */
+      if(/iconSize:\[38,32\]/.test(markerIcon.toString()))
+        return "de boom staat te klein op de kaart";
 
       /* Verschijnt hij ook werkelijk? Dat ging in 0.73 mis. */
       const bewaardPins = S.pins, bewaardMap = S.map, bewaardMarkers = S.markers, bewaardL = globalThis.L;
