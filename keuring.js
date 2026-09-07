@@ -487,6 +487,32 @@ try{
     /* Een verwijzing naar een element dat niet meer bestaat gooit een fout, en
        als die tijdens het opstarten valt, blijft het scherm leeg. Precies dat
        gebeurde toen het boomlogo van de kaart verdween. */
+    /* De penningen zijn losse afbeeldingen in de stijl; als er per ongeluk een
+       verkeerde in belandt, valt dat pas op het toestel op. Deze controle kijkt
+       of elke penning bestaat, van formaat klopt en niet toevallig dezelfde
+       afbeelding is als een andere \u2014 dat laatste betekent kopieerfout. */
+    ["penningen kloppen", ()=>{
+      const bron = (typeof GAEA_BRON === "string" && GAEA_BRON) || "";
+      if(!bron) return "broncode niet beschikbaar";
+      const nodig = ["penning-loep","penning-trechter","penning-laad","penning-plus",
+                     "penning-blanco","boom-teken"];
+      const beeld = {};
+      for(const n of nodig){
+        const m = bron.match(new RegExp("--" + n + ": url\\(data:image/png;base64,([A-Za-z0-9+/=]+)\\)"));
+        if(!m) return "ONTBREEKT: " + n;
+        beeld[n] = m[1];
+        /* Een penning van onder de kilobyte is vrijwel zeker het verkeerde
+           bestand of een mislukte uitsnede. */
+        if(m[1].length < 2000) return n + " IS VERDACHT KLEIN: " + m[1].length + " tekens";
+      }
+      const zien = new Map();
+      for(const [n, d] of Object.entries(beeld)){
+        const vinger = d.slice(0, 200);
+        if(zien.has(vinger)) return "TWEE KEER DEZELFDE AFBEELDING: " + zien.get(vinger) + " en " + n;
+        zien.set(vinger, n);
+      }
+      return nodig.length + " penningen aanwezig en onderling verschillend";
+    }],
     ["alle gezochte elementen bestaan", ()=>{
       const bron = (typeof GAEA_BRON === "string" && GAEA_BRON) ||
         (document.documentElement && document.documentElement.innerHTML) || "";
